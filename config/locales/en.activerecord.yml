@@ -1,0 +1,40 @@
+en:
+  activerecord:
+    models:
+      bundle: 
+        one: Bundle
+        other: Bundles
+      deck:
+        one: Deck
+        other: Decks Database
+      furniture:
+        one: Furniture
+        other: Furnitures Database
+      item:
+        one: Item
+        other: Items Database
+      commission:
+        one: Ship
+        other: Ships (Commissions)
+      chosen_deck: 
+        one: Selected Deck
+        other: Decks' Choice
+      chosen_furniture: 
+        one: Selected Furniture
+        other: Furnitures' Choice
+      chosen_item: 
+        one: Selected Item
+        other: Items' Choice
+      chosen_room: 
+        one: Selected Room
+        other: Rooms' Choice
+      room:
+        one: Room
+        other: Rooms Database
+      user:
+        one: User
+        other: Users Database
+      workflow:
+        one: Workflow
+        other: Workflows
+        

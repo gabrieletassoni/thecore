@@ -1,0 +1,7 @@
+<% if user_signed_in? %>
+<li><%= link_to t(:contact), contact_path %></li>
+
+<li><%= link_to t(:manage), rails_admin_path %></li>
+
+<li><%= link_to t(:sign_out), destroy_user_session_path, data:{method: :delete} %></li>
+<% end %>
