@@ -35,7 +35,7 @@ class Ability
       if user.admin?
         can :manage, :all       # only allow admin users to access Rails Admin
         cannot :destroy, User do |u| u.id == user.id end # prevents killing himself
-        cannot [:create, :update, :destroy], PrintJob
+        cannot [ :create, :update, :destroy], PrintJob
       else # only normal users not normal users and admins
         if user.has_role? :workers
           # can :manage, Commission
