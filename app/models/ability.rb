@@ -1,6 +1,8 @@
 class Ability
   include CanCan::Ability
 
+  include TheCoreAbilities
+
   def initialize(user)
     # Define abilities for the passed in user here. For example:
     #
@@ -29,24 +31,18 @@ class Ability
     # See the wiki for details:
     # https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities
 
-    if user
-      can :access, :rails_admin   # grant access to rails_admin
-      can :dashboard              # allow access to dashboard
-      if user.admin?
-        can :manage, :all       # only allow admin users to access Rails Admin
-        cannot :destroy, User do |u| u.id == user.id end # prevents killing himself
-        cannot [ :create, :update, :destroy], PrintJob
-      else # only normal users not normal users and admins
-        if user.has_role? :workers
-          # can :manage, Commission
-          can :read, ChosenItem
-          can :create, Timetable
-          can :read, Timetable, user_id: user.id
-          can :update, Timetable do |t| (t.user_id == user.id && t.created_at >= (Date.today - 2.days)) end
-          cannot :destroy, Timetable
-        end
-      end
-    else # GUEST
+    # TODO: Spiegare meglio Taris
+    # Modo per poter caricare diversi file ability presenti in diversi engine
+    # bisogna creare nella cartella config/initializers dell'engine un file che
+    # faccia il module_eval di TheCore::Abilities, aggiungendo un metodo
+    # che accetta user come parametro e con dentro la definizione delle ability
+    # include TheCore::Abilities
+    TheCoreAbilities.instance_methods(false).each do |a|
+      # method(a).call(user)
+      # eval("#{a} #{user}")
+      Rails.logger.debug "LOADING ABILITIES FROM: #{a}"
+      send(a, user)
     end
+    # core_abilities user
   end
 end

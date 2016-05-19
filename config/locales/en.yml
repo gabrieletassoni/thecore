@@ -25,25 +25,3 @@ en:
   contact: "Contact"
   manage: "Manage"
   sign_out: "Sign Out"
-  roles:
-    one: "Role One"
-    two: "Role Two"
-    three: "Role Three"
-    administratives: "Administratives"
-    production_managers: "Production Managers"
-    site_manager: "Site Manager"
-    warehouse_worker: "Warehouse Worker"
-    drivers: "Drivers"
-    workers: "Workers"
-    thirds: "Thirds"
-  statuses:
-    internal_labour: External Labour
-    external_labour: Internal Labour
-    internal_paint: External Paint
-    external_paint: Internal Paint
-    upholstery: Upholstery
-    storage: Storage
-    construction_yard: Construction Yard
-  status:
-    finished: Finished
-    suspended: Suspended

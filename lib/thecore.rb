@@ -14,6 +14,7 @@ require 'bootstrap-sass'
 require 'font-awesome-sass'
 require 'friendly_id'
 require "thecore/engine"
+require 'rails_admin_toggleable'
 
 module Thecore
 end

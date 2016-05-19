@@ -55,5 +55,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'rails-i18n'
   # https://github.com/pgeraghty/rails_admin_charts
   # s.add_dependency 'rails_admin_charts'
+  s.add_dependency 'rails_admin_toggleable'
   # -----------------------------------------------------------------------------------------------
 end

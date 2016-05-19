@@ -1,107 +1,10 @@
 it:
   activerecord:
     models:
-      bundle: 
-        one: Sovracollo
-        other: Sovracolli
-      deck:
-        one: Ponte
-        other: Anagrafica Ponti
-      furniture:
-        one: Mobile
-        other: Anagrafica Mobili
-      furniture_item:
-        one: Particolare
-        other: Particolari
-      item:
-        one: Particolare
-        other: Anagrafica Particolari
-      commission:
-        one: Barca (Commessa)
-        other: Barche (Commesse)
-      chosen_deck: 
-        one: Ponte Inserito
-        other: Configurazione dei Ponti
-      chosen_furniture: 
-        one: Mobile Inserito
-        other: Configurazione dei Mobili
-      chosen_item: 
-        one: Particolare Inserito
-        other: Scelta dei Particolari
-      chosen_room: 
-        one: Stanza Inserita
-        other: Configurazione delle Stanze
-      room:
-        one: Stanza
-        other: Anagrafica Stanze
       user:
         one: Utente
         other: Anagrafica Utenti
-      workflow:
-        one: Movimento Lavorazione
-        other: Movimenti Lavorazione
-      timetable:
-        one: Ora Lavorata
-        other: Ore Lavorate
     attributes:
-      bundle:
-        title: Titolo
-        description: Descrizione
-        code: Codice
-        commission: Commessa
-        chosen_items: Particolari Scelti
-      item:
-        name: Nome
-        description: Descrizione
-        code: Codice
-      furniture:
-        name: Nome
-        description: Descrizione
-        code: Codice
-        items: Particolari
-        furniture_items: Particolari
-      furniture_item:
-        item: Particolare
-      room:
-        name: Nome
-        description: Descrizione
-        code: Codice
-      deck:
-        name: Nome
-        description: Descrizione
-        code: Codice
-      commission:
-        name: Nome
-        issued_on: Emesso il
-        description: Descrizione
-        code: Codice
-        decks: Ponti
-        chosen_decks: Ponti Selezionati
-        closed: Cantiere terminato
-      chosen_deck:
-        deck: Ponte
-        commission: Barca (Commessa)
-        code: Codice
-        rooms: Stanze
-        chosen_rooms: Stanze Selezionate
-      chosen_room:
-        commission: Commessa
-        chosen_deck: Ponte
-        furnitures: Mobili
-        code: Codice
-        room: Stanza
-        chosen_furnitures: Mobili Selezionati
-      chosen_furniture:
-        chosen_room: Stanza
-        furniture: Mobile
-        code: Codice
-        chosen_items: Parti Selezionate
-      workflow:
-        statuses: Stati
-        chosen_item: Particolare
-        user: Utente
-        description: Descrizione
-        third_party: Conto Terzi
       user:
         email: E-Mail
         username: Nome Utente
@@ -113,14 +16,3 @@ it:
         third_party: Ente Terzo?
         password: Password
         password_confirmation: Conferma Password
-      timetable:
-        user: Utente
-        commission: Barca (Commessa)
-        chosen_item: Particolare
-        job_type: Tipo
-        status: Stato
-        hours: H
-        minutes: M
-        notes: Note
-        created_at: Data
-        
