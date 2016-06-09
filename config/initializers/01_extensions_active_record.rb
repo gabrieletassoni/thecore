@@ -1,3 +1,1 @@
-ActiveRecord::Base.class_eval do
-
-end
+require "active_record_extension"
