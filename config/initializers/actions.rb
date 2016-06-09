@@ -6,7 +6,7 @@ module TheCoreActions
     export
     bulk_delete
     show
-    clone
+    # clone
     edit
     delete
     toggle

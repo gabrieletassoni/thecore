@@ -48,7 +48,8 @@ Gem::Specification.new do |s|
   s.add_dependency 'cancancan'
   s.add_dependency 'http_accept_language'
   # https://github.com/dalpo/rails_admin_clone
-  s.add_dependency 'rails_admin_clone'
+  #s.add_dependency 'rails_admin_clone'
+  # Rails Admin
   s.add_dependency 'rails_admin'
   s.add_dependency 'rails_admin-i18n'
   #s.add_dependency 'rails_admin_history_rollback'
@@ -56,5 +57,7 @@ Gem::Specification.new do |s|
   # https://github.com/pgeraghty/rails_admin_charts
   # s.add_dependency 'rails_admin_charts'
   s.add_dependency 'rails_admin_toggleable'
+  s.add_dependency 'amoeba' # DSL for cloning
+  # s.add_dependency 'rails_admin_amoeba_dup'
   # -----------------------------------------------------------------------------------------------
 end
