@@ -6,11 +6,11 @@ module ActiveRecordExtension
   # def foo
   #    "foo"
   # end
-  def taris_deep_clone_method
-    Rails.logger.debug "FEBWUFBEUWFJEWNKJNFJDKSBFKJREHJBFKJE: Deep Cloning"
-    copy = self.amoeba_dup
-    copy.save
-  end
+  # def taris_deep_clone_method
+  #   Rails.logger.debug "FEBWUFBEUWFJEWNKJNFJDKSBFKJREHJBFKJE: Deep Cloning"
+  #   copy = self.amoeba_dup
+  #   copy.save
+  # end
 
   # add your static(class) methods here
   module ClassMethods

@@ -3,6 +3,9 @@ require 'active_support/concern'
 module ThecoreConcern
   extend ActiveSupport::Concern
   included do
+    #layout 'thecore'
+    # Prevent CSRF attacks by raising an exception.
+    # For APIs, you may want to use :null_session instead.
     layout 'thecore'
     protect_from_forgery with: :exception
     rescue_from CanCan::AccessDenied do |exception|
@@ -14,10 +17,19 @@ module ThecoreConcern
     before_filter :reject_locked!, if: :devise_controller?
     helper_method :reject_locked!
     helper_method :require_admin!
+
+    # Redirects on successful sign in
+    def after_sign_in_path_for resource
+      Rails.logger.debug("SUCCESFULL SIGNIN, USER IS ADMIN? #{current_user.admin?}")
+      if current_user.admin?
+        rails_admin.dashboard_path.sub("#{ENV['RAILS_RELATIVE_URL_ROOT']}#{ENV['RAILS_RELATIVE_URL_ROOT']}", "#{ENV['RAILS_RELATIVE_URL_ROOT']}")
+      elsif current_user.has_role? :workers
+        rails_admin.new_path('timetable').sub("#{ENV['RAILS_RELATIVE_URL_ROOT']}#{ENV['RAILS_RELATIVE_URL_ROOT']}", "#{ENV['RAILS_RELATIVE_URL_ROOT']}")
+      else
+        inside_path
+      end
+    end
   end
-  #layout 'thecore'
-  # Prevent CSRF attacks by raising an exception.
-  # For APIs, you may want to use :null_session instead.
 
   # Devise permitted params
   def configure_permitted_parameters
@@ -35,17 +47,6 @@ module ThecoreConcern
       :current_password
       )
     }
-  end
-
-  # Redirects on successful sign in
-  def after_sign_in_path_for resource
-    if current_user.admin?
-      rails_admin.dashboard_path.sub("#{ENV['RAILS_RELATIVE_URL_ROOT']}#{ENV['RAILS_RELATIVE_URL_ROOT']}", "#{ENV['RAILS_RELATIVE_URL_ROOT']}")
-    elsif current_user.has_role? :workers
-      rails_admin.new_path('timetable').sub("#{ENV['RAILS_RELATIVE_URL_ROOT']}#{ENV['RAILS_RELATIVE_URL_ROOT']}", "#{ENV['RAILS_RELATIVE_URL_ROOT']}")
-    else
-      inside_path
-    end
   end
 
   # Auto-sign out locked users
@@ -69,3 +70,6 @@ module ThecoreConcern
     end
   end
 end
+
+# include the extension
+ActionController::Base.send(:include, ThecoreConcern)
