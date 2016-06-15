@@ -57,7 +57,6 @@ Gem::Specification.new do |s|
   # https://github.com/pgeraghty/rails_admin_charts
   # s.add_dependency 'rails_admin_charts'
   s.add_dependency 'rails_admin_toggleable'
-  s.add_dependency 'amoeba' # DSL for cloning
   # s.add_dependency 'rails_admin_amoeba_dup'
   # -----------------------------------------------------------------------------------------------
 end

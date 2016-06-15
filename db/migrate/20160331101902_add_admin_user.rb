@@ -1,5 +1,6 @@
 class AddAdminUser < ActiveRecord::Migration
-  class User < ActiveRecord::Base
+  Dir['../../app/models/*.rb'].each do |f|
+    require f
   end
 
   def change
