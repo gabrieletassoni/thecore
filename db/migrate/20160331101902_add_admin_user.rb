@@ -161,10 +161,10 @@ class AddAdminUser < ActiveRecord::Migration
     puts "Temporary admin account, please change password when testing is finished."
     User.reset_column_information
     u=User.find_or_initialize_by(username: "admin")
-    u.email: "admin@example.com",
-    u.password: "1234",
-    u.password_confirmation: "1234",
-    u.admin: true
+    u.email = "admin@example.com",
+    u.password = "1234",
+    u.password_confirmation = "1234",
+    u.admin = true
     # u.skip_confirmation!
     u.save!
   end
