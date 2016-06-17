@@ -2,19 +2,6 @@ require 'rails_admin'
 
 require "thecore_actions"
 
-# TODO: Documentare bene per sapere quali file mettere nel caso di custom actions
-# Carica tutti i file ruby che finiscono con _actions.rb, qui ci sono le configurazioni automatiche
-# dei plugin di rails admin
-# require 'logger'
-# Dir["./../../../../**/config/initializers/*_actions.rb"].each do |f|
-#   Rails.logger.info "LOADING FILES: #{f}"
-#   begin
-#     require f
-#   rescue
-#     Rails.logger.info "Cannot Load, maybe not added to gemfile."
-#   end
-# end
-
 include TheCoreActions
 
 RailsAdmin.config do |config|
@@ -45,22 +32,8 @@ RailsAdmin.config do |config|
     export
     bulk_delete
     show
-    # clone
     edit
     delete
     toggle
-    # TheCoreActions.instance_methods(false).each do |a|
-    #   # method(a).call(user)
-    #   # eval("#{a} #{user}")
-    #   Rails.logger.info "LOADING ACTION FROM: #{a}"
-    #   begin
-    #     send(a)
-    #   rescue
-    #     Rails.logger.info "Cannot Load, maybe not added to gemfile."
-    #   end
-    # end
-    ## With an audit adapter, you can add:
-    # history_index
-    # history_show
   end
 end
