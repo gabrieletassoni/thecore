@@ -1,0 +1,19 @@
+#!/bin/sh
+
+if [ "$#" -ne 1 ]; then
+  echo "Usage: $0 MESSAGE_FOR_COMMIT" >&2
+  exit 1
+fi
+
+for i in *; do 
+  if [ -d "$i" ]; then 
+    echo "------------------------------------------------------------------------------------------------------------"
+    echo "+ Directory $i"; 
+    cd "$i"; 
+    git status; 
+    git add . -A
+    git commit -a -m "$1"
+    git push
+    cd ..; 
+  fi; 
+done

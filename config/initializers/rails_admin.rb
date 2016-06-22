@@ -37,3 +37,5 @@ RailsAdmin.config do |config|
     toggle
   end
 end
+
+# require "thecore_rails_admin_main_controller_concern"

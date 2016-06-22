@@ -16,6 +16,7 @@ require 'font-awesome-sass'
 require 'friendly_id'
 require "thecore/engine"
 require 'rails_admin_toggleable'
+require 'ransack'
 
 module Thecore
 end

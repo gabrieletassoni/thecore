@@ -58,5 +58,6 @@ Gem::Specification.new do |s|
   # s.add_dependency 'rails_admin_charts'
   s.add_dependency 'rails_admin_toggleable'
   # s.add_dependency 'rails_admin_amoeba_dup'
+  s.add_dependency 'ransack'
   # -----------------------------------------------------------------------------------------------
 end
