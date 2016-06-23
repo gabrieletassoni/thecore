@@ -21,13 +21,13 @@ module ThecoreConcern
     # Redirects on successful sign in
     def after_sign_in_path_for resource
       Rails.logger.debug("SUCCESFULL SIGNIN, USER IS ADMIN? #{current_user.admin?}")
-      if current_user.admin?
-        rails_admin.dashboard_path.sub("#{ENV['RAILS_RELATIVE_URL_ROOT']}#{ENV['RAILS_RELATIVE_URL_ROOT']}", "#{ENV['RAILS_RELATIVE_URL_ROOT']}")
-      elsif current_user.has_role? :workers
-        rails_admin.new_path('timetable').sub("#{ENV['RAILS_RELATIVE_URL_ROOT']}#{ENV['RAILS_RELATIVE_URL_ROOT']}", "#{ENV['RAILS_RELATIVE_URL_ROOT']}")
-      else
-        inside_path
-      end
+      #if current_user.admin?
+      rails_admin.dashboard_path.sub("#{ENV['RAILS_RELATIVE_URL_ROOT']}#{ENV['RAILS_RELATIVE_URL_ROOT']}", "#{ENV['RAILS_RELATIVE_URL_ROOT']}")
+      #elsif current_user.has_role? :workers
+      #  rails_admin.new_path('timetable').sub("#{ENV['RAILS_RELATIVE_URL_ROOT']}#{ENV['RAILS_RELATIVE_URL_ROOT']}", "#{ENV['RAILS_RELATIVE_URL_ROOT']}")
+      #else
+      #  inside_path
+      #end
     end
   end
 
