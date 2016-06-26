@@ -42,7 +42,7 @@ Gem::Specification.new do |s|
   # -----------------------------------------------------------------------------------------------
   # RAILS ADMIN
   # Devise: https://github.com/plataformatec/devise
-  s.add_dependency 'devise'
+  s.add_dependency 'devise', '4.0.1'
   s.add_dependency 'devise-i18n'
   s.add_dependency 'devise-i18n-views'
   s.add_dependency 'cancancan'
