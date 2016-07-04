@@ -28,21 +28,21 @@ Gem::Specification.new do |s|
   # -----------------------------------------------------------------------------------------------
   # PAGINATION + GUI
   # Kaminari: https://github.com/amatsuda/kaminari
-  s.add_dependency 'kaminari', '0.16.3'
+  s.add_dependency 'kaminari' #, '0.16.3'
   # Friendly_id: https://github.com/norman/friendly_id
-  s.add_dependency 'friendly_id', '5.1.0'
+  s.add_dependency 'friendly_id' #, '5.1.0'
   # Font-awesome: https://github.com/FortAwesome/font-awesome-sass
   # Ricordarsi di usare il giusto asset precompile:
   # RAILS_ENV=production bundle exec rake assets:precompile RAILS_RELATIVE_URL_ROOT=/development/hiworkflows
   # Ovviamene se non sono in un suburi, allora non serve la parte relativa a RAILS_RELATIVE_URL_ROOT
-  s.add_dependency 'font-awesome-sass', '~> 4.5.0'
+  s.add_dependency 'font-awesome-sass' #, '~> 4.5.0'
   # Bootstrap 3: https://github.com/twbs/bootstrap-sass
-  s.add_dependency 'bootstrap-sass', '3.3.5.1'
+  s.add_dependency 'bootstrap-sass' # , '3.3.5.1'
   # -----------------------------------------------------------------------------------------------
   # -----------------------------------------------------------------------------------------------
   # RAILS ADMIN
   # Devise: https://github.com/plataformatec/devise
-  s.add_dependency 'devise', '4.0.1'
+  s.add_dependency 'devise' #, '4.0.1'
   s.add_dependency 'devise-i18n'
   s.add_dependency 'devise-i18n-views'
   s.add_dependency 'cancancan'
@@ -50,7 +50,7 @@ Gem::Specification.new do |s|
   # https://github.com/dalpo/rails_admin_clone
   #s.add_dependency 'rails_admin_clone'
   # Rails Admin
-  s.add_dependency 'rails_admin'
+  s.add_dependency 'rails_admin', '~> 0.8.1'
   s.add_dependency 'rails_admin-i18n'
   #s.add_dependency 'rails_admin_history_rollback'
   s.add_dependency 'rails-i18n'
