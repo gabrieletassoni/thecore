@@ -6,6 +6,19 @@ it:
   sign_out: "Uscita"
   advanced: Avanzate
   main_records: Anagrafiche
+  tiered_times:
+    dd:
+      one: "%{dd} Giorno"
+      other: "%{dd} Giorni"
+    hh:
+      one: "%{hh} Ora"
+      other: "%{hh} Ore"
+    mm:
+      one: "%{mm} Minuto"
+      other: "%{mm} Minuti"
+    ss:
+      one: "%{ss} Secondo"
+      other: "%{ss} Secondi"
   admin:
     actions:
       charts:
