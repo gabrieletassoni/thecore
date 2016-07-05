@@ -8,17 +8,21 @@ it:
   main_records: Anagrafiche
   tiered_times:
     dd:
-      one: "%{dd} Giorno"
-      other: "%{dd} Giorni"
+      zero: "0 Giorni"
+      one: "%{count} Giorno"
+      other: "%{count} Giorni"
     hh:
-      one: "%{hh} Ora"
-      other: "%{hh} Ore"
+      zero: "0 Ore"
+      one: "%{count} Ora"
+      other: "%{count} Ore"
     mm:
-      one: "%{mm} Minuto"
-      other: "%{mm} Minuti"
+      zero: "0 Minuti"
+      one: "%{count} Minuto"
+      other: "%{count} Minuti"
     ss:
-      one: "%{ss} Secondo"
-      other: "%{ss} Secondi"
+      zero: "0 Secondi"
+      one: "%{count} Secondo"
+      other: "%{count} Secondi"
   admin:
     actions:
       charts:
