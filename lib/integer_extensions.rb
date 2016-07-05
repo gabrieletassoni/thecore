@@ -1,6 +1,6 @@
 require 'active_support/concern'
 
-module BulkDeleteConcern
+module FixnumConcern
   extend ActiveSupport::Concern
   included do
     def to_tiered_times skip_seconds
@@ -24,4 +24,4 @@ module BulkDeleteConcern
 end
 
 # include the extension
-RailsAdmin::Config::Actions::BulkDelete.send(:include, BulkDeleteConcern)
+Fixnum.send(:include, FixnumConcern)
