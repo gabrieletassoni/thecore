@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["test/**/*"]
 
-
+  s.add_dependency "rails", "~> 4.2.6"
   # RICORDARSI DI FARE INCLUDE (in lib/thecore.rb) DI QUELLE GEMME CHE NE HANNO BISOGNO
   s.add_dependency 'libv8'
   # -----------------------------------------------------------------------------------------------
@@ -59,5 +59,11 @@ Gem::Specification.new do |s|
   s.add_dependency 'rails_admin_toggleable'
   # s.add_dependency 'rails_admin_amoeba_dup'
   s.add_dependency 'ransack'
+  # OSX:
+  # brew install imagemagick
+  # brew install gs
+  # Oppure (Debian):
+  # sudo apt-get install imagemagick -y
+  s.add_dependency "paperclip", "~> 5.0.0"
   # -----------------------------------------------------------------------------------------------
 end

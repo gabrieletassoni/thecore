@@ -17,6 +17,8 @@ require 'friendly_id'
 require "thecore/engine"
 require 'rails_admin_toggleable'
 require 'ransack'
+require 'paperclip'
+require 'globalize'
 
 module Thecore
 end

@@ -1,5 +1,4 @@
 module ActiveRecordExtension
-
   extend ActiveSupport::Concern
 
   # add your instance methods here
