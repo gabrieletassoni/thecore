@@ -81,7 +81,7 @@ class User < ActiveRecord::Base
 
   rails_admin do
     navigation_label I18n.t(:advanced)
-    weight 10
+    weight 1000
     # Field present Everywhere
     field :email do
       required true
