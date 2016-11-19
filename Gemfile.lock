@@ -8,7 +8,6 @@ PATH
       devise-i18n
       devise-i18n-views
       font-awesome-sass
-      friendly_id
       http_accept_language
       kaminari
       libv8
@@ -98,13 +97,11 @@ GEM
       railties (>= 3.2, < 5.1)
     font-awesome-sass (4.7.0)
       sass (>= 3.2)
-    friendly_id (5.1.0)
-      activerecord (>= 4.0.0)
     globalid (0.3.7)
       activesupport (>= 4.1.0)
     haml (4.0.7)
       tilt
-    http_accept_language (2.0.5)
+    http_accept_language (2.1.0)
     i18n (0.7.0)
     jquery-rails (4.2.1)
       rails-dom-testing (>= 1, < 3)
