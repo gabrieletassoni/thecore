@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["test/**/*"]
 
-  s.add_dependency "rails", "~> 4.2.6"
+  s.add_dependency "rails", "~> 5.0"
   # RICORDARSI DI FARE INCLUDE (in lib/thecore.rb) DI QUELLE GEMME CHE NE HANNO BISOGNO
   s.add_dependency 'libv8'
   # -----------------------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ Gem::Specification.new do |s|
   # Kaminari: https://github.com/amatsuda/kaminari
   s.add_dependency 'kaminari' #, '0.16.3'
   # Friendly_id: https://github.com/norman/friendly_id
-  s.add_dependency 'friendly_id' #, '5.1.0'
+  # s.add_dependency 'friendly_id' #, '5.1.0'
   # Font-awesome: https://github.com/FortAwesome/font-awesome-sass
   # Ricordarsi di usare il giusto asset precompile:
   # RAILS_ENV=production bundle exec rake assets:precompile RAILS_RELATIVE_URL_ROOT=/development/hiworkflows
@@ -50,7 +50,8 @@ Gem::Specification.new do |s|
   # https://github.com/dalpo/rails_admin_clone
   #s.add_dependency 'rails_admin_clone'
   # Rails Admin
-  s.add_dependency 'rails_admin', '~> 0.8.1'
+  s.add_dependency 'rails_admin_rollincode', '~> 1.1'
+  s.add_dependency 'rails_admin', '~> 1.0'
   s.add_dependency 'rails_admin-i18n'
   #s.add_dependency 'rails_admin_history_rollback'
   s.add_dependency 'rails-i18n'

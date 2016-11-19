@@ -1,0 +1,237 @@
+#!/bin/bash --login -e
+
+if (( "$#" != 2 ))
+then
+    echo "Usage Info:"
+    echo "$0 gemname existing_rvm_gemset"
+    echo "For example:"
+    echo "$0 mygemname 2.2.4@thecore"
+    exit 1
+fi
+
+# Load RVM into a shell session *as a function*
+# if [[ -s "$HOME/.rvm/scripts/rvm" ]] ; then
+#   # First try to load from a user install
+#   source "$HOME/.rvm/scripts/rvm"
+# elif [[ -s "/usr/local/rvm/scripts/rvm" ]] ; then
+#   # Then try to load from a root install
+#   source "/usr/local/rvm/scripts/rvm"
+# else
+#   printf "ERROR: An RVM installation was not found.\n"
+#   exit 2
+# fi
+
+echo "RVM setting the environment"
+rvm use "$2"
+
+echo "Generating Engine"
+rails plugin new "$1" --full
+
+echo "Initializing Git"
+git init "$1"
+
+echo "Adding A Gitignore"
+cat > "$1/.gitignore" <<EOT
+.bundle/
+log/*.log
+pkg/
+test/dummy/db/*.sqlite3
+test/dummy/db/*.sqlite3-journal
+test/dummy/log/*.log
+test/dummy/tmp/
+test/dummy/.sass-cache
+
+# Created by https://www.gitignore.io/api/linux,osx,windows,linux,rails
+
+### Linux ###
+*~
+
+# temporary files which can be created if a process still has a handle open of a deleted file
+.fuse_hidden*
+
+# KDE directory preferences
+.directory
+
+# Linux trash folder which might appear on any partition or disk
+.Trash-*
+
+
+### OSX ###
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+
+### Windows ###
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
+
+
+### Linux ###
+*~
+
+# temporary files which can be created if a process still has a handle open of a deleted file
+.fuse_hidden*
+
+# KDE directory preferences
+.directory
+
+# Linux trash folder which might appear on any partition or disk
+.Trash-*
+
+
+### Rails ###
+*.rbc
+capybara-*.html
+.rspec
+/log
+/tmp
+/db/*.sqlite3
+/db/*.sqlite3-journal
+/public/system
+/coverage/
+/spec/tmp
+**.orig
+rerun.txt
+pickle-email-*.html
+
+# TODO Comment out these rules if you are OK with secrets being uploaded to the repo
+config/initializers/secret_token.rb
+config/secrets.yml
+
+## Environment normalization:
+/.bundle
+/vendor/bundle
+
+# these should all be checked in to normalize the environment:
+# Gemfile.lock, .ruby-version, .ruby-gemset
+
+# unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
+.rvmrc
+
+# if using bower-rails ignore default bower_components path bower.json files
+/vendor/assets/bower_components
+*.bowerrc
+bower.json
+
+# Ignore pow environment settings
+.powenv
+
+# Ignore Byebug command history file.
+.byebug_history
+EOT
+
+# echo "Entering the $1 Folder"
+# cd "$1"
+#
+# echo "Committing Gitignore"
+# git add .gitignore
+# git commit -a -m "Added gitignore"
+echo "Changing the engine.rb in lib to allow db/migrations loading of this engine from main app"
+ex -s +%s/end// -cwq "$1/lib/$1/engine.rb"
+cat >> "$1/lib/$1/engine.rb" <<EOT
+    # appending migrations to the main app's ones
+    initializer "$1.add_to_migrations" do |app|
+      unless app.root.to_s == root.to_s
+        # APPEND TO MAIN APP MIGRATIONS FROM THIS GEM
+        config.paths["db/migrate"].expanded.each do |expanded_path|
+          app.config.paths["db/migrate"] << expanded_path
+        end
+      end
+    end
+  end
+end
+EOT
+
+echo "Adding reference to thecore project into Gemfile for development purpouse."
+cat >> "$1/Gemfile" <<EOT
+gem 'thecore', path: '../../thecore_project/thecore'
+EOT
+
+echo "Removing Dependencies from $1.gemspec"
+ex -s +%s/s.add_dependency.*// -cwq "$1/$1.gemspec"
+ex -s +%s/s.add_development_dependency.*// -cwq "$1/$1.gemspec"
+ex -s +%s/^end// -cwq "$1/$1.gemspec"
+cat >> "$1/$1.gemspec" <<EOT
+  s.add_dependency "thecore"
+end
+EOT
+# awk '!/s.add_dependency/' "$1/$1.gemspec" > "$1/$1.gemspec"
+# awk '!/s.add_development_dependency/' "$1/$1.gemspec" > "$1/$1.gemspec"
+# sed -i '/^ *s.add_dependency/d' "$1/$1.gemspec"
+# sed -i '/^ *s.add_development_dependency/d' "$1/$1.gemspec"
+
+# echo "Adding the dependency to thecore gem"
+# ex -s +%s/end/s.add_dependency "thecore";end/ -cwq "$1/$1.gemspec"
+# awk '/^end/{print "s.add_dependency \"thecore\""}1' "$1/$1.gemspec" > "$1/$1.gemspec"
+# awk -v 'insert=s.add_dependency "thecore"' -v before=end '
+#   $1 == before && ! inserted {
+#     print insert
+#     inserted++
+#   }
+#   {print}
+# ' "$1/$1.gemspec" > "$1/$1.gemspec"
+# sed -i '/^end/i \
+# s.add_dependency "thecore" \
+# ' "$1/$1.gemspec"
+
+#
+# awk '//{print;print "Cygwin";next}1' file
+#
+# sed -i '/^ *class Engine < ::Rails::Engine/a \
+# initializer "'"$1"'.add_to_migrations" do |app| \
+#   unless app.root.to_s == root.to_s \
+#     # APPEND TO MAIN APP MIGRATIONS FROM THIS GEM \
+#     config.paths["db/migrate"].expanded.each do |expanded_path| \
+#       app.config.paths["db/migrate"] << expanded_path \
+#     end \
+#   end \
+# end \
+# ' "$1/lib/$1/engine.rb"t
+
+# echo "Committing these new files."
+# git add . -A
+# git commit -a -m "Initial Git"
+
+echo "Remember to edit the title and description in $1.gemspec and to commit .gitignore and other files"
+#cd ..
+
+exit 0

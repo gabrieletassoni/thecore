@@ -1,18 +1,6 @@
 class AddAdminUser < ActiveRecord::Migration
   # Model actual as of today
   class User < ActiveRecord::Base
-    extend FriendlyId
-    # Use friendly_id on Users
-    friendly_id :friendify, use: :slugged
-
-    # necessary to override friendly_id reserved words
-    def friendify
-      if username.downcase == "admin"
-        "user-#{username}"
-      else
-        "#{username}"
-      end
-    end
     # Include default devise modules. Others available are:
     # :confirmable, :lockable, :timeoutable and :omniauthable
     devise :database_authenticatable, :recoverable, :rememberable, :trackable, :validatable #, :confirmable
@@ -163,8 +151,8 @@ class AddAdminUser < ActiveRecord::Migration
     u=User.find_or_initialize_by(username: "admin")
     puts "Utente Admin: #{u.inspect}"
     u.email = "admin@example.com"
-    u.password = "1234"
-    u.password_confirmation = "1234"
+    u.password = "123456"
+    u.password_confirmation = "123456"
     u.admin = true
     # u.skip_confirmation!
     u.save!

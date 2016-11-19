@@ -13,7 +13,7 @@ require 'cancancan'
 require 'http_accept_language'
 require 'bootstrap-sass'
 require 'font-awesome-sass'
-require 'friendly_id'
+# require 'friendly_id'
 require "thecore/engine"
 require 'rails_admin_toggleable'
 require 'ransack'

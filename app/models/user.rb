@@ -1,16 +1,4 @@
-class User < ActiveRecord::Base
-  extend FriendlyId
-  # Use friendly_id on Users
-  friendly_id :friendify, use: :slugged
-
-  # necessary to override friendly_id reserved words
-  def friendify
-    if username.downcase == "admin"
-      "user-#{username}"
-    else
-      "#{username}"
-    end
-  end
+class User < ApplicationRecord
   # # include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :recoverable, :rememberable, :trackable, :validatable #, :confirmable
