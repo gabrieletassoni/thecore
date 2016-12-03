@@ -2,6 +2,7 @@ require 'active_support/concern'
 
 module ThecoreConcern
   extend ActiveSupport::Concern
+
   included do
     # Prevent CSRF attacks by raising an exception.
     # For APIs, you may want to use :null_session instead.
@@ -14,8 +15,12 @@ module ThecoreConcern
     Rails.logger.debug "Selected Locale: #{I18n.locale}"
     before_filter :configure_permitted_parameters, if: :devise_controller?
     before_filter :reject_locked!, if: :devise_controller?
+
     helper_method :reject_locked!
     helper_method :require_admin!
+    helper_method :line_break
+    helper_method :title
+    helper_method :bootstrap_class_for
 
     # Redirects on successful sign in
     def after_sign_in_path_for resource
@@ -30,6 +35,28 @@ module ThecoreConcern
     end
   end
 
+  def title value = "Thecore"
+    @title = value
+  end
+
+  def bootstrap_class_for flash_type
+    case flash_type
+    when 'success'
+      'alert-success'
+    when 'error'
+      'alert-danger'
+    when 'alert'
+      'alert-warning'
+    when 'notice'
+      'alert-info'
+    else
+      flash_type.to_s
+    end
+  end
+
+  def line_break s
+    s.gsub("\n", "<br/>")
+  end
   # Devise permitted params
   def configure_permitted_parameters
     devise_parameter_sanitizer.permit(:sign_in) { |u| u.permit(

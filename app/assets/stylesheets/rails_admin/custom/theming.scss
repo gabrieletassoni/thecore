@@ -1,0 +1,145 @@
+
+@import 'font-awesome';
+
+$RAprimary: #1c2c41;
+$RAgreen: #37BC9B;
+$RAblue: #3BAFDA;
+$RAred: #E9573F;
+$RAyellow: #F6BB42;
+
+
+body {
+  background: rgb(59, 78, 89);
+}
+
+.page-header.dashboard {
+  border-color: $RAprimary;
+}
+
+.breadcrumb {
+  background: $RAblue;
+  .false a, .false:before {
+    color: darken($RAblue, 30%) !important;
+  }
+  .active, .active:before {
+    color: #FFF;
+  }
+}
+
+.table-striped {
+  border-top-color: $RAblue;
+  .links ul li {
+    padding-right: 0;
+    a {
+      border-radius: 50%;
+    }
+  }
+}
+
+.content {
+  margin: 20px 0 15px 0;
+  padding: 8px;
+  &.dashboard {
+    background: rgb(59, 78, 89);
+  }
+}
+
+a.delete {
+  color: #FFF;
+}
+
+.box {
+  padding: 15px;
+  margin-bottom: 30px;
+  border: 1px solid $RAprimary;
+  position: relative;
+  min-height: 170px;
+  transition: all 0.3s ease;
+  color: rgba(255,255,255,0.7);
+  overflow: hidden;
+  &:hover, &:focus {
+    border-color: #FFF;
+    .icon-bg {
+      transform: scale(1.5) rotate(20deg);
+    }
+  }
+  p {
+    min-height: 30px;
+    font-size: 15px;
+    font-weight: 600;
+    a.btn {
+      border-radius: 3px;
+      color: rgba(255,255,255,0.7) !important;
+      display: inline-block;
+      margin-bottom: 0;
+      font-weight: normal;
+      text-align: center;
+      vertical-align: middle;
+      cursor: pointer;
+      background-color: rgba(0, 0, 0, 0.19);
+      border: 1px solid transparent;
+      white-space: nowrap;
+      padding: 6px 12px;
+      font-size: 14px;
+      line-height: 1.42857143;
+      border-radius: 4px;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+  }
+  strong {
+    font-size: 36px;
+    font-weight: 600;
+  }
+  .icon-bg {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    font-size: 100px;
+    color: #000;
+    opacity: 0.08;
+    filter: alpha(opacity=8);
+    transition: all 1s ease;
+  }
+  &.bg-info {
+    background-color: $RAblue;
+  }
+  &.bg-success {
+    background-color: $RAgreen;
+  }
+  &.bg-warning {
+    background-color: $RAyellow;
+  }
+  &.bg-danger {
+    background-color: $RAred;
+  }
+}
+
+/* User sign in and sign forms. */
+.border-form-div {
+  max-width: 300px;
+  padding: 19px 29px 29px;
+  margin: 0 auto 20px;
+  background-color: #fff;
+  border: 1px solid #e5e5e5;
+  -webkit-border-radius: 5px;
+     -moz-border-radius: 5px;
+          border-radius: 5px;
+  -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+     -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+          box-shadow: 0 1px 2px rgba(0,0,0,.05);
+}
+.border-form-div .form-signin-heading,
+.border-form-div .checkbox {
+  margin-bottom: 10px;
+}
+.border-form-div input[type="text"],
+.border-form-div input[type="email"],
+.border-form-div input[type="password"] {
+  font-size: 16px;
+  height: auto;
+  margin-bottom: 15px;
+  padding: 7px 9px;
+}
