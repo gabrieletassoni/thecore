@@ -7,7 +7,6 @@ $RAblue: #3BAFDA;
 $RAred: #E9573F;
 $RAyellow: #F6BB42;
 
-
 body {
   background: rgb(59, 78, 89);
 }
@@ -39,8 +38,12 @@ body {
 .content {
   margin: 20px 0 15px 0;
   padding: 8px;
+  background: rgb(59, 78, 89);
   &.dashboard {
     background: rgb(59, 78, 89);
+  }
+  .page-header {
+    display: none;
   }
 }
 

@@ -1,0 +1,5 @@
+it:
+  contact_mailer:
+    message:
+      domain: "Dominio:  %{domain}"
+      from: "Mittente: %{name} - %{email}"

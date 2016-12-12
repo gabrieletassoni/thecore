@@ -12,9 +12,7 @@ $(document).on('ready pjax:success', function(e) {
         });
     }
     // home dashboard dark theme
-    if((new RegExp('admin/$').test(e.currentTarget.URL)
-        || new RegExp('admin$').test(e.currentTarget.URL))
-        && !new RegExp('admin/admin').test(e.currentTarget.URL)){
+    if((new RegExp('app/$').test(e.currentTarget.URL) || new RegExp('app$').test(e.currentTarget.URL)) && !new RegExp('app/app').test(e.currentTarget.URL)){
         $('.page-header, .content').addClass('dashboard');
     }
     else {
@@ -23,9 +21,6 @@ $(document).on('ready pjax:success', function(e) {
 });
 
 $(function () {
-    var width = $('.nav-stacked').width();
-    $('.navbar-header').width(width);
-
     var array_menu = [];
     var lvl_1 = null;
     var count = 0;

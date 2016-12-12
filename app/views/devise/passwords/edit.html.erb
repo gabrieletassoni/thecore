@@ -4,7 +4,7 @@
   <%= f.hidden_field :reset_password_token %>
 
   <div class="field">
-    <%= f.label :password, "New password" %><br />
+    <%= f.label :password, t("devise.passwords.edit.new_password") %><br />
     <% if @minimum_password_length %>
       <em>(<%= @minimum_password_length %> characters minimum)</em><br />
     <% end %>
@@ -17,7 +17,7 @@
   </div>
 
   <div class="actions">
-    <%= f.submit "Change my password", :class => "btn btn-warning" %>
+    <%= f.submit t("devise.passwords.edit.change_my_password"), :class => "btn btn-warning" %>
 
     <%= render "devise/shared/links" %>
   </div>

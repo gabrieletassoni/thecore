@@ -1,5 +1,5 @@
-<p>New message received at <%= ENV["DOMAIN"] %>:</p>
+<p><%=t "contact_mailer.message.domain", domain: ENV["DOMAIN"] %>:</p>
 <p>--------------</p>
-<p>From: <%= @name %> - <%= @email %></p>
+<p><%=t "contact_mailer.message.from", name: @name, email: @email %></p>
 <p>--------------</p>
 <%= sanitize(line_break(@message), tags: %w(br)) %>

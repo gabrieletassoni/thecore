@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.add_dependency "rails", "~> 5.0"
   # RICORDARSI DI FARE INCLUDE (in lib/thecore.rb) DI QUELLE GEMME CHE NE HANNO BISOGNO
   s.add_dependency 'libv8'
+  s.add_dependency 'thor', '0.19.1'
   # -----------------------------------------------------------------------------------------------
   # PostgreSQL
   s.add_dependency 'pg'

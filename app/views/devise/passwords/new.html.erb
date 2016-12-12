@@ -1,5 +1,5 @@
 <div class="col-md-4 col-md-offset-4">
-<h2>Forgot your password?</h2>
+<h2><%=t("devise.shared.links.forgot_your_password")%></h2>
 
 <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
   <%= devise_error_messages! %>
@@ -10,7 +10,7 @@
   </div>
 
   <div class="actions">
-    <%= f.submit "Send me reset password instructions", :class => "btn btn-warning" %>
+    <%= f.submit t("devise.confirmations.new.resend_confirmation_instructions"), :class => "btn btn-warning" %>
 
     <%= render "devise/shared/links" %>
   </div>

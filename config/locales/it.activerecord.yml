@@ -16,3 +16,5 @@ it:
         third_party: Ente Terzo?
         password: Password
         password_confirmation: Conferma Password
+    descriptions:
+      user: In questa sezione dell'applicazione potete cercare nella lista degli utenti in diversi modi usando i filtri o ordinare la lista secondo diversi campi.

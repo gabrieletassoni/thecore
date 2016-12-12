@@ -14,13 +14,13 @@
   <div class="checkbox">
     <label>
         <%= f.check_box :remember_me %>
-        <%=t :remember_me %>
+        <%=t "activerecord.attributes.user.remember_me" %>
     </label>
   </div>
   <% end -%>
 
   <div class="actions">
-    <%= f.submit "Log in", :class => "btn btn-warning" %>
+    <%= f.submit t("devise.sessions.new.sign_in"), :class => "btn btn-warning" %>
 
     <%= render "devise/shared/links" %>
   </div>

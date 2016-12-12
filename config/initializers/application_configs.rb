@@ -22,6 +22,6 @@ Rails.application.config.i18n.default_locale = :en
 # Rails.application.middleware.use ::ActionDispatch::Static, "#{root}/vendor"
 
 # Rails Admin Theme
-ENV['RAILS_ADMIN_THEME'] = 'rollincode'
+ENV['RAILS_ADMIN_THEME'] ||= 'rollincode'
 
 Rails.application.config.assets.precompile += %w( main_app_logo.png ie.js )

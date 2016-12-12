@@ -1,0 +1,34 @@
+it:
+  admin:
+    misc:
+      scopes: Filtri Veloci
+    scopes:
+      all: Tutti
+      order_by_name: Ordine Alfabetico
+      order_by_insert_date: Ordina per Data
+      starts_with_a: Inizia per A
+      starts_with_b: Inizia per B
+      starts_with_c: Inizia per C
+      starts_with_d: Inizia per D
+      starts_with_e: Inizia per E
+      starts_with_f: Inizia per F
+      starts_with_g: Inizia per G
+      starts_with_h: Inizia per H
+      starts_with_i: Inizia per I
+      starts_with_j: Inizia per J
+      starts_with_k: Inizia per K
+      starts_with_l: Inizia per L
+      starts_with_m: Inizia per M
+      starts_with_n: Inizia per N
+      starts_with_o: Inizia per O
+      starts_with_p: Inizia per P
+      starts_with_q: Inizia per Q
+      starts_with_r: Inizia per R
+      starts_with_s: Inizia per S
+      starts_with_t: Inizia per T
+      starts_with_u: Inizia per U
+      starts_with_v: Inizia per V
+      starts_with_w: Inizia per W
+      starts_with_x: Inizia per X
+      starts_with_y: Inizia per Y
+      starts_with_z: Inizia per Z

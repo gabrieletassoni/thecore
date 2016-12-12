@@ -70,6 +70,7 @@ class User < ApplicationRecord
   rails_admin do
     navigation_label I18n.t(:advanced)
     navigation_icon 'fa fa-user-circle-o'
+    desc I18n.t("activerecord.descriptions.user")
 
     weight 1000
     # Field present Everywhere
