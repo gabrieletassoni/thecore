@@ -85,3 +85,10 @@ end
 ```
 
 No other things are needed in rails_admin configuration, it's all automagically recognized.
+
+# EXTEND RAILS_ADMIN SECTION
+
+IMPORTANT: To extend rails admin section in model, directly, instead of using concerns, I can
+extend the included method. Be sure to use a different module name, otherwis it will be overwritten
+See thecore_settings_rails_admin_model_extensions.rb initializer for a reference (gem: thecore_settings)
+on how to extend rails_admin section of a model previously defined (say it's defined in another gem)

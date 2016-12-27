@@ -4,7 +4,7 @@ it:
   contact: "Aiutaci a Migliorare"
   manage: "Gestione"
   sign_out: "Uscita"
-  advanced: Avanzate
+  advanced: Impostazioni
   main_records: Anagrafiche
   tiered_times:
     dd:
@@ -24,6 +24,8 @@ it:
       one: "%{count} Secondo"
       other: "%{count} Secondi"
   admin:
+    settings:
+      label: "Impostazioni"
     actions:
       charts:
         menu: Analisi

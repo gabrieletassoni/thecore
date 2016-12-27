@@ -68,7 +68,7 @@ class User < ApplicationRecord
   end
 
   rails_admin do
-    navigation_label I18n.t(:advanced)
+    navigation_label I18n.t("admin.settings.label")
     navigation_icon 'fa fa-user-circle-o'
     desc I18n.t("activerecord.descriptions.user")
 

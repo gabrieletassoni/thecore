@@ -1,0 +1,9 @@
+Description:
+    This generator must be run inside gems that have thecore among dependencies.
+    This way the gem will be transformed into an extension of the thecore system.
+
+Example:
+    rails generate thecoreize_rails_plugin
+
+    This will create:
+        Something similar to what's described into README.md
