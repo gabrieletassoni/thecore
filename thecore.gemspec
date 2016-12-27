@@ -17,10 +17,11 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["test/**/*"]
 
-  s.add_dependency "rails", "~> 5.0"
+  s.add_dependency "rails", '~> 5.0.0', '>= 5.0.0.1'
   # RICORDARSI DI FARE INCLUDE (in lib/thecore.rb) DI QUELLE GEMME CHE NE HANNO BISOGNO
   s.add_dependency 'libv8'
-  s.add_dependency 'thor', '0.19.1'
+  # TODO: remove when thor won't generate warnings anymore (problem appeared on 0.19.4)
+  # s.add_dependency 'thor', '0.19.1'
   # -----------------------------------------------------------------------------------------------
   # PostgreSQL
   s.add_dependency 'pg'
@@ -60,7 +61,6 @@ Gem::Specification.new do |s|
   # s.add_dependency 'rails_admin_charts'
   s.add_dependency 'rails_admin_toggleable'
   # s.add_dependency 'rails_admin_amoeba_dup'
-  s.add_dependency 'ransack'
   # OSX:
   # brew install imagemagick
   # brew install gs

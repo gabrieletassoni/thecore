@@ -6,8 +6,6 @@ In vendor there is a shell script (bash) to setup all of this automatically.
 
 This is all based on the creation of several engines (full) that could be used as bricks to build an application from the ground, having some functionalities already tested and reusable.
 
-By now thecore is only compatible with rails 4, still no support for rails 5.
-
 ```shell
 # rails _4.2.7.1_ plugin new gemname --full
 rails plugin new gemname --full

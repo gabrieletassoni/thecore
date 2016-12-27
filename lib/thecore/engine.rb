@@ -1,6 +1,5 @@
 module Thecore
   class Engine < ::Rails::Engine
-    # appending migrations to the main app's ones
     initializer "thecore.configure_rails_initialization" do |app|
       # Engine configures Rails app here
       app.config.api_only = false
@@ -13,6 +12,7 @@ module Thecore
       app.config.i18n.default_locale = :it
     end
 
+    # appending migrations to the main app's ones
     initializer "thecore.add_to_migrations" do |app|
       unless app.root.to_s == root.to_s
         # APPEND TO MAIN APP MIGRATIONS FROM THIS GEM
