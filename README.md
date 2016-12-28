@@ -1,6 +1,41 @@
-# SHELL EXECUTABLE
+# FAST AND EASY CREATION OF PLUGINS FOR THECORE
 
-In vendor there is a shell script (bash) to setup all of this automatically.
+Just use the template system provided by rails, it must point to the template file created by me that can reside even on the web
+
+```shell
+rails plugin new gemname --full -m '../thecore_project/thecore/vendor/templates/new_thecore_plugin.rb'
+```
+
+Then add all the models you need and run the generator:
+
+```shell
+rails g thecorize_models gitusername
+```
+
+Replacing gitusername with the username you'd like to use in git.
+
+If you add other models, you can rerun the generator as many times you need.
+
+# FAST AND EASY CREATION OF A NEW RAILS APP COMPATIBLE WITH THECORE
+
+Just use the template system provided by rails, it must point to the template file created by me that can reside even on the web
+
+```shell
+rails new appname --database --database=postgresql -m '../thecore_project/thecore/vendor/templates/new_thecore_app.rb'
+```
+
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+# LONGER STORY (HOW I GOT TO THOSE TWO SIMPLE COMMANDS ABOVE)
+
+If you'd like to mess manually with your plugins and apps, here is what I do into the template files
 
 # CONFIGURE FULL ENGINES THAT ARE BASED ON THE CORE
 

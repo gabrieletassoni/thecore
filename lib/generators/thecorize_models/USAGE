@@ -1,0 +1,9 @@
+Description:
+    Generator used to change all the models and make them thecore compatible
+
+Example:
+    rails generate thecorize_models
+
+    This will create:
+        It will change models and adds rails_admin declaration (a general one)
+        It will add all the necessary tidbits to associations (adds to belongs_to, tries to infer has_many's)
