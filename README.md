@@ -3,16 +3,18 @@
 Just use the template system provided by rails, it must point to the template file created by me that can reside even on the web
 
 ```shell
-rails plugin new gemname --full -m '../thecore_project/thecore/vendor/templates/new_thecore_plugin.rb'
+rails plugin new gemname -T --full -m '../thecore_project/thecore/vendor/templates/new_thecore_plugin.rb'
 ```
 
 Then add all the models you need and run the generator:
 
 ```shell
-rails g thecorize_models gitusername
+rails g thecorize_plugin $(basename $(pwd)) [-g gitserver]
 ```
 
-Replacing gitusername with the username you'd like to use in git.
+The -g switch is completely optional.
+
+Replacing gitserver with the full URL to git server.
 
 If you add other models, you can rerun the generator as many times you need.
 

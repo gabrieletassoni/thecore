@@ -2,7 +2,7 @@ Description:
     Generator used to change all the models and make them thecore compatible
 
 Example:
-    rails generate thecorize_models
+    rails generate thecorize_plugin pluginname
 
     This will create:
         It will change models and adds rails_admin declaration (a general one)
