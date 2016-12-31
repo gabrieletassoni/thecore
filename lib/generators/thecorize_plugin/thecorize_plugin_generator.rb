@@ -8,18 +8,16 @@ class ThecorizePluginGenerator < Rails::Generators::NamedBase
   def init_constants
     @plugin_path = @destination_stack.first.match(Regexp.new("^.*#{@name}"))[0]
     @parent_path = File.expand_path("..", @plugin_path)
-    inside @plugin_path do
-      @plugin_parent_name = @parent_path.split(File::SEPARATOR).last
-      @plugin_initializers_dir = File.join(@plugin_path, "config", "initializers")
-      @plugin_models_dir = File.join(@plugin_path, "app", "models")
-      @plugin_lib_file = File.join(@plugin_path, "lib", @name, "engine.rb")
-      Dir.chdir @plugin_models_dir do
-        # Getting all the models that are activerecords:
-        @model_files = Dir.glob("*.rb").map do |model|
-          file = File.join(@plugin_models_dir,model)
-          model if is_applicationrecord?(file)
-        end.compact
-      end
+    @plugin_parent_name = @parent_path.split(File::SEPARATOR).last
+    @plugin_initializers_dir = File.join(@plugin_path, "config", "initializers")
+    @plugin_models_dir = File.join(@plugin_path, "app", "models")
+    @plugin_lib_file = File.join(@plugin_path, "lib", @name, "engine.rb")
+    Dir.chdir @plugin_models_dir do
+      # Getting all the models that are activerecords:
+      @model_files = Dir.glob("*.rb").map do |model|
+        file = File.join(@plugin_models_dir,model)
+        model if is_applicationrecord?(file)
+      end.compact
     end
   end
 
@@ -74,220 +72,59 @@ TheCoreAbilities.send(:include, #{@name.classify}AbilitiesConcern)"
     end unless File.exists?(abilities_file_fullpath)
   end
 
-  desc "Add Gitignore"
   def manage_git
-    inside @plugin_path do
-      if !File.exists?(File.join(@plugin_path, '.git'))
-        remove_file File.join(@plugin_path, '.gitignore') if File.exists?(File.join(@plugin_path, '.gitignore'))
-        create_file File.join(@plugin_path, '.gitignore'),".bundle/
-log/*.log
-pkg/
-test/dummy/db/*.sqlite3
-test/dummy/db/*.sqlite3-journal
-test/dummy/log/*.log
-test/dummy/tmp/
-test/dummy/.sass-cache
-
-# Created by https://www.gitignore.io/api/linux,osx,windows,linux,rails
-
-### Linux ###
-*~
-
-# temporary files which can be created if a process still has a handle open of a deleted file
-.fuse_hidden*
-
-# KDE directory preferences
-.directory
-
-# Linux trash folder which might appear on any partition or disk
-.Trash-*
-
-
-### OSX ###
-.DS_Store
-.AppleDouble
-.LSOverride
-
-# Icon must end with two return
-Icon
-
-
-# Thumbnails
-._*
-
-# Files that might appear in the root of a volume
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-.VolumeIcon.icns
-
-# Directories potentially created on remote AFP share
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
-
-
-### Windows ###
-# Windows image file caches
-Thumbs.db
-ehthumbs.db
-
-# Folder config file
-Desktop.ini
-
-# Recycle Bin used on file shares
-$RECYCLE.BIN/
-
-# Windows Installer files
-*.cab
-*.msi
-*.msm
-*.msp
-
-# Windows shortcuts
-*.lnk
-
-
-### Linux ###
-*~
-
-# temporary files which can be created if a process still has a handle open of a deleted file
-.fuse_hidden*
-
-# KDE directory preferences
-.directory
-
-# Linux trash folder which might appear on any partition or disk
-.Trash-*
-
-
-### Rails ###
-*.rbc
-capybara-*.html
-.rspec
-/log
-/tmp
-/db/*.sqlite3
-/db/*.sqlite3-journal
-/public/system
-/coverage/
-/spec/tmp
-**.orig
-rerun.txt
-pickle-email-*.html
-
-# TODO Comment out these rules if you are OK with secrets being uploaded to the repo
-config/initializers/secret_token.rb
-config/secrets.yml
-
-## Environment normalization:
-/.bundle
-/vendor/bundle
-
-# these should all be checked in to normalize the environment:
-# Gemfile.lock, .ruby-version, .ruby-gemset
-
-# unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
-.rvmrc
-
-# if using bower-rails ignore default bower_components path bower.json files
-/vendor/assets/bower_components
-*.bowerrc
-bower.json
-
-# Ignore pow environment settings
-.powenv
-
-# Ignore Byebug command history file.
-.byebug_history
-
-test/tmp
-test/version_tmp
-test/dummy/data
-test/dummy/db/*.sqlite3
-test/dummy/log/*
-test/dummy/node_modules
-test/dummy/public/assets
-test/dummy/public/system
-test/dummy/db/schema.rb
-tmp
-test/dummy/app/assets/javascripts/*.js
-test/dummy/app/assets/javascripts/**/*.js
-test/dummy/app/assets/javascripts/**/*.js.coffee
-test/dummy/app/assets/javascripts/**/*.map
-"
-        git :init
-        git add: ".gitignore"
-        git commit: "-m 'Added Gitignore'"
-        git add: "."
-        git commit: "-m 'First commit'"
-      end
-      unless options[:git_server].blank?
-        origin = URI.join(options[:git_server], @plugin_parent_name, "#{@name.git}")
-        git remote: "set-url origin #{origin}"
-      end
-    end
+    rails_command "g thecorize_app #{@name}"
   end
 
   desc "Replace ActiveRecord::Base with ApplicationRecord"
   def replace_active_record
     # For each model in this gem
-    inside @plugin_models_dir do
-      Dir.glob("*.rb").each { |entry|
-        # It must be a class and don't have rails_admin declaration
-        file = File.join(@plugin_models_dir,entry)
-        # say "Checking file #{file}", :red
-        if is_activerecord?(file) && !has_rails_admin_declaration?(file)
-          # say "Replacing ActiveRecord::Base into #{entry}", :green
-          # Add rails admin declaration
-          gsub_file file, "ActiveRecord::Base", "ApplicationRecord"
-        end
-      }
+    @model_files.each do |entry|
+      # It must be a class and don't have rails_admin declaration
+      file = File.join(@plugin_models_dir, entry)
+      # say "Checking file #{file}", :red
+      if is_activerecord?(file) && !has_rails_admin_declaration?(file)
+        # say "Replacing ActiveRecord::Base into #{entry}", :green
+        # Add rails admin declaration
+        gsub_file file, "ActiveRecord::Base", "ApplicationRecord"
+      end
     end
   end
 
   desc "Add rails_admin declaration only in files which are ActiveRecords and don't already have that declaration"
   def add_rails_admin_reference
     # For each model in this gem
-    inside @plugin_models_dir do
-      Dir.glob("*.rb").each { |entry|
-        # It must be a class and don't have rails_admin declaration
-        file = File.join(@plugin_models_dir,entry)
-        # say "Checking file #{file}", :red
-        if is_applicationrecord?(file) && !has_rails_admin_declaration?(file)
-          # say "Adding rails_admin to #{entry}", :green
-          # Add rails admin declaration
-          inject_into_file file, before: /^end/ do
+    @model_files.each do |entry|
+      # It must be a class and don't have rails_admin declaration
+      file = File.join(@plugin_models_dir,entry)
+      # say "Checking file #{file}", :red
+      if is_applicationrecord?(file) && !has_rails_admin_declaration?(file)
+        # say "Adding rails_admin to #{entry}", :green
+        # Add rails admin declaration
+        inject_into_file file, before: /^end/ do
 "
-  rails_admin do
-    navigation_label I18n.t('admin.settings.label')
-    navigation_icon 'fa fa-file'
-  end
+rails_admin do
+  navigation_label I18n.t('admin.settings.label')
+  navigation_icon 'fa fa-file'
+end
 "
-          end
         end
-      }
+      end
     end
   end
 
   desc "Completes Belongs To Associations"
   def complete_belongs_to
     # For each model in this gem
-    inside @plugin_models_dir do
-      Dir.glob("*.rb").each do |entry|
-        # It must be a class and don't have rails_admin declaration
-        file = File.join(@plugin_models_dir,entry)
-        # say "Checking file #{file}", :red
-        if is_applicationrecord?(file)
-          # say "Adding inverse_of to all belongs_to in #{entry}", :green
-          # belongs_to that don't have inverse_of
-          gsub_file file, /^(?!.*inverse_of.*)^[ \t]*belongs_to.*$/ do |match|
-            match << ", inverse_of: :#{entry.split(".").first.pluralize}"
-          end
+    @model_files.each do |entry|
+      # It must be a class and don't have rails_admin declaration
+      file = File.join(@plugin_models_dir,entry)
+      # say "Checking file #{file}", :red
+      if is_applicationrecord?(file)
+        # say "Adding inverse_of to all belongs_to in #{entry}", :green
+        # belongs_to that don't have inverse_of
+        gsub_file file, /^(?!.*inverse_of.*)^[ \t]*belongs_to.*$/ do |match|
+          match << ", inverse_of: :#{entry.split(".").first.pluralize}"
         end
       end
     end
@@ -296,34 +133,32 @@ test/dummy/app/assets/javascripts/**/*.map
   desc "Add Has Many Associations"
   def add_has_many
     # For each model in this gem
-    inside @plugin_models_dir do
-      Dir.glob("*.rb").each do |entry|
-        file = File.join(@plugin_models_dir,entry)
-        # It must be an activerecord model class
-        if is_applicationrecord?(file)
-          # say "Looking for belongs_to in #{entry} and adding the relevant has_manies", :green
+    @model_files.each do |entry|
+      file = File.join(@plugin_models_dir,entry)
+      # It must be an activerecord model class
+      if is_applicationrecord?(file)
+        # say "Looking for belongs_to in #{entry} and adding the relevant has_manies", :green
 
-          # Polymorphic must be managed manually
-          File.readlines(file).grep(/^(?!.*polymorphic.*)^[ \t]*belongs_to :(.*),.+/).each do |a|
-            target_association = a[/:(.*?),/,1]
-            # look if the file identified by association .rb exists
-            associated_file = File.join(@plugin_models_dir,"#{target_association}.rb")
-            starting_model = entry.split(".").first.pluralize
-            # say "Found belongs_to association: #{target_association} for the model: #{starting_model}", :green
-            # say "- Looking for model file: #{associated_file}", :green
-            if File.exists?(associated_file)
-              # say "The file in which to add has_many, exists and the has_many does not! #{associated_file}", :green
-              # if true, check that the association is non existent and add the association to that file
-              inject_into_file associated_file, after: " < ApplicationRecord\n" do
+        # Polymorphic must be managed manually
+        File.readlines(file).grep(/^(?!.*polymorphic.*)^[ \t]*belongs_to :(.*),.+/).each do |a|
+          target_association = a[/:(.*?),/,1]
+          # look if the file identified by association .rb exists
+          associated_file = File.join(@plugin_models_dir,"#{target_association}.rb")
+          starting_model = entry.split(".").first.pluralize
+          # say "Found belongs_to association: #{target_association} for the model: #{starting_model}", :green
+          # say "- Looking for model file: #{associated_file}", :green
+          if File.exists?(associated_file)
+            # say "The file in which to add has_many, exists and the has_many does not! #{associated_file}", :green
+            # if true, check that the association is non existent and add the association to that file
+            inject_into_file associated_file, after: " < ApplicationRecord\n" do
 "  has_many :#{starting_model}, inverse_of: :#{target_association}, dependent: :destroy
 "
-              end unless has_has_many_association?(associated_file, starting_model)
-            else
-              # otherwise (the file does not exist) check if the initializer for concerns exists,
-              # For each model in this gem
-              inside @plugin_path do
-                initializer_name = "associations_#{target_association}_concern.rb"
-                initializer initializer_name do
+            end unless has_has_many_association?(associated_file, starting_model)
+          else
+            # otherwise (the file does not exist) check if the initializer for concerns exists,
+            # For each model in this gem
+            initializer_name = "associations_#{target_association}_concern.rb"
+            initializer initializer_name do
 "require 'active_support/concern'
 
 module #{target_association.classify}AssociationsConcern
@@ -335,15 +170,13 @@ end
 # include the extension
 #{target_association.classify}.send(:include, #{target_association.classify}AssociationsConcern)
 "
-                end unless File.exists?(File.join(@plugin_initializers_dir, initializer_name))
+            end unless File.exists?(File.join(@plugin_initializers_dir, initializer_name))
 
-                # then add to it the has_many declaration
-                # TODO: only if it doesn't already exists
-                inject_into_file File.join(@plugin_initializers_dir, initializer_name), after: "included do\n" do
+            # then add to it the has_many declaration
+            # TODO: only if it doesn't already exists
+            inject_into_file File.join(@plugin_initializers_dir, initializer_name), after: "included do\n" do
 "    has_many :#{starting_model}, inverse_of: :#{target_association}, dependent: :destroy
 "
-                end
-              end
             end
           end
         end
@@ -353,6 +186,32 @@ end
 
   desc "Add Has Many Through Associations"
   def add_has_many_through
+    # I'ts just an approximation, but for now it could work
+    @model_files.each do |model|
+      association_model = model.split(".").first
+      file = File.join(@plugin_models_dir,model)
+      # It must be an activerecord model class
+      model_with_belongs_to = File.readlines(file).grep(/^[ \t]*belongs_to :.*$/)
+      if model_with_belongs_to.size == 2
+        if yes?("Is #{model} an association model for a has_many through relation?", :red)
+          # getting both the belongs_to models, find their model files, and add the through to each other
+          left_side = model_with_belongs_to.first[/:(.*?),/,1]
+          right_side = model_with_belongs_to.last[/:(.*?),/,1]
+          # This side of the through
+          inject_into_file File.join(@plugin_models_dir, "#{left_side}.rb"), after: " < ApplicationRecord\n" do
+            #has_many :rooms, through: :chosen_rooms, inverse_of: :chosen_decks
+"  has_many :#{right_side.pluralize}, through: :#{association_model.pluralize}, inverse_of: :#{left_side.pluralize}
+"
+          end unless is_has_many_through? file, right_side.pluralize, association_model.pluralize
+          # Other side of the through
+          inject_into_file File.join(@plugin_models_dir, "#{right_side}.rb"), after: " < ApplicationRecord\n" do
+            #has_many :rooms, through: :chosen_rooms, inverse_of: :chosen_decks
+"  has_many :#{left_side.pluralize}, through: :#{association_model.pluralize}, inverse_of: :#{right_side.pluralize}
+"
+          end unless is_has_many_through? file, left_side.pluralize, association_model.pluralize
+        end
+      end
+    end
   end
 
   desc "Detect polymorphic Associations"
@@ -364,12 +223,10 @@ end
       # It must be an activerecord model class
       # belongs_to :rowable, polymorphic: true, inverse_of: :rows
       polymorphics = File.readlines(file).grep(/^[ \t]*belongs_to :.*polymorphic.*/)
-      say "Find all Polymorphic Associations, these must be handled manually:" unless polymorphics.empty?
       polymorphics.each do |polymorphic_belongs_to|
         polymorphic_target_association = polymorphic_belongs_to[/:(.*?),/,1]
-        say " - Polymorphic belongs_to (#{polymorphic_target_association}) found in #{model}", :red
         # Just keeping the models that are not this model, and
-        answers = ask_question_multiple_choice @model_files.reject {|m| m == model && !has_polymorphic_has_many?(File.join(@plugin_models_dir,m), polymorphic_target_association)}, " - - Where do you want to add the polymorphic has_many?"
+        answers = ask_question_multiple_choice @model_files.reject {|m| m == model || has_polymorphic_has_many?(File.join(@plugin_models_dir,m), polymorphic_target_association)}, "Where do you want to add the polymorphic has_many called #{polymorphic_target_association} found in #{model}?"
         answers.each do |answer|
           # Add the polymorphic has_name declaration
           inject_into_file File.join(@plugin_models_dir, answer), after: " < ApplicationRecord\n" do
@@ -391,11 +248,15 @@ end
     while (answer ||= "") != "cancel"
       remaining_models = (models-return_array)
       break if remaining_models.empty?
-      answer = ask question, limited_to: remaining_models.push("cancel").uniq
+      answer = ask question, :red, limited_to: remaining_models.push("cancel").uniq
       break if answer == "cancel"
       return_array.push answer
     end
     return return_array
+  end
+
+  def is_has_many_through? file, assoc, through
+    (File.readlines(file).grep(/^[ \t]*has_many[ \t]+:#{assoc},[ \t]+through:[ \t]+:#{through}.*/).size > 0) rescue false
   end
 
   def has_polymorphic_has_many? file, polymorphic_name
