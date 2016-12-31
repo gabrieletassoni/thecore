@@ -1,6 +1,3 @@
-#remove the index.html
-remove_file 'public/index.html'
-
 # Selecting the gems needed
 current_gem_user = run "bundle config www.taris.it", capture: true
 # Set for the current user (/Users/iltasu/.bundle/config): "bah"
@@ -11,10 +8,12 @@ if credentials.blank? || yes? "Credentials already set, do you want to change th
   password = ask "Please provide your password: ", :red
   credentials = "#{username}:#{password}"
   run "bundle config www.taris.it '#{credentials}'"
+  run "gem sources --add 'https://#{credentials}@www.taris.it/gems-repo/'"
 end
 
-add_source "https://www.taris.it/gems-repo" do
-  output = run "gem search ^thecore$ -ra --source https://www.taris.it/gems-repo", capture: true
+gems_repo = "https://www.taris.it/gems-repo/"
+add_source gems_repo do
+  output = run "gem search ^thecore$ -ra --source #{gems_repo}", capture: true
   versions = output.match(/^[\s\t]*thecore \((.*)\)/)[1].split(", ") rescue []
   unless versions.empty?
     answer = ask "Which version of thecore do you want to use?", :red, limited_to: versions.push("cancel")
@@ -22,7 +21,7 @@ add_source "https://www.taris.it/gems-repo" do
   end
   gem 'thecore', "~> #{answer.split(".").first}" # , path: '../../thecore_project/thecore'
 
-  all_gems_in_source = run "gem search .* -r --source https://www.taris.it/gems-repo", capture: true
+  all_gems_in_source = run "gem search -r --source #{gems_repo}", capture: true
   # Getting all the gem names in the previous serach
   gems = all_gems_in_source.scan(/^[\s\t]*(.*) \(.*\)/).flatten
   gems.each do |a_gem|

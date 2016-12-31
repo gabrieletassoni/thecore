@@ -7,11 +7,12 @@ if credentials.blank? || yes? "Credentials already set, do you want to change th
   password = ask "Please provide your password: ", :red
   credentials = "#{username}:#{password}"
   run "bundle config www.taris.it '#{credentials}'"
+  run "gem sources --add 'https://#{credentials}@www.taris.it/gems-repo/'"
 end
 
 # Versioning on major versions, there is where breakage con occour
 # minor versions and patches must be made backward compatible
-output = run "gem search ^thecore$ -ra --source https://www.taris.it/gems-repo", capture: true
+output = run "gem search ^thecore$ -ra --source https://www.taris.it/gems-repo/", capture: true
 gem_dependency = "s.add_dependency 'thecore'"
 versions = output.match(/^[\s\t]*thecore \((.*)\)/)[1].split(", ") rescue []
 unless versions.empty?
