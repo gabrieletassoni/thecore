@@ -67,5 +67,8 @@ Gem::Specification.new do |s|
   # Oppure (Debian):
   # sudo apt-get install imagemagick -y
   s.add_dependency "paperclip", "~> 5.0"
+  # Useful using the tempaltes generators for app:
+  s.add_dependency "net_dav", "~> 0.0"
+  s.add_dependency "curb", "~> 0"
   # -----------------------------------------------------------------------------------------------
 end
