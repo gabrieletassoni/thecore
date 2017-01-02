@@ -3,7 +3,7 @@
 Just use the template system provided by rails, it must point to the template file created by me that can reside even on the web
 
 ```shell
-rails plugin new gemname -T --full -m '../thecore_project/thecore/vendor/templates/new_thecore_plugin.rb'
+rails plugin new gemname -T --full -m 'https://www.taris.it/thecore_bins/new_thecore_plugin.rb'
 ```
 
 Then add all the models you need and run the generator:
@@ -23,7 +23,7 @@ If you add other models, you can rerun the generator as many times you need.
 Just use the template system provided by rails, it must point to the template file created by me that can reside even on the web
 
 ```shell
-rails new appname --database --database=postgresql -m '../thecore_project/thecore/vendor/templates/new_thecore_app.rb'
+rails new appname --database --database=postgresql -m 'https://www.taris.it/thecore_bins/new_thecore_app.rb'
 ```
 
 ---------------------------------------------------------------------------------------------------------
