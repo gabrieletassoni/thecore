@@ -24,6 +24,8 @@ it:
       one: "%{count} Secondo"
       other: "%{count} Secondi"
   admin:
+    tools:
+      label: "Strumenti"
     settings:
       label: "Impostazioni"
     actions:

@@ -10,12 +10,13 @@ module Thecore
       # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
       # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
       app.config.i18n.default_locale = :it
-      
+
       # Assets
+      app.config.assets.precompile += %w( thecore/ie.js )
+      app.config.assets.precompile += %w( thecore/thecore.js )
       app.config.assets.precompile += %w( thecore/favicon.ico )
       app.config.assets.precompile += %w( thecore/apple-touch-icon.png )
       app.config.assets.precompile += %w( thecore/apple-touch-icon-precomposed.png )
-      app.config.assets.precompile += %w( thecore/thecore.js )
       app.config.assets.precompile += %w( thecore/thecore.css )
       app.config.assets.precompile += %w( thecore/app_logo.png )
       app.config.assets.precompile += %w( thecore/main_app_logo.png )
