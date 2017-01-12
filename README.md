@@ -26,6 +26,13 @@ Just use the template system provided by rails, it must point to the template fi
 rails new appname --database --database=postgresql -m 'https://www.taris.it/thecore_bins/new_thecore_app.rb'
 ```
 
+# APPLY NEW GITIGNORE ADDS
+
+```shell
+git ls-files -ci --exclude-standard -z | xargs -0r git rm --cached
+git push
+```
+
 ---------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------
