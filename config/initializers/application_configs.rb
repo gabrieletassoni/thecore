@@ -4,7 +4,7 @@
 
 # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
 # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
-Rails.application.config.i18n.default_locale = :en
+# Rails.application.config.i18n.default_locale = :en
 #I18n.enforce_available_locales = false
 
 # Test framework
@@ -24,4 +24,3 @@ Rails.application.config.i18n.default_locale = :en
 # Rails Admin Theme
 ENV['RAILS_ADMIN_THEME'] ||= 'rollincode'
 
-Rails.application.config.assets.precompile += %w( main_app_logo.png ie.js )

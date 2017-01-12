@@ -1,15 +1,27 @@
-# encoding: utf-8
+# class ImageUploader < CarrierWave::Uploader::Base
+#   include CarrierWave::MiniMagick
+#
+#   storage :file
+#
+#   def store_dir
+#     "uploads/#{model.class.to_s.underscore}/#{mounted_as}/#{model.id}"
+#   end
+#
+#   #version :example, if: :is_example? do
+#     #process :resize_to_fill => [200, 150]
+#   #end
+#
+#   def extension_white_list
+#     %w(jpg jpeg gif png)
+#   end
+#
+#   def content_type_whitelist
+#     /image\//
+#   end
+#
+#   protected
+#   #def is_example?(picture)
+#   #  model.kind_of?(ExampleModel)
+#   #end
+# end
 
-class AttachmentUploader < CarrierWave::Uploader::Base
-  storage :file
-
-  # Override the directory where uploaded files will be stored.
-  # This is a sensible default for uploaders that are meant to be mounted:
-  def store_dir
-    "uploads/#{model.class.to_s.underscore}/#{mounted_as}/#{model.id}"
-  end
-
-  def extension_white_list
-    %w(pdf doc htm html docx)
-  end
-end
