@@ -54,6 +54,7 @@ Gem::Specification.new do |s|
   # Rails Admin
   s.add_dependency 'rails_admin_rollincode'#, '~> 1.1'
   s.add_dependency 'rails_admin'#, '~> 1.0'
+  s.add_dependency 'rails_admin_selectize'#, github: 'glyph-fr/rails_admin_selectize'
   s.add_dependency 'rails_admin-i18n'#, "~> 1.11"
   #s.add_dependency 'rails_admin_history_rollback'
   s.add_dependency 'rails-i18n'#, "~> 5.0"

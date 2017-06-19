@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  # mount RailsAdminSelectize::Engine => '/rails-admin-selectize', as: 'rails_admin_selectize'
   mount RailsAdmin::Engine => '/app', as: 'rails_admin'
 
   get "home", to: "pages#home", as: "home"
