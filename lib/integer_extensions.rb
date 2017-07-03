@@ -23,4 +23,4 @@ module FixnumConcern
 end
 
 # include the extension
-Fixnum.send(:include, FixnumConcern)
+Integer.send(:include, FixnumConcern)
