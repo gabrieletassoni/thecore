@@ -13,8 +13,8 @@ module ThecoreConcern
     end
     include HttpAcceptLanguage::AutoLocale
     Rails.logger.debug "Selected Locale: #{I18n.locale}"
-    before_filter :configure_permitted_parameters, if: :devise_controller?
-    before_filter :reject_locked!, if: :devise_controller?
+    before_action :configure_permitted_parameters, if: :devise_controller?
+    before_action :reject_locked!, if: :devise_controller?
 
     helper_method :reject_locked!
     helper_method :require_admin!
