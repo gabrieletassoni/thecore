@@ -1,6 +1,6 @@
 module Thecore
   class Engine < ::Rails::Engine
-    initializer "thecore.configure_rails_initialization", :group => :all do |app|
+    initializer "thecore.configure_rails_initialization", group: :all do |app|
       # Engine configures Rails app here
       app.config.api_only = false
       # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
