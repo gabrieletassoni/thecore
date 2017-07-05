@@ -1,4 +1,4 @@
-class AddAdminUser < ActiveRecord::Migration
+class AddAdminUser < ActiveRecord::Migration[4.2]
   # Model actual as of today
   class User < ActiveRecord::Base
     # Include default devise modules. Others available are:

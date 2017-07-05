@@ -1,4 +1,4 @@
-class RemoveFriendlyIdSlugs < ActiveRecord::Migration
+class RemoveFriendlyIdSlugs < ActiveRecord::Migration[4.2]
   def change
     drop_table :friendly_id_slugs
   end
