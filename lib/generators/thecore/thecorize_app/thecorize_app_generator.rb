@@ -7,5 +7,9 @@ module Thecore
       #remove the index.html
       remove_file 'public/index.html'
     end
+
+    # TODO: Must add
+    # *= require thecore to application.css before */
+    # //= require thecore to application.js before //= require_tree .
   end
 end
