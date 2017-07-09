@@ -30,18 +30,27 @@ module Thecore
       if is_engine?(@plugin_lib_file) && !has_add_to_migrations_declaration?(@plugin_lib_file)
         say "Adding migration reflection into engine.rb of", :green
         inject_into_file @plugin_lib_file, after: "class Engine < ::Rails::Engine\n" do
-  "
-      initializer '#{@name}.add_to_migrations' do |app|
-        unless app.root.to_s == root.to_s
-          # APPEND TO MAIN APP MIGRATIONS FROM THIS GEM
-          config.paths['db/migrate'].expanded.each do |expanded_path|
-            app.config.paths['db/migrate'] << expanded_path
-          end
+"
+    initializer '#{@name}.add_to_migrations' do |app|
+      unless app.root.to_s == root.to_s
+        # APPEND TO MAIN APP MIGRATIONS FROM THIS GEM
+        config.paths['db/migrate'].expanded.each do |expanded_path|
+          app.config.paths['db/migrate'] << expanded_path
         end
       end
+    end
 
-  "
+"
         end
+      end
+    end
+
+    desc "require thecore"
+    def add_require_thecore
+      inject_into_file "lib/#{@name}.rb", before: "require \"#{@name}/engine\"" do
+"
+require 'thecore'
+"
       end
     end
 
@@ -52,28 +61,30 @@ module Thecore
       abilities_file_name = "abilities_#{@name}_concern.rb"
       abilities_file_fullpath = File.join(@plugin_initializers_dir, abilities_file_name)
       initializer abilities_file_name do
-  "require 'active_support/concern'
+"
+require 'active_support/concern'
 
-  module #{@name.classify}AbilitiesConcern
-    extend ActiveSupport::Concern
-    included do
-      def #{@name}_abilities user
-        if user
-          # if the user is logged in, it can do certain tasks regardless his role
-          if user.admin?
-            # if the user is an admin, it can do a lot of things, usually
-          end
+module #{@name.classify}AbilitiesConcern
+  extend ActiveSupport::Concern
+  included do
+    def #{@name}_abilities user
+      if user
+        # if the user is logged in, it can do certain tasks regardless his role
+        if user.admin?
+          # if the user is an admin, it can do a lot of things, usually
+        end
 
-          if user.has_role? :role
-            # a specific role, brings specific powers
-          end
+        if user.has_role? :role
+          # a specific role, brings specific powers
         end
       end
     end
   end
+end
 
-  # include the extension
-  TheCoreAbilities.send(:include, #{@name.classify}AbilitiesConcern)"
+# include the extension
+TheCoreAbilities.send(:include, #{@name.classify}AbilitiesConcern)
+"
       end unless File.exists?(abilities_file_fullpath)
     end
 
