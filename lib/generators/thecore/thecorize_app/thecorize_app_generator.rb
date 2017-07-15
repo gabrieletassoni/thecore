@@ -31,7 +31,7 @@ module Thecore
     # "Traversing the DIR structures it adds git remote URL", "By checking wether or not the .git folder exists, it inits or changes the url."
     def update_or_init_git_remote
       say "Manage Git", :green
-      rails_command "g thecore:thecore_add_git #{@name}"
+      rails_command "g thecore:add_git #{@name}"
     end
   end
 end

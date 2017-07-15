@@ -90,7 +90,7 @@ TheCoreAbilities.send(:include, #{@name.classify}AbilitiesConcern)
 
     def manage_git
       say "Manage Git", :green
-      rails_command "g thecore:thecore_add_git #{@name}"
+      rails_command "g thecore:add_git #{@name}"
     end
 
     def thecoreize_the_models
