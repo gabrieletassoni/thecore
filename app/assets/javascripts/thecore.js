@@ -13,5 +13,5 @@
 //= require jquery
 //= require jquery_ujs
 //= require bootstrap
-//= require thecore/ie
+//= require ie
 //= require_tree .
