@@ -6,7 +6,7 @@ module Thecore
     # TODO: add a .gitignore good for Rails and manage git
     # "Traversing the DIR structures it adds git remote URL", "By checking wether or not the .git folder exists, it inits or changes the url."
     def update_or_init_git_remote
-      template "gitignore.rails" ".gitignore"
+      template "templates/rails.gitignore" "./.gitignore"
       git :init
       git add: ". -A"
       git commit: "-a -m 'First commit'"
