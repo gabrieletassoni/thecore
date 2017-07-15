@@ -8,8 +8,8 @@ module Thecore
     def update_or_init_git_remote
       template "gitignore.rails" ".gitignore"
       git :init
-      git add: "."
-      git commit: "-m First commit!"
+      git add: ". -A"
+      git commit: "-a -m 'First commit'"
     end
   end
 end
