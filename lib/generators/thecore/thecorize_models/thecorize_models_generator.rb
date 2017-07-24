@@ -48,12 +48,14 @@ module Thecore
           # say "Adding rails_admin to #{entry}", :green
           # Add rails admin declaration
           inject_into_file file, before: /^end/ do
-  "
-  rails_admin do
+"
+RailsAdmin.config do |config|
+  config.model self.name.underscore.capitalize.classify do
     navigation_label I18n.t('admin.settings.label')
     navigation_icon 'fa fa-file'
   end
-  "
+end
+"
           end
         end
       end
@@ -99,32 +101,44 @@ module Thecore
               # say "The file in which to add has_many, exists and the has_many does not! #{associated_file}", :green
               # if true, check that the association is non existent and add the association to that file
               inject_into_file associated_file, after: " < ApplicationRecord\n" do
-  "  has_many :#{starting_model}, inverse_of: :#{target_association}, dependent: :destroy
-  "
+"
+  has_many :#{starting_model}, inverse_of: :#{target_association}, dependent: :destroy
+"
               end unless has_has_many_association?(associated_file, starting_model)
             else
               # otherwise (the file does not exist) check if the initializer for concerns exists,
               # For each model in this gem
               initializer_name = "associations_#{target_association}_concern.rb"
               initializer initializer_name do
-  "require 'active_support/concern'
+"require 'active_support/concern'
 
-  module #{target_association.classify}AssociationsConcern
-    extend ActiveSupport::Concern
-    included do
-    end
+module #{target_association.classify}AssociationsConcern
+  extend ActiveSupport::Concern
+  included do
   end
+end
 
-  # include the extension
-  #{target_association.classify}.send(:include, #{target_association.classify}AssociationsConcern)
-  "
+# include the extension
+# #{target_association.classify}.send(:include, #{target_association.classify}AssociationsConcern)
+"
               end unless File.exists?(File.join(@plugin_initializers_dir, initializer_name))
+
+              # AGGIUNGO L'INCLUDE
+              say "Adding after_initialize file", :green
+              after_initialize_file_name = "#{@name}_after_initialize.rb"
+              after_initialize_file_fullpath = File.join(@plugin_initializers_dir, after_initialize_file_name)
+              inject_into_file after_initialize_file_name, after: "config.after_initialize do\n" do
+"
+    #{target_association.classify}.send(:include, #{target_association.classify}AssociationsConcern)
+"
+              end unless File.exists?(after_initialize_file_fullpath)
 
               # then add to it the has_many declaration
               # TODO: only if it doesn't already exists
               inject_into_file File.join(@plugin_initializers_dir, initializer_name), after: "included do\n" do
-  "    has_many :#{starting_model}, inverse_of: :#{target_association}, dependent: :destroy
-  "
+"
+    has_many :#{starting_model}, inverse_of: :#{target_association}, dependent: :destroy
+"
               end
             end
           end
@@ -149,14 +163,16 @@ module Thecore
             # This side of the through
             inject_into_file File.join(@plugin_models_dir, "#{left_side}.rb"), after: " < ApplicationRecord\n" do
               #has_many :rooms, through: :chosen_rooms, inverse_of: :chosen_decks
-  "  has_many :#{right_side.pluralize}, through: :#{association_model.pluralize}, inverse_of: :#{left_side.pluralize}
-  "
+"
+  has_many :#{right_side.pluralize}, through: :#{association_model.pluralize}, inverse_of: :#{left_side.pluralize}
+"
             end unless is_has_many_through? file, right_side.pluralize, association_model.pluralize
             # Other side of the through
             inject_into_file File.join(@plugin_models_dir, "#{right_side}.rb"), after: " < ApplicationRecord\n" do
               #has_many :rooms, through: :chosen_rooms, inverse_of: :chosen_decks
-  "  has_many :#{left_side.pluralize}, through: :#{association_model.pluralize}, inverse_of: :#{right_side.pluralize}
-  "
+"
+  has_many :#{left_side.pluralize}, through: :#{association_model.pluralize}, inverse_of: :#{right_side.pluralize}
+"
             end unless is_has_many_through? file, left_side.pluralize, association_model.pluralize
           end
         end
@@ -180,8 +196,9 @@ module Thecore
           answers.each do |answer|
             # Add the polymorphic has_name declaration
             inject_into_file File.join(@plugin_models_dir, answer), after: " < ApplicationRecord\n" do
-  "  has_many :#{model.split(".").first.pluralize}, as: :#{polymorphic_target_association}, inverse_of: :#{answer.split(".").first.singularize}, dependent: :destroy
-  "
+"
+  has_many :#{model.split(".").first.pluralize}, as: :#{polymorphic_target_association}, inverse_of: :#{answer.split(".").first.singularize}, dependent: :destroy
+"
             end
           end
         end
@@ -222,7 +239,7 @@ module Thecore
     end
 
     def has_rails_admin_declaration? file
-      (File.readlines(file).grep(/^[ \t]*rails_admin do/).size > 0) rescue false
+      (File.readlines(file).grep(/^[ \t]*RailsAdmin.config do/).size > 0) rescue false
     end
 
     def is_engine? file

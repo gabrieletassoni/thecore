@@ -39,7 +39,7 @@ module Thecore
         end
       end
     end
-    
+
 "
         end
       end
@@ -86,6 +86,22 @@ end
 TheCoreAbilities.send(:include, #{@name.classify}AbilitiesConcern)
 "
       end unless File.exists?(abilities_file_fullpath)
+    end
+
+    desc "Add after_initialize File"
+    def add_after_initialize_file
+      # do this just the first time
+      say "Adding after_initialize file", :green
+      after_initialize_file_name = "#{@name}_after_initialize.rb"
+      after_initialize_file_fullpath = File.join(@plugin_initializers_dir, after_initialize_file_name)
+      initializer after_initialize_file_name do
+"
+Rails.application.configure do
+  config.after_initialize do
+  end
+end
+"
+      end unless File.exists?(after_initialize_file_fullpath)
     end
 
     def manage_git
