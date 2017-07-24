@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  include RailsAdmin
   # # include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :recoverable, :rememberable, :trackable, :validatable #, :confirmable
@@ -67,79 +68,82 @@ class User < ApplicationRecord
     chosen_roles.compact.include? role
   end
 
-  rails_admin do
-    navigation_label I18n.t("admin.settings.label")
-    navigation_icon 'fa fa-user-circle-o'
-    desc I18n.t("activerecord.descriptions.user")
+  # RailsAdmin.config do |config|
+    # config.model self.name.underscore.capitalize.constantize do
+    rails_admin do
+      navigation_label I18n.t("admin.settings.label")
+      navigation_icon 'fa fa-user-circle-o'
+      desc I18n.t("activerecord.descriptions.user")
 
-    weight 1000
-    # Field present Everywhere
-    field :email do
-      required true
-    end
-    field :username do
-      required true
-    end
-    field :code
-    field :admin do
-      visible do
-        bindings[:view].current_user.admin? && bindings[:view].current_user.id != bindings[:object].id
-      end
-    end
-    field :locked do
-      visible do
-        bindings[:view].current_user.admin? && bindings[:view].current_user.id != bindings[:object].id
-      end
-    end
-    field :third_party do
-      visible do
-        bindings[:view].current_user.admin? && bindings[:view].current_user.id != bindings[:object].id
-      end
-    end
-    field :roles, :enum do
-      visible !ROLES.blank?
-      pretty_value do # used in list view columns and show views, defaults to formatted_value for non-association fields
-        value.map { |v| bindings[:object].roles_enum.rassoc(v)[0] rescue nil }.compact.join ", "
-      end
-      export_value do
-        value.map { |v| bindings[:object].roles_enum.rassoc(v)[0] rescue nil }.compact.join ", " # used in exports, where no html/data is allowed
-      end
-      queryable false
-    end
-    # include UserRailsAdminConcern
-
-    # Fields only in lists and forms
-    list do
-      field :created_at
-      configure :email do
-        visible false
-      end
-
-      # include UserRailsAdminListConcern
-    end
-
-    create do
-      field :password do
+      weight 1000
+      # Field present Everywhere
+      field :email do
         required true
       end
-      field :password_confirmation do
+      field :username do
         required true
       end
-
-      # include UserRailsAdminCreateConcern
-    end
-
-    edit do
-      field :password do
-        required false
+      field :code
+      field :admin do
+        visible do
+          bindings[:view].current_user.admin? && bindings[:view].current_user.id != bindings[:object].id
+        end
       end
-      field :password_confirmation do
-        required false
+      field :locked do
+        visible do
+          bindings[:view].current_user.admin? && bindings[:view].current_user.id != bindings[:object].id
+        end
+      end
+      field :third_party do
+        visible do
+          bindings[:view].current_user.admin? && bindings[:view].current_user.id != bindings[:object].id
+        end
+      end
+      field :roles, :enum do
+        visible !ROLES.blank?
+        pretty_value do # used in list view columns and show views, defaults to formatted_value for non-association fields
+          value.map { |v| bindings[:object].roles_enum.rassoc(v)[0] rescue nil }.compact.join ", "
+        end
+        export_value do
+          value.map { |v| bindings[:object].roles_enum.rassoc(v)[0] rescue nil }.compact.join ", " # used in exports, where no html/data is allowed
+        end
+        queryable false
+      end
+      # include UserRailsAdminConcern
+
+      # Fields only in lists and forms
+      list do
+        field :created_at
+        configure :email do
+          visible false
+        end
+
+        # include UserRailsAdminListConcern
       end
 
-      # include UserRailsAdminEditConcern
+      create do
+        field :password do
+          required true
+        end
+        field :password_confirmation do
+          required true
+        end
+
+        # include UserRailsAdminCreateConcern
+      end
+
+      edit do
+        field :password do
+          required false
+        end
+        field :password_confirmation do
+          required false
+        end
+
+        # include UserRailsAdminEditConcern
+      end
     end
-  end
+  # end
 
   #has_paper_trail
 

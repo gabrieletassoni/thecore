@@ -39,7 +39,7 @@ module Thecore
         end
       end
     end
-
+    
 "
         end
       end

@@ -51,6 +51,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 ### Rails ###
+/test/dummy/log
 *.rbc
 capybara-*.html
 .rspec

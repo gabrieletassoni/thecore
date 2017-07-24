@@ -24,8 +24,7 @@ module Thecore
 .AppleDouble
 .LSOverride
 # Icon must end with two \r
-Icon
-
+Icon\r\r
 
 # Thumbnails
 ._*
@@ -60,6 +59,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 ### Rails ###
+/test/dummy/log
 *.rbc
 capybara-*.html
 .rspec
