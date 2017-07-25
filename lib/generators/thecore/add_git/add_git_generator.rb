@@ -245,12 +245,24 @@ fabric.properties
 # End of https://www.gitignore.io/api/linux,osx,windows,rails,ruby,rubymine
 
 "
-      template ".gitignore"
       git :init
       git add: ".gitignore"
       git commit: "-a -m 'Added gitignore'"
       git add: ". -A"
       git commit: "-a -m 'First commit'"
+      Dir.chdir(".git/hooks") do
+        File.rename("post-update.sample", "post-update") rescue nil
+        system "chmod +x post-update"
+      end
+      project_dir = File.basename File.expand_path("..", Dir.pwd)
+      engine_dir = File.basename File.expand_path(".", Dir.pwd)
+      remote_url = `"git config --get remote.origin.url"`
+      action = remote_url.empty? ? "add" : "set-url"
+      system "git remote #{action} origin https://www.taris.it/git/rails/#{project_dir}/#{engine_dir}.git"
+      system "git update-server-info"
+      Dir.chdir("..") do
+        system "git clone --bare #{engine_dir} #{engine_dir}.git"
+      end
     end
   end
 end
