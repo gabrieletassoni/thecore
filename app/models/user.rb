@@ -68,9 +68,9 @@ class User < ApplicationRecord
     chosen_roles.compact.include? role
   end
 
-  # RailsAdmin.config do |config|
-    # config.model self.name.underscore.capitalize.constantize do
-    rails_admin do
+  RailsAdmin.config do |config|
+    config.model self.name.underscore.capitalize.constantize do
+    # rails_admin do
       navigation_label I18n.t("admin.settings.label")
       navigation_icon 'fa fa-user-circle-o'
       desc I18n.t("activerecord.descriptions.user")
@@ -143,7 +143,7 @@ class User < ApplicationRecord
         # include UserRailsAdminEditConcern
       end
     end
-  # end
+  end
 
   #has_paper_trail
 
