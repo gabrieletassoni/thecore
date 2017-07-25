@@ -259,10 +259,11 @@ fabric.properties
       remote_url = `"git config --get remote.origin.url"`
       action = remote_url.empty? ? "add" : "set-url"
       system "git remote #{action} origin https://www.taris.it/git/rails/#{project_dir}/#{engine_dir}.git"
-      system "git update-server-info"
+      system "git branch --set-upstream-to=origin/master master"
       Dir.chdir("..") do
         system "git clone --bare #{engine_dir} #{engine_dir}.git"
       end
+      say "Remember to run (on the server)\n\tgit update-server-info\nafter uploading the #{engine_dir}.git directory", :red
     end
   end
 end
