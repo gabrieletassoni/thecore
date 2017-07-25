@@ -101,9 +101,7 @@ end
               # say "The file in which to add has_many, exists and the has_many does not! #{associated_file}", :green
               # if true, check that the association is non existent and add the association to that file
               inject_into_file associated_file, after: " < ApplicationRecord\n" do
-"
-  has_many :#{starting_model}, inverse_of: :#{target_association}, dependent: :destroy
-"
+                "\n\t\thas_many :#{starting_model}, inverse_of: :#{target_association}, dependent: :destroy\n"
               end unless has_has_many_association?(associated_file, starting_model)
             else
               # otherwise (the file does not exist) check if the initializer for concerns exists,
@@ -130,7 +128,7 @@ end
               initializer after_initialize_file_name do
                 "Rails.application.configure do\n\tconfig.after_initialize do\n\tend\nend"
               end unless File.exists?(after_initialize_file_fullpath)
-              inject_into_file after_initialize_file_name, after: "config.after_initialize do\n" do
+              inject_into_file after_initialize_file_fullpath, after: "config.after_initialize do\n" do
                 "\n\t\t#{target_association.classify}.send(:include, #{target_association.classify}AssociationsConcern)\n"
               end
 
