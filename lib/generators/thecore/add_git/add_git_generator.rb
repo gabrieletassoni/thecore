@@ -256,7 +256,7 @@ fabric.properties
       end
       project_dir = File.basename File.expand_path("..", Dir.pwd)
       engine_dir = File.basename File.expand_path(".", Dir.pwd)
-      remote_url = `"git config --get remote.origin.url"`
+      remote_url = `git config --get remote.origin.url`
       action = remote_url.empty? ? "add" : "set-url"
       system "git remote #{action} origin https://www.taris.it/git/rails/#{project_dir}/#{engine_dir}.git"
       system "git branch --set-upstream-to=origin/master master"
