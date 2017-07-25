@@ -49,12 +49,12 @@ module Thecore
           # Add rails admin declaration
           inject_into_file file, before: /^end/ do
 "
-RailsAdmin.config do |config|
-  config.model self.name.underscore.capitalize.classify do
-    navigation_label I18n.t('admin.settings.label')
-    navigation_icon 'fa fa-file'
+  RailsAdmin.config do |config|
+    config.model self.name.underscore.capitalize.classify do
+      navigation_label I18n.t('admin.settings.label')
+      navigation_icon 'fa fa-file'
+    end
   end
-end
 "
           end
         end
