@@ -127,18 +127,17 @@ end
               say "Adding after_initialize file", :green
               after_initialize_file_name = "#{@name}_after_initialize.rb"
               after_initialize_file_fullpath = File.join(@plugin_initializers_dir, after_initialize_file_name)
-              inject_into_file after_initialize_file_name, after: "config.after_initialize do\n" do
-"
-    #{target_association.classify}.send(:include, #{target_association.classify}AssociationsConcern)
-"
+              initializer after_initialize_file_name do
+                "Rails.application.configure do\n\tconfig.after_initialize do\n\tend\nend"
               end unless File.exists?(after_initialize_file_fullpath)
+              inject_into_file after_initialize_file_name, after: "config.after_initialize do\n" do
+                "\n\t\t#{target_association.classify}.send(:include, #{target_association.classify}AssociationsConcern)\n"
+              end
 
               # then add to it the has_many declaration
               # TODO: only if it doesn't already exists
               inject_into_file File.join(@plugin_initializers_dir, initializer_name), after: "included do\n" do
-"
-    has_many :#{starting_model}, inverse_of: :#{target_association}, dependent: :destroy
-"
+                "\n\t\thas_many :#{starting_model}, inverse_of: :#{target_association}, dependent: :destroy\n"
               end
             end
           end
