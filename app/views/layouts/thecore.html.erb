@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><%= Settings.app_name rescue "Thecore" %></title>
-  <link rel="manifest" href="/manifest.json" />
+  <%= tag("link", rel: "manifest", href: asset_path("application.js", skip_pipeline: true)) %>
   <meta name="turbolinks-cache-control" content="no-cache">
   <%= stylesheet_link_tag 'thecore', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'thecore', 'data-turbolinks-track' => true %>
