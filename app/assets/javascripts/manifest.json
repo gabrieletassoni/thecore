@@ -1,0 +1,25 @@
+{
+  "short_name": "TheCore",
+  "name": "Gabriele Tassoni's TheCore",
+  "icons": [
+    {
+      "src": "thecore/apple-touch-icon-ipad-76x76.png",
+      "type": "image/png",
+      "sizes": "60x60"
+    },
+    {
+      "src": "thecore/apple-touch-icon-iphone-retina-120x120.png",
+      "type": "image/png",
+      "sizes": "114x114"
+    },
+    {
+      "src": "thecore/apple-touch-icon-ipad-retina-152x152.png",
+      "type": "image/png",
+      "sizes": "144x144"
+    }
+  ],
+  "start_url": "/?utm_source=homescreen",
+  "background_color": "#2196F3",
+  "orientation": "portrait",
+  "display": "standalone"
+}

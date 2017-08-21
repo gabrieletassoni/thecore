@@ -72,5 +72,6 @@ Gem::Specification.new do |s|
   # Useful using the tempaltes generators for app:
   s.add_dependency "net_dav", "~> 0.5"
   s.add_dependency "curb", "~> 0.9"
+  s.add_dependency 'serviceworker-rails',  "~> 0.5"
   # -----------------------------------------------------------------------------------------------
 end

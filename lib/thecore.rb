@@ -21,6 +21,8 @@ require 'rails_admin_toggleable'
 require 'rails_admin-i18n'
 # require 'rails_admin_initializer'
 # require 'rails_admin_history_rollback'
+require 'serviceworker-rails'
+
 require 'rails-i18n'
 require 'kaminari'
 require 'kaminari_config'
