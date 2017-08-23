@@ -26,10 +26,13 @@ module ThecoreConcern
     def after_sign_in_path_for resource
       Rails.logger.debug("SUCCESFULL SIGNIN, USER IS ADMIN? #{current_user.admin?}")
       #if current_user.admin?
-      root_actions = RailsAdmin::Config::Actions.all(:root).collect(&:action_name)
-      Rails.logger.debug "ROOT ACTIONS: #{root_actions.inspect}"
-      action = RailsAdmin::Config::Actions.all(:root).collect(&:action_name).first
-      Rails.logger.debug "FIRST ACTION: #{action}"
+      # GETTING JUST THE ROOT ACTIONS I (CURRENT_USER) CAN MANAGE
+      root_actions = RailsAdmin::Config::Actions.all(:root).select {|action| can? action.action_name, :all }
+      # Rails.logger.debug "ROOT ACTIONS: #{root_actions.inspect}"
+      # GETTING THE FIRST ACTION I CAN MANAGE
+      action = root_actions.collect(&:action_name).first
+      # Rails.logger.debug "FIRST ACTION: #{action}"
+      # REDIRECT TO THAT ACTION
       rails_admin.send("#{action}_path").sub("#{ENV['RAILS_RELATIVE_URL_ROOT']}#{ENV['RAILS_RELATIVE_URL_ROOT']}", "#{ENV['RAILS_RELATIVE_URL_ROOT']}")
       #rails_admin.dashboard_path.sub("#{ENV['RAILS_RELATIVE_URL_ROOT']}#{ENV['RAILS_RELATIVE_URL_ROOT']}", "#{ENV['RAILS_RELATIVE_URL_ROOT']}")
       #elsif current_user.has_role? :workers
