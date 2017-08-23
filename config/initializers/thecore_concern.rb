@@ -26,7 +26,12 @@ module ThecoreConcern
     def after_sign_in_path_for resource
       Rails.logger.debug("SUCCESFULL SIGNIN, USER IS ADMIN? #{current_user.admin?}")
       #if current_user.admin?
-      rails_admin.dashboard_path.sub("#{ENV['RAILS_RELATIVE_URL_ROOT']}#{ENV['RAILS_RELATIVE_URL_ROOT']}", "#{ENV['RAILS_RELATIVE_URL_ROOT']}")
+      root_actions = RailsAdmin::Config::Actions.all(:root).collect(&:action_name)
+      Rails.logger.debug "ROOT ACTIONS: #{root_actions.inspect}"
+      action = RailsAdmin::Config::Actions.all(:root).collect(&:action_name).first
+      Rails.logger.debug "FIRST ACTION: #{action}"
+      rails_admin.send("#{action}_path").sub("#{ENV['RAILS_RELATIVE_URL_ROOT']}#{ENV['RAILS_RELATIVE_URL_ROOT']}", "#{ENV['RAILS_RELATIVE_URL_ROOT']}")
+      #rails_admin.dashboard_path.sub("#{ENV['RAILS_RELATIVE_URL_ROOT']}#{ENV['RAILS_RELATIVE_URL_ROOT']}", "#{ENV['RAILS_RELATIVE_URL_ROOT']}")
       #elsif current_user.has_role? :workers
       #  rails_admin.new_path('timetable').sub("#{ENV['RAILS_RELATIVE_URL_ROOT']}#{ENV['RAILS_RELATIVE_URL_ROOT']}", "#{ENV['RAILS_RELATIVE_URL_ROOT']}")
       #else
