@@ -73,5 +73,7 @@ Gem::Specification.new do |s|
   s.add_dependency "net_dav", "~> 0.5"
   s.add_dependency "curb", "~> 0.9"
   s.add_dependency 'serviceworker-rails',  "~> 0.5"
+  s.add_dependency 'oj', '~> 3.3'
+  s.add_dependency "multi_json", '~> 1.11'
   # -----------------------------------------------------------------------------------------------
 end

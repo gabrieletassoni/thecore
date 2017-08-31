@@ -42,6 +42,9 @@ require 'paperclip'
 require 'thecore_rails_admin_export_concern'
 require 'thecore_rails_admin_bulk_delete_concern'
 
+require 'oj'
+require 'multi_json'
+
 require 'thecore/engine'
 
 # require 'controllers/application_controller'
