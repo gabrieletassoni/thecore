@@ -26,30 +26,43 @@
 
 body {
   height: 100vh;
-  background: linear-gradient(-20deg, #09b7b9 30%, #1c51a4 100%);
+  // background: linear-gradient(-20deg, #09b7b9 30%, #1c51a4 100%);
+  background-color: rgb(59,	78,	89);
 }
 
-.navbar-brand {
-  padding-top: 12px;
+.jumbotron {
+  background-color: rgb(59,	78,	89);
 }
 
-.alert {
-  z-index: 999;
-  position: fixed;
-  border-radius: 0;
-  border: 0;
-  color: #fff;
-  width: 100%;
+.vertical-center {
+  min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
+  min-height: 100vh; /* These two lines are counted as one :-)       */
+
+  display: flex;
+  align-items: center;
 }
 
-.alert-info {
-  background-color: #3498db;
-}
-
-.alert-success {
-  background-color: #2ecc71;
-}
-
-.alert-danger {
-  background-color: #e74c3c;
-}
+// .navbar-brand {
+//   padding-top: 12px;
+// }
+//
+// .alert {
+//   z-index: 999;
+//   position: fixed;
+//   border-radius: 0;
+//   border: 0;
+//   color: #fff;
+//   width: 100%;
+// }
+//
+// .alert-info {
+//   background-color: #3498db;
+// }
+//
+// .alert-success {
+//   background-color: #2ecc71;
+// }
+//
+// .alert-danger {
+//   background-color: #e74c3c;
+// }

@@ -1,35 +1,37 @@
 <!DOCTYPE html>
 <html lang="<%=I18n.locale%>">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><%= Settings.app_name rescue "Thecore" %></title>
-  <%= tag("link", rel: "manifest", href: asset_path("manifest.json", skip_pipeline: true)) %>
-  <meta name="turbolinks-cache-control" content="no-cache">
-  <%= stylesheet_link_tag 'thecore', media: 'all', 'data-turbolinks-track' => true %>
-  <%= javascript_include_tag 'thecore', 'data-turbolinks-track' => true %>
-  <%= favicon_link_tag 'thecore/apple-touch-icon-iphone-60x60.png', rel: 'icon', type: 'image/png' %>
-  <%= favicon_link_tag 'thecore/apple-touch-icon-ipad-76x76.png', rel: 'apple-touch-icon', type: 'image/png',  sizes: "60x60" %>
-  <%= favicon_link_tag 'thecore/apple-touch-icon-ipad-retina-152x152.png', rel: 'apple-touch-icon', type: 'image/png',  sizes: "144x144" %>
-  <%= favicon_link_tag 'thecore/apple-touch-icon-iphone-60x60.png', rel: 'apple-touch-icon', type: 'image/png' %>
-  <%= favicon_link_tag 'thecore/apple-touch-icon-iphone-retina-120x120.png', rel: 'apple-touch-icon', type: 'image/png', sizes: "114x114" %>
-  <%= csrf_meta_tags %>
-  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-  <!--[if lt IE 9]>
-    <%= javascript_include_tag "ie" %>
-  <![endif]-->
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= Settings.app_name rescue "Thecore" %></title>
+    <%= tag("link", rel: "manifest", href: asset_path("manifest.json", skip_pipeline: true)) %>
+    <meta name="turbolinks-cache-control" content="no-cache">
+    <%= stylesheet_link_tag 'thecore', media: 'all', 'data-turbolinks-track' => true %>
+    <%= javascript_include_tag 'thecore', 'data-turbolinks-track' => true %>
+    <%= favicon_link_tag 'thecore/apple-touch-icon-iphone-60x60.png', rel: 'icon', type: 'image/png' %>
+    <%= favicon_link_tag 'thecore/apple-touch-icon-ipad-76x76.png', rel: 'apple-touch-icon', type: 'image/png',  sizes: "60x60" %>
+    <%= favicon_link_tag 'thecore/apple-touch-icon-ipad-retina-152x152.png', rel: 'apple-touch-icon', type: 'image/png',  sizes: "144x144" %>
+    <%= favicon_link_tag 'thecore/apple-touch-icon-iphone-60x60.png', rel: 'apple-touch-icon', type: 'image/png' %>
+    <%= favicon_link_tag 'thecore/apple-touch-icon-iphone-retina-120x120.png', rel: 'apple-touch-icon', type: 'image/png', sizes: "114x114" %>
+    <%= csrf_meta_tags %>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]> <%= javascript_include_tag "ie" %> <![endif]-->
+  </head>
+  <body>
+    <div class="jumbotron vertical-center">
+      <div class="container">
+        <div class="col-md-4 col-md-offset-4 text-center">
+          <img class="main-menu-app-logo" width="152" src="<%= image_url('thecore/app-logo.png') %>"/>
+        </div>
+        <%- unless flash.empty? %>
+        <div class="col-md-4 col-md-offset-4" style="margin-top: 1em;">
+          <%= render partial: 'shared/flash' %>
+        </div>
+        <%-end%>
+        <%= yield %>
+      </div>
+    </div>
 
-<%= render partial: 'shared/flash_messages', flash: flash %>
-
-<%= render 'layouts/header' %>
-
-<div class="container">
-  <%= yield %>
-</div>
-
-<%= render 'layouts/footer' %>
-
-</body>
+    <%= render 'layouts/footer' %>
+  </body>
 </html>
