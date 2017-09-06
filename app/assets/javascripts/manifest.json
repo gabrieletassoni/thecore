@@ -1,7 +1,20 @@
 {
   "short_name": "TheCore",
+  "icons": [
+      {
+          "src": "<%= image_path 'android-chrome-192x192.png' %>",
+          "sizes": "192x192",
+          "type": "image/png"
+      },
+      {
+          "src": "<%= image_path 'android-chrome-512x512.png' %>",
+          "sizes": "512x512",
+          "type": "image/png"
+      }
+  ],
   "name": "Gabriele Tassoni's TheCore",
-  "background_color": "#2196F3",
+  "theme_color": "#3b4e59",
+  "background_color": "#3b4e59",
   "orientation": "portrait",
   "display": "standalone"
 }

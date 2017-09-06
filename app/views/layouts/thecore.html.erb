@@ -8,11 +8,13 @@
     <meta name="turbolinks-cache-control" content="no-cache">
     <%= stylesheet_link_tag 'thecore', media: 'all', 'data-turbolinks-track' => true %>
     <%= javascript_include_tag 'thecore', 'data-turbolinks-track' => true %>
-    <%= favicon_link_tag 'thecore/apple-touch-icon-iphone-60x60.png', rel: 'icon', type: 'image/png' %>
-    <%= favicon_link_tag 'thecore/apple-touch-icon-ipad-76x76.png', rel: 'apple-touch-icon', type: 'image/png',  sizes: "60x60" %>
-    <%= favicon_link_tag 'thecore/apple-touch-icon-ipad-retina-152x152.png', rel: 'apple-touch-icon', type: 'image/png',  sizes: "144x144" %>
-    <%= favicon_link_tag 'thecore/apple-touch-icon-iphone-60x60.png', rel: 'apple-touch-icon', type: 'image/png' %>
-    <%= favicon_link_tag 'thecore/apple-touch-icon-iphone-retina-120x120.png', rel: 'apple-touch-icon', type: 'image/png', sizes: "114x114" %>
+
+    <%= favicon_link_tag 'apple-touch-icon.png', rel: 'apple-touch-icon', sizes: "180x180" %>
+    <%= favicon_link_tag 'favicon-32x32.png', rel: 'icon', sizes: "32x32" %>
+    <%= favicon_link_tag 'favicon-16x16.png', rel: 'icon', sizes: "16x16" %>
+    <%= favicon_link_tag 'safari-pinned-tab.svg', rel: 'mask-icon', color: "#5bbad5" %>
+    <meta name="theme-color" content="#3b4e59">
+
     <%= csrf_meta_tags %>
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]> <%= javascript_include_tag "ie" %> <![endif]-->
@@ -21,7 +23,7 @@
     <div class="jumbotron vertical-center">
       <div class="container">
         <div class="col-md-4 col-md-offset-4 text-center">
-          <img class="main-menu-app-logo" width="152" src="<%= image_url('thecore/app-logo.png') %>"/>
+          <img class="main-menu-app-logo" width="152" src="<%= image_url('logo.png') %>"/>
         </div>
         <%- unless flash.empty? %>
         <div class="col-md-4 col-md-offset-4" style="margin-top: 1em;">

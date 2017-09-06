@@ -12,14 +12,14 @@ module Thecore
       app.config.i18n.default_locale = :it
 
       # Assets
-      app.config.assets.precompile += %w( thecore/ie.js )
-      app.config.assets.precompile += %w( thecore/thecore.js )
-      app.config.assets.precompile += %w( thecore/thecore.css )
-      app.config.assets.precompile += %w( thecore/app-logo.png )
-      app.config.assets.precompile += %w( thecore/apple-touch-icon-ipad-76x76.png )
-      app.config.assets.precompile += %w( thecore/apple-touch-icon-ipad-retina-152x152.png )
-      app.config.assets.precompile += %w( thecore/apple-touch-icon-iphone-60x60.png )
-      app.config.assets.precompile += %w( thecore/apple-touch-icon-iphone-retina-120x120.png )
+      # app.config.assets.precompile += %w( thecore/ie.js )
+      # app.config.assets.precompile += %w( thecore/thecore.js )
+      # app.config.assets.precompile += %w( thecore/thecore.css )
+      # app.config.assets.precompile += %w( thecore/app-logo.png )
+      # app.config.assets.precompile += %w( thecore/apple-touch-icon-ipad-76x76.png )
+      # app.config.assets.precompile += %w( thecore/apple-touch-icon-ipad-retina-152x152.png )
+      # app.config.assets.precompile += %w( thecore/apple-touch-icon-iphone-60x60.png )
+      # app.config.assets.precompile += %w( thecore/apple-touch-icon-iphone-retina-120x120.png )
     end
 
     # appending migrations to the main app's ones
