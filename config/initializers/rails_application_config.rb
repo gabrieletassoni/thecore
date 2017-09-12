@@ -8,6 +8,7 @@ Rails.application.configure do
   config.assets.precompile += %w( android-chrome-192x192.png )
   config.assets.precompile += %w( android-chrome-512x512.png )
   config.assets.precompile += %w( logo.png )
+  config.assets.precompile += %w( up-arrow.png )
   # mstile-150x150
   config.assets.precompile += %w( thecore.js )
   config.assets.precompile += %w( thecore.css )

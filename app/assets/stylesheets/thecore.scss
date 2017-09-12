@@ -37,9 +37,19 @@ body {
 .vertical-center {
   min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
   min-height: 100vh; /* These two lines are counted as one :-)       */
-
   display: flex;
   align-items: center;
+}
+
+#up-arrow {
+  // width: 75%;
+  // max-width: 300px;
+  bottom: -2em;
+  margin-right: auto;
+  margin-left: auto;
+  opacity: 0.2;
+  filter: alpha(opacity = 20);
+  /* For IE8 and earlier */
 }
 
 // .navbar-brand {
