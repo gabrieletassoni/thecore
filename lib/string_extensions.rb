@@ -5,7 +5,8 @@ module StringConcern
   extend ActiveSupport::Concern
 
   def likeize
-    strip.gsub(/[^A-Za-z0-9]/, " ").split.select{|w| w.length > 2}.join("%")
+    # .select{|w| w.length > 2}
+    strip.gsub(/[^A-Za-z0-9]/, " ").split.join("%")
   end
 end
 
