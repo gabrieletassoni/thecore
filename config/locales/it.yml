@@ -1,4 +1,5 @@
 it:
+  current_user: Utente corrente
   hello: "Ciao Mondo"
   dashboard: "Pannello di controllo"
   contact: "Aiutaci a Migliorare"

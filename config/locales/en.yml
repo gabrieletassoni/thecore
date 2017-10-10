@@ -20,6 +20,7 @@
 # available at http://guides.rubyonrails.org/i18n.html.
 
 en:
+  current_user: Current user
   hello: "Hello world"
   dashboard: "Dashboard"
   contact: "Contact"
