@@ -25,6 +25,8 @@ it:
       one: "%{count} Secondo"
       other: "%{count} Secondi"
   admin:
+    links:
+      label: Collegamenti
     tools:
       label: "Strumenti"
     settings:

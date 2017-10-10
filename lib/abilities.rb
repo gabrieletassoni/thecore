@@ -1,5 +1,10 @@
 module TheCoreAbilities
   def core_abilities user
+    # So the static link navigation can be set runtime (yes it's an hack)
+    RailsAdmin.config do |config|
+      config.navigation_static_label = I18n.t("admin.links.label")
+    end
+    # Normal core abilities file
     if user
       can :access, :rails_admin # grant access to rails_admin
       can :dashboard, :all # allow access to dashboard

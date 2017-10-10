@@ -26,3 +26,6 @@ en:
   contact: "Contact"
   manage: "Manage"
   sign_out: "Sign Out"
+  admin:
+    links:
+      label: Links
