@@ -17,6 +17,8 @@
  *= stub rails_admin/custom/theming.scss
  *= require_self
 */
+@import "jquery-ui";
+@import "jquery-ui/dialog";
 @import 'bootstrap-sprockets';
 @import 'bootstrap';
 @import "font-awesome-sprockets";
