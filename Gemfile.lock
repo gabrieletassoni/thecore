@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    thecore (1.3.18)
+    thecore (1.3.19)
       bootstrap-sass (~> 3.3)
       cancancan (~> 2.0)
       curb (~> 0.9)
