@@ -16,4 +16,5 @@
 //= require jquery_ujs
 //= require bootstrap
 //= require ie
+//= require timer
 //= require_tree .
