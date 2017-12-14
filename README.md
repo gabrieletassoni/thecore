@@ -1,3 +1,4 @@
+![Thecore Logo](https://github.com/gabrieletassoni/thecore/raw/master/app/assets/images/logo.png)
 # Thecore component
 ## Whys
 As a freelance full-stack developer I always needed smart tools and methods to manage scalable projects. During the years I started to make choices, studying languages, patterns and technologies that were getting my attention because of their smartness.
