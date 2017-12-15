@@ -10,3 +10,6 @@ I always preferred to invest some more time in finding the best tool for what I 
 Hire [me](mailto:gabriele.tassoni@gmail.com) as a full-stack developer for your RoR projects, I will use Thecore technology and show you how good it is. This is a straightforward way to support this project.
 ## Wiki
 In the [wiki](https://github.com/gabrieletassoni/thecore/wiki) I'll put all the useful articles needed to fully understand the tool and the background theory.
+## TO DO
+ * **Code Cleanup**: move some views and assets in a dedicated Thecore Component
+ * **Embrace Yarn completely**: rewrite some JS assets as installable packages and move them in a dedicated component
