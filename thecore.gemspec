@@ -66,7 +66,7 @@ Gem::Specification.new do |s|
   # OSX:
   # brew install imagemagick
   # brew install gs
-  # Oppure (Debian):
+  # Debian:
   # sudo apt-get install imagemagick -y
   s.add_dependency "paperclip", "~> 5.1"
   # Useful using the tempaltes generators for app:
