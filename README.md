@@ -3,7 +3,7 @@
 **Thecore** is made of **ATOMS** or, well, _Atomic Components_. The RoR App, the one made using _rails new_ command, will be just a container, which will depend on the Atomic Components, in which the main logic will be spread.
 **Thecore** is a set of tools, best practices and guidelines aimed at creating bigger WebApps without focusing on how to it, way better to focus on what to do, don't you think?
 ## But... _What are ATOMS?_
- * **Self Contained engines:** the _Atomic Component_ must be developed following some guidelines which I'll document in the Wiki.
+ * **Self Contained engines:** the _Atomic Component_ must be developed following some guidelines which I'll document in the [Wiki](https://github.com/gabrieletassoni/thecore/wiki).
  * **Pluggable Components:** just make your RoR WebApp or another _Atomic Component_ depend on an _Atomic Component_ and it will inherit the funcitonalities of the _Atomic Component_, you don't need them anymore? just remove the dependency from Gemfile or gemspec and your WebApp will continue to work as before, but without the functionality provided by the _Atomic Component_
  * **Tested Components:** once tested for one application, they are tested for every other applications, no need to do regression tests on your app if it includes (say... depends) on functionalities provided by an Atomic Component.
  * **Easily Extandable:** _Atomic Components_ can be improved in their functionalities by adding new , but even better, they can be extended, without the need to touch well established code, in other _Atomic Components_ which will depend on the original one.
@@ -13,6 +13,10 @@ As a freelance full-stack developer I always needed smart tools and methods to m
 Here is the efforts-turned-code, used and tested in different professional projects; thecore is just one of the  components, the most important, the foundation on which all the other atomic components grow. On github I'll put all of them, or, at least the general ones, the ones which doesn't have a strong characterization on a process peculiar to one of my customers.
 ## Philosphy
 I always preferred to invest some more time in finding the best tool for what I need and compile a toolbox of helpful technologies, rather than start coding mindlessly. Thecore has grown and proved to be a time saver, it surely could be enhanced and as long as I keep using it for my day by day job, it will grow more, but if you feel that RoR, sane defaults, atomic engines (components) sound good to you, don't be scared to pull and make Thecore even more useful.
+## Atomic Components
+Here will be kept track of all the _Atomic Components_ available.
+ * Utilities
+    * [Thecore Thor Scripts](https://github.com/gabrieletassoni/thecore_thor_scripts): A set of scripts used to create new **Thecore** WebApps or new _Atomic Components_ and to transform an already created engine, into a **Thecore** _Atomic Component_
 ## Partecipate
 If you like to partecipate on this project, please do so; file bugs, pull and modify code, give suggestions...
 ## Support
