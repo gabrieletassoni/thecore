@@ -1,7 +1,11 @@
 ![Thecore Logo](https://github.com/gabrieletassoni/thecore/raw/master/app/assets/images/logo.png)
 # Thecore
-**Thecore** is made of **ATOMS** or, well, _Atomic Components_. The RoR App, the one made using _rails new_ command, will be just a container, which will depend on the Atomic Components, in which the main logic will be spread.
-**Thecore** is a set of tools, best practices and guidelines aimed at creating bigger WebApps without focusing on how to it, way better to focus on what to do, don't you think?
+**Thecore** is made of _ATOMS_ or, well, **Atomic Components**. 
+The RoR App, the one made using _rails new_ command, will become just a container dependent on the _Atomic Components_ you need.
+**Thecore** is a set of tools, best practices and guidelines aimed at creating bigger WebApps without focusing on how to do it.
+
+**It's way better to focus on what to do, don't you think?**
+
 ## But... _What are ATOMS?_
  * **Self Contained engines:** the _Atomic Component_ must be developed following some guidelines which I'll document in the [Wiki](https://github.com/gabrieletassoni/thecore/wiki).
  * **Pluggable Components:** just make your RoR WebApp or another _Atomic Component_ depend on an _Atomic Component_ and it will inherit the funcitonalities of the _Atomic Component_, you don't need them anymore? just remove the dependency from Gemfile or gemspec and your WebApp will continue to work as before, but without the functionality provided by the _Atomic Component_
