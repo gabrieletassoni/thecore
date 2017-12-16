@@ -7,7 +7,7 @@ The RoR App, the one made using _rails new_ command, will become just a containe
 **It's way better to focus on what to do, don't you think?**
 
 ## But... _What are ATOMS?_
- * **Self Contained engines:** the _Atomic Component_ must be developed following some guidelines which I'll document in the [Wiki](https://github.com/gabrieletassoni/thecore/wiki).
+ * **Self Contained engines:** the _Atomic Component_ must be developed following some guidelines which I'll document in the [Wiki](https://github.com/gabrieletassoni/thecore/wiki/Atomic_Component_Guidelines).
  * **Pluggable Components:** just make your RoR WebApp or another _Atomic Component_ depend on an _Atomic Component_ and it will inherit the funcitonalities of the _Atomic Component_, you don't need them anymore? just remove the dependency from Gemfile or gemspec and your WebApp will continue to work as before, but without the functionality provided by the _Atomic Component_
  * **Tested Components:** once tested for one application, they are tested for every other applications, no need to do regression tests on your app if it includes (say... depends) on functionalities provided by an Atomic Component.
  * **Easily Extandable:** _Atomic Components_ can be improved in their functionalities by adding new , but even better, they can be extended, without the need to touch well established code, in other _Atomic Components_ which will depend on the original one.
