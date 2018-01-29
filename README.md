@@ -1,10 +1,10 @@
-![Thecore Logo](https://github.com/gabrieletassoni/thecore/raw/master/app/assets/images/logo.png)
+![Thecore Logo](https://github.com/gabrieletassoni/thecore_ui_layout_taris_website/raw/master/app/assets/images/logo.png)
 # Thecore
 **Thecore** is made of _ATOMS_ or, well, **Atomic Components**. 
 The RoR App, the one made using _rails new_ command, will become just a container dependent on the _Atomic Components_ you need.
 **Thecore** is a set of tools, best practices and guidelines aimed at creating bigger WebApps without focusing on how to do it.
 
-**It's way better to focus on what to do, don't you think?**
+**It's way better to focus on what to do than on how to do it, don't you think?**
 
 ## But... _What are ATOMS?_
  * **Self Contained engines:** the _Atomic Component_ must be developed following some guidelines which I'll document in the [Wiki](https://github.com/gabrieletassoni/thecore/wiki/Atomic_Component_Guidelines).
