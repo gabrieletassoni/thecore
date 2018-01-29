@@ -21,6 +21,12 @@ I always preferred to invest some more time in finding the best tool for what I 
 Here will be kept track of all the _Atomic Components_ available.
  * Utilities
     * [Thecore Thor Scripts](https://github.com/gabrieletassoni/thecore_thor_scripts): A set of scripts used to create new **Thecore** WebApps or new _Atomic Components_ and to transform an already created engine, into a **Thecore** _Atomic Component_
+    * [Thecore Settings](https://github.com/gabrieletassoni/thecore_settings): If included in your projects it gives you an easy way of storing and retrieving settings for your app, completely integrated in Rails Admin thanks to [Rails Admin Settings](https://github.com/rs-pro/rails_admin_settings)
+    * [Thecore Theme Taris](https://github.com/gabrieletassoni/thecore_theme_taris): Dependency package to pull all UI components and which provides some assets.
+        * [Rails Admin UI Dashboard Blocks](rails_admin_uihttps://github.com/gabrieletassoni/rails_admin_ui_dashboard_blocks_dashboard_blocks): I loved the concept of this dashboard since the very first moment I saw it, thus I integrated the assets from [Rollinbox](https://github.com/rollincode/rollinbox) into Thecore.
+        * [Rails Admin UI Index Cards](https://github.com/gabrieletassoni/rails_admin_ui_index_cards): I like better a card layout for tables instead of the usual row one, it allows me to focus bettere on the info I need, this components brings right this, if included in your project, it replaces the tables with cards.
+        * [Rails Admin Layout Taris](https://github.com/gabrieletassoni/rails_admin_ui_layout_taris): Main tweaks and assets to turn Rails Admin base layout to Thecore style.
+        * [Rails Admin Layout Taris Website](https://github.com/gabrieletassoni/thecore_ui_layout_taris_website): Assets for the part of web app which resides outside Rails Admin scope.
 ## Partecipate
 If you like to partecipate on this project, please do so; file bugs, pull and modify code, give suggestions...
 ## Support
