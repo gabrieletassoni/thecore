@@ -23,7 +23,7 @@ Here will be kept track of all the _Atomic Components_ available.
     * [Thecore Thor Scripts](https://github.com/gabrieletassoni/thecore_thor_scripts): A set of scripts used to create new **Thecore** WebApps or new _Atomic Components_ and to transform an already created engine, into a **Thecore** _Atomic Component_
     * [Thecore Settings](https://github.com/gabrieletassoni/thecore_settings): If included in your projects it gives you an easy way of storing and retrieving settings for your app, completely integrated in Rails Admin thanks to [Rails Admin Settings](https://github.com/rs-pro/rails_admin_settings)
     * [Thecore Background Jobs](https://github.com/gabrieletassoni/thecore_background_jobs): Thecore common setup to send or schedule background jobs.
-    * [Rails Admin Telnet Print](https://github.com/gabrieletassoni/rails_admin_telnet_print): Atomic COmponent used to Print to a set of predefined printers (using TCP/IP protocols such as ZPL).
+    * [Rails Admin Telnet Print](https://github.com/gabrieletassoni/rails_admin_telnet_print): Atomic Component used to Print to a set of predefined printers (using TCP/IP protocols such as ZPL).
     * Thecore Dataentry
         * [Thecore Dataentry Commons](https://github.com/gabrieletassoni/thecore_dataentry_commons): Common libraries used by other data entry components. This component allows dataentry by keyboard, keyboard emulation barcode scanners or websocket.
         * [Thecore Dataentry With Date Start and End](https://github.com/gabrieletassoni/thecore_dataentry_with_date_start_and_end): Atomic Component with UIs to perform barcode dataentry and confirm a start date and end date.
