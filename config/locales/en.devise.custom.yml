@@ -1,5 +1,8 @@
 en:
   devise:
+    failure:
+      user:
+        invalid: Incorrect login credentials. 
     mailer:
       password_changed_instructions:
         greeting: Welcome %{recipient}!

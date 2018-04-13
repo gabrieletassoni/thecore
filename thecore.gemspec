@@ -46,8 +46,8 @@ Gem::Specification.new do |s|
   # RAILS ADMIN
   # Devise: https://github.com/plataformatec/devise
   s.add_dependency 'devise', "~> 4.2" #, '4.0.1'
-  s.add_dependency 'devise-i18n', "~> 1.1"
-  s.add_dependency 'devise-i18n-views', "~> 0.3"
+  s.add_dependency 'devise-i18n', "~> 1.5"
+  #s.add_dependency 'devise-i18n-views', "~> 0.3"
   s.add_dependency 'cancancan', "~> 2.0"
   s.add_dependency 'http_accept_language', "~> 2.1"
   # https://github.com/dalpo/rails_admin_clone

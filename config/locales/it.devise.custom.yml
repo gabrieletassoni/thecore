@@ -1,5 +1,8 @@
 it:
   devise:
+    failure:
+      user: 
+        invalid: Credenziali di accesso errate.
     mailer:
       password_changed_instructions:
         greeting: Benvenuto %{recipient}!
