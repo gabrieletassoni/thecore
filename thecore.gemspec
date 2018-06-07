@@ -63,6 +63,7 @@ Gem::Specification.new do |s|
   # s.add_dependency 'rails_admin_charts'
   s.add_dependency 'rails_admin_toggleable', "~> 0.7"
   s.add_dependency "wysiwyg-rails", "~> 2.8"
+  # s.add_dependency "wysiwyg-rails", "~> 1.2.7"
   # s.add_dependency 'rails_admin_amoeba_dup'
   # OSX:
   # brew install imagemagick

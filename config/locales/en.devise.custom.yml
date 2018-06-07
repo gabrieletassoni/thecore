@@ -2,7 +2,8 @@ en:
   devise:
     failure:
       user:
-        invalid: Incorrect login credentials. 
+        invalid: Incorrect login credentials.
+        not_found_in_database: Incorrect login credentials.
     mailer:
       password_changed_instructions:
         greeting: Welcome %{recipient}!
