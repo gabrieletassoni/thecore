@@ -117,10 +117,13 @@ class User < ApplicationRecord
         configure :email do
           visible false
         end
-
+        exclude_fields :lock_version
         # include UserRailsAdminListConcern
       end
-
+      show do
+        #exclude_fields :id
+        exclude_fields :lock_version
+      end
       create do
         field :password do
           required true
@@ -128,10 +131,11 @@ class User < ApplicationRecord
         field :password_confirmation do
           required true
         end
-
+        field :lock_version, :hidden do
+          visible true
+        end
         # include UserRailsAdminCreateConcern
       end
-
       edit do
         field :password do
           required false
@@ -140,6 +144,9 @@ class User < ApplicationRecord
           required false
         end
 
+        field :lock_version, :hidden do
+          visible true
+        end
         # include UserRailsAdminEditConcern
       end
     end
