@@ -22,7 +22,7 @@ Rails.application.configure do
 
   config.active_record.raise_in_transactional_callbacks = true
 
-  config.serviceworker.routes.draw do
-    match "/manifest.json"
-  end
+  # config.serviceworker.routes.draw do
+  #   match "/manifest.json"
+  # end
 end

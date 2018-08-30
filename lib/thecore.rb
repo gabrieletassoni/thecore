@@ -20,7 +20,7 @@ require 'rails_admin'
 require 'rails_admin_toggleable'
 require 'rails_admin-i18n'
 require "wysiwyg-rails"
-require 'serviceworker-rails'
+# require 'serviceworker-rails'
 
 require 'rails-i18n'
 require 'kaminari'

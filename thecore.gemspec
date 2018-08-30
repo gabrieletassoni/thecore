@@ -72,8 +72,8 @@ Gem::Specification.new do |s|
   # sudo apt-get install imagemagick -y
   # s.add_dependency "paperclip", "~> 5.1"
   # Useful using the templates generators for app:
-  s.add_dependency "net_dav", "~> 0.5"
-  s.add_dependency "curb", "~> 0.9"
+  # s.add_dependency "net_dav", "~> 0.5"
+  # s.add_dependency "curb", "~> 0.9"
   s.add_dependency 'serviceworker-rails',  "~> 0.5"
   s.add_dependency 'oj', '~> 3.3'
   s.add_dependency "multi_json", '~> 1.11'
