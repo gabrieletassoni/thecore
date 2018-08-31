@@ -54,7 +54,11 @@ Gem::Specification.new do |s|
   #s.add_dependency 'rails_admin_clone'
   # Rails Admin
   s.add_dependency 'rails_admin_rollincode', '~> 1.2'
-  s.add_dependency 'rails_admin', '~> 1.2'
+  # Due to an error in 1.4.1 which crashes the app when other 
+  # middleware changing gems are present in bundle, I must fix this version to 1.4.0
+  # TODO: Remove when issue is resolved by rails admin team:
+  # https://github.com/sferik/rails_admin/issues/3060
+  s.add_dependency 'rails_admin', '1.4.0' # , '~> 1.2' 
   # s.add_dependency 'rails_admin_selectize'#, github: 'glyph-fr/rails_admin_selectize'
   s.add_dependency 'rails_admin-i18n', "~> 1.11"
   #s.add_dependency 'rails_admin_history_rollback'
