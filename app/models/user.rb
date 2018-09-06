@@ -83,18 +83,12 @@ class User < ApplicationRecord
       field :username do
         required true
       end
-      field :code
       field :admin do
         visible do
           bindings[:view].current_user.admin? && bindings[:view].current_user.id != bindings[:object].id
         end
       end
       field :locked do
-        visible do
-          bindings[:view].current_user.admin? && bindings[:view].current_user.id != bindings[:object].id
-        end
-      end
-      field :third_party do
         visible do
           bindings[:view].current_user.admin? && bindings[:view].current_user.id != bindings[:object].id
         end
