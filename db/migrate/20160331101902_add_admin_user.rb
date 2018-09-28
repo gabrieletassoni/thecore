@@ -153,6 +153,9 @@ class AddAdminUser < ActiveRecord::Migration[4.2]
     u.email = "admin@example.com"
     psswd = SecureRandom.hex(5)
     puts "\tThecore admin password is:\n\n\t\t#{psswd}\n\n\tplease save it somewhere, securely."
+    File.open('.passwords', 'w') do |f|
+      f.write(psswd)
+    end
     u.password = psswd
     u.password_confirmation = psswd
     u.admin = true
