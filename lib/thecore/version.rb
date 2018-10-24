@@ -1,3 +1,3 @@
 module Thecore
-  VERSION = '1.4.10'.freeze
+  VERSION = '1.5.0'.freeze
 end

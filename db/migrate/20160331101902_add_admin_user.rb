@@ -160,6 +160,6 @@ class AddAdminUser < ActiveRecord::Migration[4.2]
     u.password_confirmation = psswd
     u.admin = true
     # u.skip_confirmation!
-    u.save!
+    u.save! false
   end
 end
