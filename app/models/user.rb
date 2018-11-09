@@ -23,7 +23,7 @@ class User < ApplicationRecord
   validates :password, presence: true, on: :create
   validates :password_confirmation, presence: true, on: :create
 
-  validates :roles, presence: true, on: :create
+  validates :roles, presence: true, on: :create, :unless => lambda { ROLES.blank? }
 
   def self.paged(page_number)
     order(admin: :desc, username: :asc).page page_number
