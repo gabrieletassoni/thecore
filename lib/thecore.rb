@@ -39,6 +39,8 @@ require 'thecore_rails_admin_bulk_delete_concern'
 require 'oj'
 require 'multi_json'
 require 'date_validator'
+require 'ckeditor'
+require "ckeditor/orm/active_record"
 
 require 'thecore/engine'
 

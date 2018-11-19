@@ -17,6 +17,7 @@ Rails.application.configure do
   config.assets.precompile += %w( ie.js )
   config.assets.precompile += %w( manifest.json )
   config.assets.precompile += %w( browserconfig.xml )
+  config.assets.precompile += %w( ckeditor/* )
 
   config.filter_parameters += [:password]
 

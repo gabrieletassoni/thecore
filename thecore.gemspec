@@ -82,5 +82,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'oj', '~> 3.3'
   s.add_dependency "multi_json", '~> 1.11'
   s.add_dependency "date_validator", '~> 0.9'
+  s.add_dependency 'ckeditor', '~> 4.2'
   # -----------------------------------------------------------------------------------------------
 end
