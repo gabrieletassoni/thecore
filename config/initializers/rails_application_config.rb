@@ -19,6 +19,12 @@ Rails.application.configure do
   config.assets.precompile += %w( browserconfig.xml )
   config.assets.precompile += %w( ckeditor/* )
 
+  # config.action_controller.asset_host = if ENV['RAILS_URL'].blank? || ENV['RAILS_RELATIVE_URL_ROOT'].blank?
+  #   "http://localhost:3000"
+  # else
+  #   "#{ENV['RAILS_URL']}#{ENV['RAILS_RELATIVE_URL_ROOT']}"
+  # end
+
   config.filter_parameters += [:password]
 
   config.active_record.raise_in_transactional_callbacks = true
