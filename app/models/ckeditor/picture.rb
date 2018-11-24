@@ -9,8 +9,8 @@ class Ckeditor::Picture < Ckeditor::Asset
   validates_attachment_content_type :data, content_type: /\Aimage/
 
   def url_content
-    # url(:content)
     # url_t = (ENV['RAILS_URL'].blank? || ) ? "http://localhost:3000" : "#{ENV['RAILS_URL']}#{ENV['RAILS_RELATIVE_URL_ROOT']}"
-    "#{ENV['RAILS_URL'].presence || "http://localhost:3000"}#{ENV['RAILS_RELATIVE_URL_ROOT'].presence}#{url(:content)}"
+    # "#{ENV['RAILS_URL'].presence || "http://localhost:3000"}#{ENV['RAILS_RELATIVE_URL_ROOT'].presence}#{url(:content)}"
+    url(:content)
   end
 end
