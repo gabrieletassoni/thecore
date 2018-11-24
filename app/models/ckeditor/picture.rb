@@ -10,11 +10,7 @@ class Ckeditor::Picture < Ckeditor::Asset
 
   def url_content
     # url(:content)
-    url = if ENV['RAILS_URL'].blank? || ENV['RAILS_RELATIVE_URL_ROOT'].blank?
-      "http://localhost:3000"
-    else
-      "#{ENV['RAILS_URL']}#{ENV['RAILS_RELATIVE_URL_ROOT']}"
-    end
-    "#{url}#{url(:content)}"
+    # url_t = (ENV['RAILS_URL'].blank? || ) ? "http://localhost:3000" : "#{ENV['RAILS_URL']}#{ENV['RAILS_RELATIVE_URL_ROOT']}"
+    "#{ENV['RAILS_URL'].presence || "http://localhost:3000"}#{ENV['RAILS_RELATIVE_URL_ROOT'].presence}#{url(:content)}"
   end
 end
