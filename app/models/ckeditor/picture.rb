@@ -1,6 +1,6 @@
 class Ckeditor::Picture < Ckeditor::Asset
   has_attached_file :data,
-                    url: '/ckeditor_assets/pictures/:id/:style_:basename.:extension',
+                    url: "#{ENV['RAILS_RELATIVE_URL_ROOT'].presence}/ckeditor_assets/pictures/:id/:style_:basename.:extension",
                     path: ':rails_root/public/ckeditor_assets/pictures/:id/:style_:basename.:extension',
                     styles: { content: '800>', thumb: '118x100#' }
 
@@ -10,7 +10,7 @@ class Ckeditor::Picture < Ckeditor::Asset
 
   def url_content
     # url_t = (ENV['RAILS_URL'].blank? || ) ? "http://localhost:3000" : "#{ENV['RAILS_URL']}#{ENV['RAILS_RELATIVE_URL_ROOT']}"
-    # "#{ENV['RAILS_URL'].presence || "http://localhost:3000"}#{ENV['RAILS_RELATIVE_URL_ROOT'].presence}#{url(:content)}"
-    url(:content)
+    # url(:content)
+    "#{ENV['RAILS_URL'].presence}#{ENV['RAILS_RELATIVE_URL_ROOT'].presence}#{url(:content)}"
   end
 end
