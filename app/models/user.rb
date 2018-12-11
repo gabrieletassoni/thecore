@@ -2,7 +2,7 @@ class User < ApplicationRecord
   include RailsAdmin
   # # include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable, :recoverable, :rememberable, :trackable, :validatable #, :confirmable
+  devise :database_authenticatable, :recoverable, :rememberable, :trackable, :validatable, :timeoutable #, :confirmable
 
   before_create :generate_authentication_token
 
@@ -51,7 +51,12 @@ class User < ApplicationRecord
   def self.users_count
     where(admin: false, locked: false).count
   end
-
+  
+  def timeout_in
+    return 30.minutes if admin?
+    1.day
+  end
+  
   def title
     username
   end
