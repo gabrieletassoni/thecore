@@ -38,9 +38,10 @@ Gem::Specification.new do |s|
   # Ricordarsi di usare il giusto asset precompile:
   # RAILS_ENV=production bundle exec rake assets:precompile RAILS_RELATIVE_URL_ROOT=/development/hiworkflows
   # Ovviamene se non sono in un suburi, allora non serve la parte relativa a RAILS_RELATIVE_URL_ROOT
-  s.add_dependency 'font-awesome-sass', "~> 4.7" #, '~> 4.5.0'
+  s.add_dependency 'font-awesome-sass', '~> 5.6'#, "~> 4.7" #, '~> 4.5.0'
   # Bootstrap 3: https://github.com/twbs/bootstrap-sass
-  s.add_dependency 'bootstrap-sass', "~> 3.3" # , '3.3.5.1'
+  s.add_dependency 'bootstrap-sass', '~> 3.4'
+  s.add_dependency 'sassc-rails', '~> 2.0'
   # -----------------------------------------------------------------------------------------------
   # -----------------------------------------------------------------------------------------------
   # RAILS ADMIN
@@ -58,7 +59,7 @@ Gem::Specification.new do |s|
   # middleware changing gems are present in bundle, I must fix this version to 1.4.0
   # TODO: Remove when issue is resolved by rails admin team:
   # https://github.com/sferik/rails_admin/issues/3060
-  s.add_dependency 'rails_admin', '1.4.0' # , '~> 1.2' 
+  s.add_dependency 'rails_admin', '~> 1.4' # , '~> 1.2' 
   # s.add_dependency 'rails_admin_selectize'#, github: 'glyph-fr/rails_admin_selectize'
   s.add_dependency 'rails_admin-i18n', "~> 1.11"
   #s.add_dependency 'rails_admin_history_rollback'

@@ -91,7 +91,7 @@ class User < ApplicationRecord
     config.model self.name.underscore.capitalize.constantize do
     # rails_admin do
       navigation_label I18n.t("admin.settings.label")
-      navigation_icon 'fa fa-user-circle-o'
+      navigation_icon 'fa fa-user-circle'
       desc I18n.t("activerecord.descriptions.user")
 
       weight 1000
