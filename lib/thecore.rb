@@ -42,6 +42,8 @@ require 'date_validator'
 require 'ckeditor'
 require "ckeditor/orm/active_record"
 
+require "webpacker"
+
 require 'thecore/engine'
 
 module Thecore

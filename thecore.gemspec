@@ -85,4 +85,6 @@ Gem::Specification.new do |s|
   s.add_dependency "date_validator", '~> 0.9'
   s.add_dependency 'ckeditor', '~> 4.2'
   # -----------------------------------------------------------------------------------------------
+
+  s.add_dependency 'webpacker', '~> 3.5'
 end
