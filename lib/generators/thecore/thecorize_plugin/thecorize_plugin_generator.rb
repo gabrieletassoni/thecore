@@ -32,7 +32,7 @@ module Thecore
         inject_into_file @plugin_lib_file, after: "class Engine < ::Rails::Engine\n" do
 "
     initializer '#{@name}.add_to_migrations' do |app|
-      unless app.root.to_s == root.to_s
+      unless app.root.to_s.match root.to_s
         # APPEND TO MAIN APP MIGRATIONS FROM THIS GEM
         config.paths['db/migrate'].expanded.each do |expanded_path|
           app.config.paths['db/migrate'] << expanded_path
