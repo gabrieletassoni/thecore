@@ -7,6 +7,9 @@ it:
   sign_out: "Uscita"
   advanced: Impostazioni
   main_records: Anagrafiche
+  errors:
+    messages:
+      invalid: contiene caratteri invalidi
   tiered_times:
     dd:
       zero: "0 Giorni"
@@ -31,6 +34,9 @@ it:
       label: "Strumenti"
     settings:
       label: "Impostazioni"
+      advanced: Avanzate
+      registries: Anagrafiche
+      operations: Operatività
     actions:
       charts:
         menu: Analisi
