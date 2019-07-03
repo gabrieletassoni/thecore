@@ -87,4 +87,5 @@ Gem::Specification.new do |s|
   # -----------------------------------------------------------------------------------------------
 
   s.add_dependency 'webpacker', '~> 3.5'
+  s.add_dependency "mini_magick", '~> 4.9'
 end
