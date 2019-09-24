@@ -2,7 +2,7 @@ class User < ApplicationRecord
   include RailsAdmin
   # # include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable, :recoverable, :rememberable, :trackable, :validatable, :timeoutable #, :confirmable
+  devise :database_authenticatable, :recoverable, :rememberable, :trackable, :validatable, :timeoutable, timeout_in: 30.minutes
 
   before_create :generate_authentication_token
 
