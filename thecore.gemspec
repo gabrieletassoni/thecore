@@ -38,7 +38,7 @@ Gem::Specification.new do |s|
   # Ricordarsi di usare il giusto asset precompile:
   # RAILS_ENV=production bundle exec rake assets:precompile RAILS_RELATIVE_URL_ROOT=/development/hiworkflows
   # Ovviamene se non sono in un suburi, allora non serve la parte relativa a RAILS_RELATIVE_URL_ROOT
-  s.add_dependency 'font-awesome-sass', '~> 5.6'#, "~> 4.7" #, '~> 4.5.0'
+#  s.add_dependency 'font-awesome-sass', '~> 5.6'#, "~> 4.7" #, '~> 4.5.0'
   # Bootstrap 3: https://github.com/twbs/bootstrap-sass
   s.add_dependency 'bootstrap-sass', '~> 3.4'
   s.add_dependency 'sassc-rails', '~> 2.0'

@@ -31,7 +31,7 @@ require 'devise-i18n'
 require 'cancancan'
 require 'http_accept_language'
 require 'bootstrap-sass'
-require 'font-awesome-sass'
+# require 'font-awesome-sass'
 
 require 'thecore_rails_admin_export_concern'
 require 'thecore_rails_admin_bulk_delete_concern'
