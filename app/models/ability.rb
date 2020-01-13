@@ -37,11 +37,13 @@ class Ability
     # faccia il module_eval di TheCore::Abilities, aggiungendo un metodo
     # che accetta user come parametro e con dentro la definizione delle ability
     # include TheCore::Abilities
+    core_abilities user
     TheCoreAbilities.instance_methods(false).each do |a|
       # method(a).call(user)
       # eval("#{a} #{user}")
-      Rails.logger.debug "LOADING ABILITIES FROM: #{a}"
-      send(a, user)
+      
+      # Rails.logger.debug "LOADING ABILITIES FROM: #{a}"
+      send(a, user) if a.to_s != "core_abilities"
     end
     # core_abilities user
   end

@@ -78,7 +78,7 @@ class User < ApplicationRecord
     rescue
       # single role
       # ROLES[self.roles.to_i - 1] == role
-      Rails.logger.debug "ROLES: #{self.roles.to_s}"
+      # Rails.logger.debug "ROLES: #{self.roles.to_s}"
       self.roles.to_s == role.to_s
     end
   end
