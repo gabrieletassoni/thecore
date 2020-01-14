@@ -2,7 +2,13 @@ class PagesController < ApplicationController
   before_action :authenticate_user!, only: [
     :inside, :contact
   ]
-  #authorize_resource :class => false
+    
+  # So the static link navigation can be set runtime (yes it's an hack
+  # since I have to set this dynamically at runtime, using a class
+  # continously re-evaluated)
+  RailsAdmin.config do |config|
+    config.navigation_static_label = I18n.t('admin.links.label')
+  end
 
   def home
   end
