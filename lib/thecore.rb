@@ -46,5 +46,14 @@ require "webpacker"
 
 require 'thecore/engine'
 
+require 'deep_merge/rails_compat'
+
 module Thecore
+    def self.smart_merge src, dest
+        src.deeper_merge! dest, {
+            extend_existing_arrays: true, 
+            merge_hash_arrays: true
+        }
+        src
+    end
 end

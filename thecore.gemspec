@@ -88,4 +88,8 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'webpacker', '~> 3.5'
   s.add_dependency "mini_magick", '~> 4.9'
+
+  # Intelligent Merging (recursive and recognizes types)
+  # https://github.com/danielsdeleo/deep_merge
+  s.add_dependency "deep_merge", '~> 1.2'
 end
