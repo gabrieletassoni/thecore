@@ -3,4 +3,4 @@ en:
     models:
       user:
         one: User
-        other: Users Database
+        other: Users

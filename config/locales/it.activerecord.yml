@@ -3,7 +3,7 @@ it:
     models:
       user:
         one: Utente
-        other: Anagrafica Utenti
+        other: Utenti
     attributes:
       user:
         email: E-Mail
