@@ -27,23 +27,23 @@ graph LR
 ./app/assets/stylesheets --> ./app/assets/stylesheets/main_tcp_debug.scss
 ./app/assets/javascripts --> ./app/assets/javascripts/main_tcp_debug.js
 ./.github/workflows --> ./.github/workflows/gempush.yml
-. --> ./.gitignore
-. --> ./thecore_tcp_debug.gemspec
-. --> ./.git
-. --> ./README.md
-. --> ./Gemfile
+.gitignore
+thecore_tcp_debug.gemspec
+.git
+README.md
+Gemfile
 ./config/locales --> ./config/locales/it.thecore_tcp_debug.yml
 ./config/locales --> ./config/locales/en.thecore_tcp_debug.yml
 ./config/initializers --> ./config/initializers/assets.rb
 ./config/initializers --> ./config/initializers/after_initialize.rb
 ./config/initializers --> ./config/initializers/add_to_db_migration.rb
-. --> ./MIT-LICENSE
+MIT-LICENSE
 ./lib/root_actions --> ./lib/root_actions/tcp_debug.rb
 ./lib/thecore_tcp_debug --> ./lib/thecore_tcp_debug/engine.rb
 ./lib/thecore_tcp_debug --> ./lib/thecore_tcp_debug/version.rb
 ./lib --> ./lib/thecore_tcp_debug.rb
 ./db --> ./db/seeds.rb
-. --> ./Rakefile
+Rakefile
 ```
 
 ## `*.gemspec` file
