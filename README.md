@@ -20,8 +20,12 @@ Here you can find this efforts-turned-code thing: **Thecore** has been used and 
 ## Philosphy
 I always preferred to invest some more time in finding the best tool for what I need and compile a toolbox of helpful technologies, rather than start coding mindlessly. **Thecore** has grown and proved to be a time saver, it surely could be enhanced and as long as I keep using it for my day by day job, it will grow more, but if you feel that RoR, sane defaults, atomic engines (components) sounds good to you, don't be scared to pull and make **Thecore** even more useful.
 
-## Partecipate
+# Thecore ATOMS
+
+[Here](https://github.com/gabrieletassoni?tab=repositories&q=thecore&type=public&language=ruby&sort=name) you can find all **Thecore** ATOMS I published for public usage. They cover all the main aspects of a **Thecore** Application, from out of the box _APIs_, _Authentication_, _Backend UX_ and even interaction with Zebra RFID/Barcode scanners.
+
+# Partecipate
 If you like to partecipate on this project, please do so; file bugs, pull and modify code, give suggestions...
 
-## Support
+# Support
 Hire [me](mailto:gabriele.tassoni@gmail.com) as a full-stack developer for your RoR projects, I will use **Thecore** technology and show you how good it is. This is a straightforward way to support this project.
