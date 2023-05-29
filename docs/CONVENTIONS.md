@@ -23,7 +23,7 @@ It's advised to add in the `lib/[this_atom_name].rb` file all the **requires** p
 
 ## .gitignore
 
-[Here](samples/Gitignore) you can find a sample of a sane and comprehensive Git ignore file.
+[Here](../samples/Gitignore) you can find a sample of a sane and comprehensive Git ignore file.
 
 ## Root Actions
 
