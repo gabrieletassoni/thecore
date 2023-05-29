@@ -6,6 +6,46 @@
 
 # ATOMS
 
+# Folder Structure
+
+Usually an _ATOM_ adds some conventions also on folders and files structure, here is the base structure you'll see more often when dealing with _ATOMS_:
+
+```mermaid
+graph LR
+./app --> ./app/views
+./app/views --> ./app/views/rails_admin
+./app/views/rails_admin --> ./app/views/rails_admin/main
+./app --> ./app/assets
+./app/assets --> ./app/assets/stylesheets
+./app/assets --> ./app/assets/javascripts
+./.github --> ./.github/workflows
+./config --> ./config/locales
+./config --> ./config/initializers
+./lib --> ./lib/root_actions
+./lib --> ./lib/thecore_tcp_debug
+./app/views/rails_admin/main --> ./app/views/rails_admin/main/tcp_debug.html.erb
+./app/assets/stylesheets --> ./app/assets/stylesheets/main_tcp_debug.scss
+./app/assets/javascripts --> ./app/assets/javascripts/main_tcp_debug.js
+./.github/workflows --> ./.github/workflows/gempush.yml
+. --> ./.gitignore
+. --> ./thecore_tcp_debug.gemspec
+. --> ./.git
+. --> ./README.md
+. --> ./Gemfile
+./config/locales --> ./config/locales/it.thecore_tcp_debug.yml
+./config/locales --> ./config/locales/en.thecore_tcp_debug.yml
+./config/initializers --> ./config/initializers/assets.rb
+./config/initializers --> ./config/initializers/after_initialize.rb
+./config/initializers --> ./config/initializers/add_to_db_migration.rb
+. --> ./MIT-LICENSE
+./lib/root_actions --> ./lib/root_actions/tcp_debug.rb
+./lib/thecore_tcp_debug --> ./lib/thecore_tcp_debug/engine.rb
+./lib/thecore_tcp_debug --> ./lib/thecore_tcp_debug/version.rb
+./lib --> ./lib/thecore_tcp_debug.rb
+./db --> ./db/seeds.rb
+. --> ./Rakefile
+```
+
 ## `*.gemspec` file
 
 An _ATOM_ can depend on these two base thecore ATOMS. They can added together or just once, be the ATOM an API only gem or a gem which delivers functionalities useful for a GUI experience.
