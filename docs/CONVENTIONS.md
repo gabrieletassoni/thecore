@@ -159,6 +159,10 @@ To embed the Javascript file directly into the action's `.html.erb` file is advi
 
 # THECORE APP
 
+## Versioning
+
+Please keep your wrapper App with Major version equal to the **Thecore** Major version, i.e. if using thecore 3 gems, then your wrapper App will start at 3.0.0 version, in order to keep it simple to identify on which **Thecore** base is built your aplication.
+
 ## Dependencies
 
 In the thecore APP the preferred way to integrate your code is by putting in the Gemfile.base the ATOM which depends on the base thecore ATOMS: [Model Driven API](https://github.com/gabrieletassoni/model_driven_api) and [Thecore UI Rails Admin](https://github.com/gabrieletassoni/thecore_ui_rails_admin). These are added in a separate way to allow developer to focus on the needed aspects of the application, UI or API based.
