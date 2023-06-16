@@ -19,7 +19,7 @@ The RoR App, the one made using _rails new_ command, will become just a wrapper 
 
 As a freelance full-stack developer I always needed smart tools and methods to manage scalable projects. During the years I started to make choices, studying languages, patterns and technologies that were getting my attention because of their smartness.
 
-Here you can find this efforts-turned-code thing: **Thecore** has been used and tested in different professional projects and always proved smart enough to let me manage them even if they looked too big for one person; **Thecore** is just the most important aspect of all the ATOMS you can find in other repositories which follow **Thecore** [Guidelines](docs/SUMMARY.md), the foundation on which all the other atomic components grow. On github I'll put all of them, or, at least the general ones, the ones which doesn't have a strong characterization on a process peculiar to one of my customers.
+Here you can find this efforts-turned-code thing: **Thecore** has been used and tested in different professional projects and always proved smart enough to let me manage them even if they looked too big for one person; **Thecore** is just the most important aspect of all the ATOMS you can find in other repositories which follow **Thecore** [Guidelines](docs/00_SUMMARY.md), the foundation on which all the other atomic components grow. On github I'll put all of them, or, at least the general ones, the ones which doesn't have a strong characterization on a process peculiar to one of my customers.
 
 ## Philosphy
 
