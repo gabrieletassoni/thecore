@@ -1,16 +1,15 @@
-[[_TOC_]]
+# Using WSL Ubuntu as a Docker host for remote containers
 
-# Usare WSL Ubuntu come docker host per il remote container
+Docker Desktop is convenient but can be inefficient in terms of performance and system resource usage. It is recommended to remove Docker Desktop if you want to use the Devcontainer feature of VS Code for portable and self-contained application development.
 
-Docker desktop è comodo, ma molto inefficente a livello di prestaizoni e peso su SO, meglio rimuoverlo, se si vuole usare la feature Devcontainer di VS Code per lo sviluppo portabile e self contained di applicazioni.
+## Remove Docker Desktop
 
-## Rimuovere Docker Desktop
+Using the standard application removal tools in Windows (typically "Add or Remove Programs"), search for and uninstall Docker Desktop.
 
-Usando i normali strumenti di rimozione delle applicazioni in windows (tipicamente `Installazione Applicazioni`, cercare e rimuovere Docker Desktop.
 
-## Controllare di avere WSL alla versione 2
+## Check for WSL version 2
 
-Aprire powershell e lanciare questo comando:
+Open PowerShell and run the following command:
 
 ```powershell
 wsl -l -v
