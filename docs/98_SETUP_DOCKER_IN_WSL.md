@@ -16,7 +16,7 @@ Aprire powershell e lanciare questo comando:
 wsl -l -v
 ```
 
-![image.png](./images/vscode/image.png)
+![Alt text](images/image.png)
 
 E' importante che sotto la colonna VERSION venga visualizzato 2.
 
@@ -36,7 +36,7 @@ Per prima cosa, controlliamo le immagini presenti online, ufficialmente supporta
 wsl --list --online
 ```
 
-![image-1.png](./images/vscode/image-1.png)
+![Alt text](images/image-1.png)
 
 E poi installiamo l'ultima versione disponibile
 
@@ -54,7 +54,7 @@ Una volta proiettati nella shell di Ubuntu, potete controllare la versione corre
 ```sh
 lsb_release -a
 ```
-![image-2.png](./images/vscode/image-2.png)
+![Alt text](images/image-2.png)
 
 Se è minore della `22.04`, al momento di scrivere questo documento era la versione LTS più nuova.
 
@@ -152,7 +152,7 @@ docker ps
 
 Se l'ultimo comando restituisce una schermata simile a:
 
-![image-3.png](./images/vscode/image-3.png)
+![Alt text](images/image-3.png)
 
 Complimenti! Avete installato correttamente docker.
 
