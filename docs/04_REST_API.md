@@ -20,7 +20,7 @@
 4. Run the migrations: ```rails db:migrate```
 4. Run the migrations: ```rails thecore:db:seed```
 5. Bring up your dev server: ```rails s```
-6. Use **[Insomnia](https://github.com/Kong/insomnia)** rest client to try the endpoints by importing [the API v2 tests](samples/insomnia/ApiV2Tests.json) and edit the environment variables as needed.
+6. Use **[Insomnia](https://github.com/Kong/insomnia)** rest client to try the endpoints by importing [the API v2 tests](../samples/insomnia/ApiV2Tests.json) and edit the environment variables as needed.
 
 This will setup a *User* model, *Role* model, *Permissions* model and the HABTM table between these + any added model you created at the step 3.
 
