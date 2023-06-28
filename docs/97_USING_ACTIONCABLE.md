@@ -51,7 +51,7 @@ require 'action_cable_client'
 
 ## Example of usage
 
-The following example uses the provided gem to recieve messages using ActionCable, it can be in a Model or a standalone ruby script, it does not depend on Ruby on Rails.
+The following example uses the provided gem to receive messages using ActionCable, it can be in a Model or a standalone ruby script, it does not depend on Ruby on Rails.
 This example checks in the message received event for a specific topic for which to enable the business logic: **rfid_raw_tag_reading** this is a custom topic taken from an actual application, but the important thing here is that the topic key always exists in the messages which arrive through the ActionCable Channel.
 The **Authorization** token is assumed received using JWT in a previous step.
 The `timeout`, `websocket_url` and `channel_name` are variables assumed to be set in previous code.
