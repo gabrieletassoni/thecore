@@ -1,5 +1,22 @@
 [[_TOC_]]
 
+# Existing Channel topics
+
+Any message sent in a **Thecore** application must have a `topic` key, i.e. `{ topic: "record" }`
+
+Any **topic** can be added to the message. The Channel is always **ActivityLogChannel**.
+
+## Existing Topics
+
+- **{ topic: "record" }**: This topic sends a message whenever an ActiveRecord record is created succesfully in the DB, in the message these keys are also mandatory:
+  - **action**: This key holds information about the action executed on the record, be it: *create*, *update* or *destroy*.
+  - **class**: This is the class of the ActiveRecord Model on which the *action* was performed.
+  - **success**: Boolean indicating whether or not the *action* performed succesfully.
+  - **valid**: Boolean indicating if there where validation errors.
+  - **errors**: An array of validation errors.
+  - **record**: The ActiveRecord Model object.
+
+
 # From a Ruby script
 
 Works also for ActiveRecord Models.
@@ -27,31 +44,36 @@ require 'action_cable_client'
 ## Example of usage
 
 The following example uses the provided gem to recieve messages using ActionCable, it can be in a Model or a standalone ruby script, it does not depend on Ruby on Rails.
+This example checks in the message received event for a specific topic for which to enable the business logic: **rfid_raw_tag_reading** this is a custom topic taken from an actual application, but the important thing here is that the topic key always exists in the messages which arrive through the ActionCable Channel.
+The **Authorization** token is assumed received using JWT in a previous step.
+The `timeout`, `websocket_url` and `channel_name` are variables assumed to be set in previous code.
 
 ```ruby
 EventMachine.run do
-# Stop EventMachine after timeout seconds
-timer = EventMachine::Timer.new(timeout) { 
-  EventMachine.stop 
-}
+  # Stop EventMachine after timeout seconds
+  timer = EventMachine::Timer.new(timeout) { 
+    EventMachine.stop 
+  }
 
-# Create a new ActionCableClient
-# client = ActionCableClient.new(websocket_url, channel_name)
-client = ActionCableClient.new(websocket_url, channel_name, true, { 
-  'Authorization' => "Bearer #{token}" 
-})
-# called whenever a welcome message is received from the server
-client.connected { 
-  # Send a connection message to the server
-  client.perform('receive', { message: 'On Demand Inventory Client is connected', topic: "home", namespace: "subscriptions" }) 
-}
+  # Create a new ActionCableClient
+  # client = ActionCableClient.new(websocket_url, channel_name)
+  client = ActionCableClient.new(websocket_url, channel_name, true, { 
+    'Authorization' => "Bearer #{token}" 
+  })
+  # called whenever a welcome message is received from the server
+  client.connected { 
+    # Send a connection message to the server
+    client.perform('receive', { message: 'On Demand Inventory Client is connected', topic: "home", namespace: "subscriptions" }) 
+  }
 
-# called whenever a message is received from the server
-client.received do | message |
-  # Accumulate the message in the array only if the message is a rfid_raw_tag_reading and the tag matches the regex and the rssi is greater than the threshold and the tag is not already present in the array and the number of unique tags is less than the expected number of unique tags and the interface is still in on_demand_inventory mode
-  @messages << message["message"]["message"]["uuid"] if message["message"]["topic"] == "rfid_raw_tag_reading" && message["message"]["message"]["uuid"].match(regex) && message["message"]["message"]["rssi"].to_i > threshold.to_i && !@messages.include?(message["message"]["message"]["uuid"]) && @messages.count < expected_unique_tags && Interface.find_by(address: address).on_demand_inventory
-  # Stop the EventMachine if the number of unique tags is equal to the expected number of unique tags
-  EventMachine.stop if @messages.count >= expected_unique_tags
+  # called whenever a message is received from the server
+  client.received do | message |
+    # Accumulate the message in the array only if the message is a rfid_raw_tag_reading and the tag matches the regex and the rssi is greater than the threshold and the tag is not already present in the array and the number of unique tags is less than the expected number of unique tags and the interface is still in on_demand_inventory mode
+    # Assume that the interesting topic is rfid_raw_tag_reading:
+    @messages << message["message"]["message"]["uuid"] if message["message"]["topic"] == "rfid_raw_tag_reading"
+    # Stop the EventMachine if the number of unique tags is equal to the expected number of unique tags
+    EventMachine.stop if @messages.count >= expected_unique_tags
+  end
 end
 ```
 
