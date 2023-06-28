@@ -23,6 +23,7 @@ Any **topic** can be added to the message. The Channel is always **ActivityLogCh
     - *200*: The other end responded to ping or TCP connection.
     - *400*: Invalid test, thus the requested test does not exist among the available ones.
     - *503*: The other end didn't respond to ping or TCP connection.
+  - **message**: A descriptive message of the test performed.
 
 # From a Ruby script
 
