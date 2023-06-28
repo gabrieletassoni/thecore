@@ -1,13 +1,16 @@
 [[_TOC_]]
 
-# Existing Channel topics
+# Topics and Namespaces
 
-Any message sent in a **Thecore** application must have a `topic` key, i.e. `{ topic: "record" }`
+If the message has a `namespace: "subscriptions"` key in the message sent, it defaults to a conventional behaviour of PING - PONG from sender to server.
+
+Any message sent in a **Thecore** application must have a `topic` key, i.e. `{ topic: "record" }`, otherwise, only in cas of `namespace: "subscriptions"`, it can be automatically set to **general** if not provided.
 
 Any **topic** can be added to the message. The Channel is always **ActivityLogChannel**.
 
 ## Existing Topics
 
+- **{ topic: "general" }**: If no topic is defined in the message, it defaults to this one only if the message has a `namespace: "subscriptions"` key/value.
 - **{ topic: "record" }**: This topic sends a message whenever an ActiveRecord record is created succesfully in the DB, in the message these keys are also mandatory:
   - **action**: This key holds information about the action executed on the record, be it: *create*, *update* or *destroy*.
   - **class**: This is the class of the ActiveRecord Model on which the *action* was performed.
@@ -15,7 +18,11 @@ Any **topic** can be added to the message. The Channel is always **ActivityLogCh
   - **valid**: Boolean indicating if there where validation errors.
   - **errors**: An array of validation errors.
   - **record**: The ActiveRecord Model object.
-
+- **{ topic: "tcp_debug" }**: Exists only if the _ATOM_ [Thecore TCP Debug](https://github.com/gabrieletassoni/thecore_tcp_debug) is included in your project, it characterizes messages dealing with the PING or TCP Port Connection tests present in that Root Action. Other mandatory keys are:
+  - **status**: It indicates if the test performed correctly, can assume these values:
+    - *200*: The other end responded to ping or TCP connection.
+    - *400*: Invalid test, thus the requested test does not exist among the available ones.
+    - *503*: The other end didn't respond to ping or TCP connection.
 
 # From a Ruby script
 
