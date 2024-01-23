@@ -31,7 +31,12 @@
 				"lewisardern.semgrep-snippets",
 				"eamodio.gitlens",
 				"aliariff.vscode-erb-beautify",
-				"GrapeCity.gc-excelviewer"
+				"GrapeCity.gc-excelviewer",
+				"GitHub.copilot",
+				"GitHub.copilot-chat",
+				"rebornix.ruby",
+				"jnbt.vscode-rufo",
+				"anweber.vscode-httpyac"
 			]
 		}
 	},
