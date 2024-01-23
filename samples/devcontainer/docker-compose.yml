@@ -1,4 +1,4 @@
-version: '3'
+version: '3.9'
 
 services:
   app:
@@ -20,7 +20,7 @@ services:
     network_mode: service:db
     environment:
       REDIS_URL: redis://db:6379/1
-      DATABASE_URL: postgres://postgres:postgres@db:5432/myprint_dev?pool=5
+      DATABASE_URL: postgres://postgres:postgres@db:5432/mytrack_dev?pool=5
 
     # Uncomment the next line to use a non-root user for all processes.
     # user: vscode
@@ -30,12 +30,20 @@ services:
   redis:
     image: redis:latest
     restart: unless-stopped
-    command: redis-server --save 60 1 --loglevel warning
+    command: redis-server
     # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
     network_mode: service:db
+    healthcheck: 
+      interval: 1s
+      retries: 30
+      test: "redis-cli ping"
+      timeout: 3s
+
 
   db:
-    image: postgres:latest
+    # One might assume that using postgres:15 as their tag would accomplish soft-pinning to avoid breaking changes. However, what occurred in the past few days was that 15 moved from 15-bullseye to 15-bookworm. This creates a breaking change because postgres does not provide its own collations -- it uses collations from the base OS, which were upgraded with Debian's change from bullseye to bookworm.
+    # The takeaway is that if you actually want soft-pinning without breaking changes, you need to pin not only the postgres major version, but also the operating system, i.e. postgres:15-bookworm.
+    image: postgres:15-bookworm
     restart: unless-stopped
     volumes:
       - postgres-data:/var/lib/postgresql/data
