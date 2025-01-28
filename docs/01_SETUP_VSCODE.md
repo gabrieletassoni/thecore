@@ -2,15 +2,15 @@
 
 # Using DevContainer in Visual Studio Code for Development
 
-## Overview
-In modern software development, managing consistent environments across different developers and machines is crucial. The DevContainer feature in Visual Studio Code (VS Code) helps address this by creating reproducible, isolated development environments that can be easily shared and configured using a simple configuration file (`devcontainer.json`). This setup offers significant advantages in terms of standardization, clean environments, and fast cold-starts, especially when onboarding new team members or replacing workstations.
-
 ## TL;DR
 
 For specific walkthrough, please reade the relevant setup pages for: 
 - [Linux](01.1_SETUP_VSCODE_LINUX.md)
 - [Windows](01.2_SETUP_VSCODE_WINDOWS.md)
 - [Mac OS](01.3_SETUP_VSCODE_MACOS.md)
+
+## Overview
+In modern software development, managing consistent environments across different developers and machines is crucial. The DevContainer feature in Visual Studio Code (VS Code) helps address this by creating reproducible, isolated development environments that can be easily shared and configured using a simple configuration file (`devcontainer.json`). This setup offers significant advantages in terms of standardization, clean environments, and fast cold-starts, especially when onboarding new team members or replacing workstations.
 
 ## Why Use DevContainer in Visual Studio Code
 
