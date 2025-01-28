@@ -1,38 +1,78 @@
 ![**Thecore** Logo](https://github.com/gabrieletassoni/thecore_ui_layout_taris_website/raw/master/app/assets/images/logo.png)
 
-# Thecore
+# Thecore  
 
-**Thecore** is made of _ATOMS_ or, well, **Atomic Components**. 
-The RoR App, the one made using _rails new_ command, will become just a wrapper which depends only on the _Atomic Components_ you need.
-**Thecore** is a set of tools, best practices and guidelines aimed at creating bigger WebApps without focusing on how to do it.
+**Thecore** is a framework built on the idea of _ATOMS_—modular **Atomic Components** that empower you to create scalable, maintainable web applications. At its core, your Ruby on Rails (RoR) app becomes a lightweight wrapper, depending only on the _Atomic Components_ you truly need.
 
-**It's way better to focus on what to do than on how to do it, don't you think?**
+With **Thecore**, you stop worrying about _how_ to build your app and focus on _what_ to build.  
 
-## But... _What are ATOMS?_
+**Wouldn’t you rather focus on your ideas than reinventing the wheel?**
 
- * **Self Contained engines:** the _Atomic Component_ must be developed following some guidelines which are documented in this repository.
- * **Pluggable Components:** just make your RoR WebApp or another _Atomic Component_ depend on an _Atomic Component_ and it will inherit the funcitonalities of the _Atomic Component_, you don't need them anymore? just remove the dependency from Gemfile or gemspec and your WebApp will continue to work as before, but without the functionality provided by the _Atomic Component_ and without breaking the business logic.
- * **Tested Components:** once tested for one application, they are tested for every other applications, no need to do regression tests on your app if it includes (say... depends) on functionalities provided by an _Atomic Component_.
- * **Easily Extandable:** _Atomic Components_ can be improved in their functionalities by adding new ones, but even better, they can be extended in other _Atomic Components_ which will depend on the original one, without the need to touch well established code.
+---
 
-## Why
+## What Are ATOMS?  
 
-As a freelance full-stack developer I always needed smart tools and methods to manage scalable projects. During the years I started to make choices, studying languages, patterns and technologies that were getting my attention because of their smartness.
+ATOMS are the building blocks of **Thecore**, designed with these principles:  
 
-Here you can find this efforts-turned-code thing: **Thecore** has been used and tested in different professional projects and always proved smart enough to let me manage them even if they looked too big for one person; **Thecore** is just the most important aspect of all the ATOMS you can find in other repositories which follow **Thecore** [Guidelines](docs/00_SUMMARY.md), the foundation on which all the other atomic components grow. On github I'll put all of them, or, at least the general ones, the ones which doesn't have a strong characterization on a process peculiar to one of my customers.
+### 1. **Self-Contained Engines**  
+Each _Atomic Component_ is an isolated Rails engine, developed with clear guidelines outlined in this repository.  
 
-## Philosphy
+### 2. **Pluggable Components**  
+Need a specific feature? Add the corresponding _Atomic Component_ to your app’s dependencies.  
+Don’t need it anymore? Simply remove it from the `Gemfile` or `gemspec`, and your app will keep running smoothly—without breaking existing business logic.  
 
-I always preferred to invest some more time in finding the best tool for what I need and compile a toolbox of helpful technologies, rather than start coding mindlessly. **Thecore** has grown and proved to be a time saver, it surely could be enhanced and as long as I keep using it for my day by day job, it will grow more, but if you feel that RoR, sane defaults, atomic engines (components) sounds good to you, don't be scared to pull and make **Thecore** even more useful.
+### 3. **Tested, Reusable Components**  
+Every _Atomic Component_ is rigorously tested. Once verified in one app, it’s reliable in all others, reducing regression testing overhead.  
 
-# Thecore ATOMS
+### 4. **Easily Extensible**  
+Enhance _Atomic Components_ with additional functionality or extend them by building new components that depend on the originals. No need to touch established, stable code.
 
-[Here](https://github.com/gabrieletassoni?tab=repositories&q=thecore&type=public&language=ruby&sort=name) you can find all **Thecore** ATOMS I published for public usage. They cover all the main aspects of a **Thecore** Application, from out of the box _APIs_, _Authentication_, _Backend UX_ and even interaction with Zebra RFID/Barcode scanners.
+---
 
-# Partecipate
+## Why **Thecore** Exists  
 
-If you like to partecipate on this project, please do so; file bugs, pull and modify code, give suggestions...
+As a freelance full-stack developer, I’ve always sought smarter ways to manage scalable projects. Over the years, I’ve refined my approach by studying languages, patterns, and technologies that prioritize efficiency and scalability.  
 
-# Support
+**Thecore** is the culmination of these efforts—a framework born from real-world projects. It has consistently proven its value, helping me handle projects that might seem overwhelming for a solo developer.  
 
-Hire [me](mailto:gabriele.tassoni@gmail.com) as a full-stack developer for your RoR projects, I will use **Thecore** technology and show you how good it is. This is a straightforward way to support this project.
+At its heart, **Thecore** provides a foundation where every other _Atomic Component_ grows. Many of these components are shared on GitHub, particularly those that aren’t tied to a specific client’s needs.  
+
+---
+
+## The Philosophy Behind **Thecore**  
+
+I believe in investing time to find the right tools and building a reliable toolbox, rather than diving headfirst into coding without a plan.  
+
+**Thecore** is the result of that philosophy. It saves time, scales effortlessly, and evolves as I use it in my day-to-day work.  
+
+If RoR, sane defaults, and modular engines sound appealing to you, don’t hesitate to explore and contribute. **Thecore** is designed to grow through collaboration.  
+
+---
+
+## Discover Thecore ATOMS  
+
+Explore the public **Thecore** ATOMS [here](https://github.com/gabrieletassoni?tab=repositories&q=thecore&type=public&language=ruby&sort=name). These components cover key aspects of a **Thecore** application:  
+
+- Out-of-the-box **APIs**  
+- Seamless **Authentication**  
+- Intuitive **Backend UX**  
+- Hardware integration, like **Zebra RFID/Barcode scanners**  
+
+---
+
+## Get Involved  
+
+Your contributions can make **Thecore** even better:  
+- Report bugs  
+- Suggest improvements  
+- Submit pull requests  
+
+Every bit of input counts!  
+
+---
+
+## Support the Project  
+
+Want to see **Thecore** in action? Hire [me](mailto:gabriele.tassoni@gmail.com) as your full-stack developer. I’ll bring **Thecore** technology to your Ruby on Rails projects and demonstrate how it can save time, effort, and resources.  
+
+Let’s build smarter, together.  
