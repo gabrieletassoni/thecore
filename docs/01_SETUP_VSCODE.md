@@ -1,5 +1,3 @@
-[[_TOC_]]
-
 # Using DevContainer in Visual Studio Code for Development
 
 ## TL;DR
