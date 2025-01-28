@@ -10,6 +10,12 @@ With **Thecore**, you stop worrying about _how_ to build your app and focus on _
 
 ---
 
+## TL;DR
+
+If you are impatient and want to directly enter the action, head to the [documentation](docs/00_SUMMARY.md) section of this project.
+
+---
+
 ## What Are ATOMS?  
 
 ATOMS are the building blocks of **Thecore**, designed with these principles:  
