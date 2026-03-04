@@ -1,5 +1,3 @@
-[[_TOC_]]
-
 # Topics and Namespaces
 
 If the message has a `namespace: "subscriptions"` key in the message sent, it defaults to a conventional behaviour of PING - PONG from sender to server.
