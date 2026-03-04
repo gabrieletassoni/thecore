@@ -1,5 +1,3 @@
-[[_TOC_]]
-
 # Model Driven Api
 
 ## Goals
