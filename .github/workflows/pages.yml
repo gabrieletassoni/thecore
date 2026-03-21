@@ -31,9 +31,6 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      - name: Copy markdown docs
-        run: cp GUIDE.md WALKTHROUGH.md docs/
-
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
