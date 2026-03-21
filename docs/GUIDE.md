@@ -64,9 +64,9 @@ This makes models introspectable, composable, and straightforward to extend with
 | [Thecore extension](https://marketplace.visualstudio.com/items?itemName=gabrieletassoni.thecore) | Provides all Thecore commands |
 
 For platform-specific installation instructions see:
-- [Linux (Ubuntu 24.04)](01.1_SETUP_VSCODE_LINUX.md)
-- [Windows 11 via WSL](01.2_SETUP_VSCODE_WINDOWS.md)
-- [macOS](01.3_SETUP_VSCODE_MACOS.md)
+- [Linux (Ubuntu 24.04)](SETUP_VSCODE_LINUX.md)
+- [Windows 11 via WSL](SETUP_VSCODE_WINDOWS.md)
+- [macOS](SETUP_VSCODE_MACOS.md)
 
 ### What the devcontainer contains
 
@@ -865,6 +865,6 @@ The devcontainer image itself is rebuilt weekly via the GitHub Actions workflow 
 
 | Topic | Document |
 |---|---|
-| REST API reference (authentication, endpoints, search, schema, DSL) | [04_REST_API.md](04_REST_API.md) |
-| ActionCable topics, namespaces, and usage from Ruby/JavaScript clients | [97_USING_ACTIONCABLE.md](97_USING_ACTIONCABLE.md) |
-| Platform-specific environment setup | [01.1 Linux](01.1_SETUP_VSCODE_LINUX.md) · [01.2 Windows](01.2_SETUP_VSCODE_WINDOWS.md) · [01.3 macOS](01.3_SETUP_VSCODE_MACOS.md) |
+| REST API reference (authentication, endpoints, search, schema, DSL) | [REST_API.md](REST_API.md) |
+| ActionCable topics, namespaces, and usage from Ruby/JavaScript clients | [ACTIONCABLE.md](ACTIONCABLE.md) |
+| Platform-specific environment setup | [Linux](SETUP_VSCODE_LINUX.md) · [Windows](SETUP_VSCODE_WINDOWS.md) · [macOS](SETUP_VSCODE_MACOS.md) |

@@ -15,8 +15,8 @@ A DevContainer is a containerised development environment defined in `.devcontai
 
 Follow the guide for your operating system to install Docker and VS Code before opening a Thecore devcontainer:
 
-- [Linux (Ubuntu 24.04)](01.1_SETUP_VSCODE_LINUX.md)
-- [Windows 11 via WSL — no Docker Desktop](01.2_SETUP_VSCODE_WINDOWS.md)
-- [macOS](01.3_SETUP_VSCODE_MACOS.md)
+- [Linux (Ubuntu 24.04)](SETUP_VSCODE_LINUX.md)
+- [Windows 11 via WSL — no Docker Desktop](SETUP_VSCODE_WINDOWS.md)
+- [macOS](SETUP_VSCODE_MACOS.md)
 
 Once Docker and VS Code are running, continue with [WALKTHROUGH.md](WALKTHROUGH.md) Step 1 to set up the Thecore devcontainer for your project.
