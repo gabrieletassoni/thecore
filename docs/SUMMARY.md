@@ -19,6 +19,7 @@ Start with **WALKTHROUGH.md** if you are new to Thecore. Use **GUIDE.md** as you
 
 | Document | Purpose |
 |---|---|
+| [AUTHENTICATION.md](AUTHENTICATION.md) | Authentication integrations: local Devise, LDAP/Active Directory, Google OAuth2, Microsoft Entra ID |
 | [REST_API.md](REST_API.md) | REST API: authentication, CRUD endpoints, search, schema, DSL, translations |
 | [ACTIONCABLE.md](ACTIONCABLE.md) | ActionCable: topics, namespaces, Ruby and JavaScript client examples |
 
