@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thecore — Rails API & Admin Framework</title>
+  <meta name="description" content="Thecore is a Ruby on Rails framework for building model-driven REST APIs and admin interfaces with zero boilerplate. Built on model_driven_api and thecore_ui_rails_admin." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:        #080b12;
+      --bg-card:   #0e1320;
+      --bg-card2:  #121826;
+      --border:    rgba(255,255,255,0.07);
+      --border-hi: rgba(255,255,255,0.14);
+      --ruby:      #e03030;
+      --ruby-dim:  #b02424;
+      --ruby-glow: rgba(224,48,48,0.18);
+      --violet:    #7c5cbf;
+      --violet-dim:#5a3f9a;
+      --violet-glow:rgba(124,92,191,0.18);
+      --green:     #22c55e;
+      --text:      #e8eaf0;
+      --text-muted:#7a8299;
+      --text-dim:  #4a5068;
+      --mono:      'JetBrains Mono', monospace;
+      --sans:      'Inter', system-ui, sans-serif;
+      --radius:    12px;
+      --radius-sm: 8px;
+      --shadow:    0 1px 3px rgba(0,0,0,0.4), 0 8px 32px rgba(0,0,0,0.3);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ─── Utility ──────────────────────────────────────────────── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600; letter-spacing: .08em;
+      text-transform: uppercase; padding: 4px 10px;
+      border-radius: 20px; border: 1px solid;
+    }
+    .tag-ruby  { color: var(--ruby);   border-color: var(--ruby-dim);   background: var(--ruby-glow); }
+    .tag-violet{ color: #a78bfa;       border-color: var(--violet-dim); background: var(--violet-glow); }
+    .tag-green { color: var(--green);  border-color: #16803c;           background: rgba(34,197,94,.12); }
+
+    /* ─── Nav ──────────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      background: rgba(8,11,18,.85);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 18px; font-weight: 700; letter-spacing: -.3px;
+    }
+    .nav-logo-mark {
+      width: 30px; height: 30px; border-radius: 7px;
+      background: linear-gradient(135deg, var(--ruby), #a01e1e);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 800; color: #fff;
+      box-shadow: 0 0 12px var(--ruby-glow);
+    }
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a {
+      font-size: 13.5px; color: var(--text-muted);
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      font-size: 13px; font-weight: 600;
+      padding: 7px 16px; border-radius: var(--radius-sm);
+      background: var(--ruby); color: #fff;
+      transition: background .2s, box-shadow .2s;
+    }
+    .nav-cta:hover {
+      background: #c42828;
+      box-shadow: 0 0 18px var(--ruby-glow);
+    }
+
+    /* ─── Hero ─────────────────────────────────────────────────── */
+    .hero {
+      padding: 140px 0 100px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(224,48,48,.12) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 80% 60%,  rgba(124,92,191,.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 12.5px; font-weight: 600; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--ruby);
+      margin-bottom: 22px;
+    }
+    .hero-eyebrow::before, .hero-eyebrow::after {
+      content: ''; display: block;
+      width: 28px; height: 1px; background: var(--ruby-dim);
+    }
+    .hero h1 {
+      font-size: clamp(38px, 6vw, 68px);
+      font-weight: 800; line-height: 1.08; letter-spacing: -1.5px;
+      max-width: 820px; margin: 0 auto 22px;
+    }
+    .hero h1 span { color: var(--ruby); }
+    .hero-sub {
+      font-size: clamp(15px, 2vw, 18px);
+      color: var(--text-muted); max-width: 600px;
+      margin: 0 auto 40px; line-height: 1.7;
+    }
+    .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 28px; border-radius: var(--radius-sm);
+      font-size: 14.5px; font-weight: 600;
+      background: var(--ruby); color: #fff;
+      transition: background .2s, box-shadow .2s, transform .15s;
+    }
+    .btn-primary:hover {
+      background: #c42828;
+      box-shadow: 0 0 24px var(--ruby-glow);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 28px; border-radius: var(--radius-sm);
+      font-size: 14.5px; font-weight: 600;
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border-hi);
+      transition: border-color .2s, background .2s, transform .15s;
+    }
+    .btn-secondary:hover {
+      border-color: rgba(255,255,255,.25);
+      background: rgba(255,255,255,.04);
+      transform: translateY(-1px);
+    }
+    .hero-code {
+      margin: 56px auto 0;
+      max-width: 720px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      overflow: hidden;
+      text-align: left;
+      box-shadow: var(--shadow);
+    }
+    .code-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #e05252; }
+    .dot-y { background: #e0c052; }
+    .dot-g { background: #52e077; }
+    .code-file { margin-left: 8px; font-family: var(--mono); font-size: 11px; color: var(--text-dim); }
+    .code-body { padding: 22px 24px; font-family: var(--mono); font-size: 13px; line-height: 1.75; overflow-x: auto; white-space: pre; }
+    .kw  { color: #e879f9; }
+    .cl  { color: #60a5fa; }
+    .cm  { color: var(--text-dim); font-style: italic; }
+    .st  { color: #86efac; }
+    .nu  { color: #fb923c; }
+    .fn  { color: #fbbf24; }
+
+    /* ─── Section headings ─────────────────────────────────────── */
+    section { padding: 88px 0; }
+    .section-label {
+      font-size: 11.5px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--text-dim);
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 800; letter-spacing: -.8px;
+      line-height: 1.15; margin-bottom: 16px;
+    }
+    .section-sub {
+      font-size: 16px; color: var(--text-muted);
+      max-width: 540px; line-height: 1.7;
+    }
+    .section-header { margin-bottom: 56px; }
+    .section-header.centered { text-align: center; }
+    .section-header.centered .section-sub { margin: 0 auto; }
+
+    /* ─── Divider ──────────────────────────────────────────────── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+
+    /* ─── Pillars ──────────────────────────────────────────────── */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--border);
+    }
+    .pillar {
+      background: var(--bg-card);
+      padding: 32px 26px;
+      transition: background .2s;
+    }
+    .pillar:hover { background: var(--bg-card2); }
+    .pillar-icon {
+      font-size: 26px; margin-bottom: 16px;
+      display: block;
+    }
+    .pillar h3 {
+      font-size: 14.5px; font-weight: 700;
+      letter-spacing: -.2px; margin-bottom: 8px;
+    }
+    .pillar p {
+      font-size: 13px; color: var(--text-muted); line-height: 1.65;
+    }
+
+    /* ─── ATOM cards ───────────────────────────────────────────── */
+    .atoms-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 720px) { .atoms-grid { grid-template-columns: 1fr; } }
+
+    .atom-card {
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      background: var(--bg-card);
+      display: flex; flex-direction: column;
+      transition: border-color .25s, box-shadow .25s;
+    }
+    .atom-card:hover {
+      border-color: var(--border-hi);
+      box-shadow: 0 0 0 1px var(--border-hi), var(--shadow);
+    }
+    .atom-card-header {
+      padding: 28px 28px 22px;
+      border-bottom: 1px solid var(--border);
+    }
+    .atom-card-header .tag { margin-bottom: 18px; }
+    .atom-card-header h2 {
+      font-size: 21px; font-weight: 800;
+      letter-spacing: -.4px; margin-bottom: 10px;
+    }
+    .atom-card-header p {
+      font-size: 13.5px; color: var(--text-muted); line-height: 1.65;
+    }
+    .atom-features { padding: 22px 28px; flex: 1; }
+    .atom-feature {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .atom-feature:last-child { border-bottom: none; }
+    .atom-feature-icon {
+      width: 28px; height: 28px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0; margin-top: 1px;
+    }
+    .icon-ruby { background: var(--ruby-glow); }
+    .icon-violet { background: var(--violet-glow); }
+    .atom-feature-text h4 {
+      font-size: 13px; font-weight: 600; margin-bottom: 2px;
+    }
+    .atom-feature-text p {
+      font-size: 12px; color: var(--text-muted); line-height: 1.55;
+    }
+    .atom-code {
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .atom-code .code-body { font-size: 12px; padding: 18px 22px; }
+
+    /* ─── Architecture diagram ─────────────────────────────────── */
+    .arch {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px 32px;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 2;
+      overflow-x: auto;
+    }
+    .arch-row {
+      display: flex; align-items: center;
+      gap: 0; flex-wrap: nowrap;
+    }
+    .arch-box {
+      border: 1px solid var(--border-hi);
+      border-radius: var(--radius-sm);
+      padding: 6px 14px;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+    .arch-box.main  { border-color: var(--ruby-dim); color: var(--ruby); background: var(--ruby-glow); }
+    .arch-box.atom  { border-color: var(--violet-dim); color: #a78bfa; background: var(--violet-glow); }
+    .arch-box.db    { border-color: #2d7a4f; color: var(--green); background: rgba(34,197,94,.1); }
+    .arch-box.ext   { border-color: var(--border-hi); color: var(--text-muted); }
+    .arch-arrow { color: var(--text-dim); padding: 0 10px; font-size: 16px; }
+    .arch-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 16px 24px;
+      align-items: start;
+    }
+    .arch-label { color: var(--text-dim); font-size: 11px; padding-top: 8px; white-space: nowrap; }
+    .arch-items { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    /* ─── How it works (steps) ─────────────────────────────────── */
+    .steps { display: flex; flex-direction: column; gap: 0; }
+    .step {
+      display: grid; grid-template-columns: 60px 1fr;
+      gap: 0 24px; padding: 28px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .step:last-child { border-bottom: none; }
+    .step-num {
+      font-size: 11px; font-weight: 700; letter-spacing: .05em;
+      color: var(--text-dim); padding-top: 3px;
+      font-family: var(--mono);
+    }
+    .step-body h3 {
+      font-size: 15px; font-weight: 700;
+      margin-bottom: 5px; letter-spacing: -.2px;
+    }
+    .step-body p {
+      font-size: 13.5px; color: var(--text-muted); line-height: 1.65;
+    }
+    .step-body code {
+      font-family: var(--mono); font-size: 11.5px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--border);
+      padding: 1px 6px; border-radius: 4px;
+      color: #a78bfa;
+    }
+
+    /* ─── Comparison table ─────────────────────────────────────── */
+    .compare {
+      width: 100%; border-collapse: collapse;
+      font-size: 13.5px;
+    }
+    .compare th, .compare td {
+      padding: 14px 18px;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+    .compare th {
+      background: var(--bg-card2);
+      font-size: 12px; font-weight: 700;
+      letter-spacing: .05em; text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .compare tr:nth-child(even) td { background: rgba(255,255,255,.015); }
+    .compare .check { color: var(--green); font-weight: 700; }
+    .compare .cross { color: var(--text-dim); }
+    .compare td:first-child { color: var(--text); font-weight: 500; }
+
+    /* ─── CTA ──────────────────────────────────────────────────── */
+    .cta-section {
+      padding: 100px 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(224,48,48,.09) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-section h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800; letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+    .cta-section p {
+      font-size: 16px; color: var(--text-muted);
+      max-width: 480px; margin: 0 auto 36px; line-height: 1.7;
+    }
+
+    /* ─── Footer ───────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 36px 0;
+    }
+    .footer-inner {
+      display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 16px;
+    }
+    .footer-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 14px; font-weight: 700;
+    }
+    .footer-mark {
+      width: 24px; height: 24px; border-radius: 5px;
+      background: linear-gradient(135deg, var(--ruby), #a01e1e);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800; color: #fff;
+    }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a {
+      font-size: 13px; color: var(--text-dim);
+      transition: color .2s;
+    }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy { font-size: 12px; color: var(--text-dim); }
+
+    /* ─── Responsive ───────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .hero { padding: 110px 0 70px; }
+      section { padding: 60px 0; }
+    }
+
+    /* ─── Scroll reveal ────────────────────────────────────────── */
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+  </style>
+</head>
+<body>
+
+<!-- ── Nav ─────────────────────────────────────────────────────── -->
+<nav>
+  <div class="container nav-inner">
+    <a href="#" class="nav-logo">
+      <div class="nav-logo-mark">T</div>
+      Thecore
+    </a>
+    <div class="nav-links">
+      <a href="#atoms">ATOMs</a>
+      <a href="#philosophy">Philosophy</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#compare">vs. vanilla Rails</a>
+      <a href="GUIDE.html">Developer Guide</a>
+    </div>
+    <a href="https://github.com/gabrieletassoni/thecore_devcontainer" class="nav-cta" target="_blank" rel="noopener">
+      GitHub →
+    </a>
+  </div>
+</nav>
+
+<!-- ── Hero ────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">Ruby on Rails · API · Admin · Modular</div>
+    <h1>Build production-grade<br /><span>Rails backends</span> without the boilerplate</h1>
+    <p class="hero-sub">
+      Thecore is a Ruby on Rails framework that turns a model definition into
+      a fully wired REST API, admin interface, and background job setup —
+      in seconds, not days.
+    </p>
+    <div class="hero-actions">
+      <a href="WALKTHROUGH.html" class="btn-primary">
+        ↳ Read the walkthrough
+      </a>
+      <a href="GUIDE.html" class="btn-secondary">
+        Developer Guide
+      </a>
+      <a href="https://github.com/gabrieletassoni/thecore_devcontainer" class="btn-secondary" target="_blank" rel="noopener">
+        View on GitHub
+      </a>
+    </div>
+
+    <div class="hero-code reveal">
+      <div class="code-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <span class="code-file">app/models/vehicle.rb</span>
+      </div>
+      <div class="code-body">
+<span class="cm"># 1. Generate everything with one VS Code context menu action</span>
+<span class="cm">#    Right-click ATOM folder → Thecore 3: Add a Model</span>
+<span class="cm">#    Enter: Vehicle  |  plate:string make:string year:integer status:string</span>
+
+<span class="kw">class</span> <span class="cl">Vehicle</span> &lt; <span class="cl">ApplicationRecord</span>
+  <span class="fn">include</span> <span class="cl">Api</span>::<span class="cl">Vehicle</span>           <span class="cm"># → auto REST API with json_attrs</span>
+  <span class="fn">include</span> <span class="cl">RailsAdmin</span>::<span class="cl">Vehicle</span>   <span class="cm"># → auto admin UI with rails_admin</span>
+<span class="kw">end</span>
+
+<span class="cm"># That's it. The API endpoint and admin panel are live.</span>
+<span class="cm"># No serialiser. No controller. No route. No policy class.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── Philosophy ──────────────────────────────────────────────── -->
+<section id="philosophy">
+  <div class="container">
+    <div class="section-header centered reveal">
+      <div class="section-label">Design Principles</div>
+      <h2 class="section-title">Five pillars, zero compromise</h2>
+      <p class="section-sub">
+        Every decision in Thecore traces back to one of these principles.
+        Together they eliminate entire categories of work.
+      </p>
+    </div>
+    <div class="pillars-grid reveal">
+      <div class="pillar">
+        <span class="pillar-icon">⚡</span>
+        <h3>Convention over configuration</h3>
+        <p>Files land in predictable places with predictable names. Every developer reads every Thecore project without a README.</p>
+      </div>
+      <div class="pillar">
+        <span class="pillar-icon">🤖</span>
+        <h3>High automation</h3>
+        <p>A single context menu click triggers migrations, model moves, concern scaffolding, and i18n entries simultaneously.</p>
+      </div>
+      <div class="pillar">
+        <span class="pillar-icon">📐</span>
+        <h3>High standardisation</h3>
+        <p>Every ATOM has the same internal layout. Every model has the same three concern files. Scale to ten ATOMs feels like adding the second.</p>
+      </div>
+      <div class="pillar">
+        <span class="pillar-icon">🔍</span>
+        <h3>Introspection-based</h3>
+        <p>The API and admin UI configure themselves at runtime by reading your model structure. Add a field to a migration and it appears everywhere, automatically.</p>
+      </div>
+      <div class="pillar">
+        <span class="pillar-icon">🎯</span>
+        <h3>Sensible defaults</h3>
+        <p>A new model is visible in the admin UI, serialised in the API, and has a custom endpoint stub — before you write a single line of business logic.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── ATOMs ────────────────────────────────────────────────────── -->
+<section id="atoms">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">Core ATOMs</div>
+      <h2 class="section-title">Two engines.<br />Everything else follows.</h2>
+      <p class="section-sub">
+        Thecore ships with two foundational ATOMs that every application
+        inherits. Every feature ATOM you create builds on top of them.
+      </p>
+    </div>
+
+    <div class="atoms-grid">
+
+      <!-- model_driven_api -->
+      <div class="atom-card reveal">
+        <div class="atom-card-header">
+          <span class="tag tag-ruby">REST API</span>
+          <h2>model_driven_api</h2>
+          <p>
+            Turns any Rails model into a fully-documented REST API endpoint
+            with zero controller code. The JSON shape is driven entirely by
+            the model's <code style="font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.06);border:1px solid var(--border);padding:1px 5px;border-radius:4px;color:#a78bfa">json_attrs</code> configuration,
+            read at runtime via introspection.
+          </p>
+        </div>
+        <div class="atom-features">
+          <div class="atom-feature">
+            <div class="atom-feature-icon icon-ruby">🔌</div>
+            <div class="atom-feature-text">
+              <h4>Zero-boilerplate REST endpoints</h4>
+              <p>index, show, create, update, destroy — all live the moment the concern is included. No routes file to edit, no controller to write.</p>
+            </div>
+          </div>
+          <div class="atom-feature">
+            <div class="atom-feature-icon icon-ruby">🎛️</div>
+            <div class="atom-feature-text">
+              <h4>Declarative JSON serialisation</h4>
+              <p>Use <code style="font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.06);border:1px solid var(--border);padding:1px 5px;border-radius:4px;color:#a78bfa">json_attrs</code> with <code style="font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.06);border:1px solid var(--border);padding:1px 5px;border-radius:4px;color:#a78bfa">only:</code>, <code style="font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.06);border:1px solid var(--border);padding:1px 5px;border-radius:4px;color:#a78bfa">except:</code>, <code style="font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.06);border:1px solid var(--border);padding:1px 5px;border-radius:4px;color:#a78bfa">methods:</code>, <code style="font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.06);border:1px solid var(--border);padding:1px 5px;border-radius:4px;color:#a78bfa">include:</code> to shape the response with no serialiser class.</p>
+            </div>
+          </div>
+          <div class="atom-feature">
+            <div class="atom-feature-icon icon-ruby">🔗</div>
+            <div class="atom-feature-text">
+              <h4>Custom non-CRUD endpoints</h4>
+              <p>The <code style="font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.06);border:1px solid var(--border);padding:1px 5px;border-radius:4px;color:#a78bfa">Endpoints::ModelName</code> concern lets you add custom actions with inline OpenAPI/Swagger documentation.</p>
+            </div>
+          </div>
+          <div class="atom-feature">
+            <div class="atom-feature-icon icon-ruby">📄</div>
+            <div class="atom-feature-text">
+              <h4>Auto-generated OpenAPI docs</h4>
+              <p>API schema is derived from the model definition and <code style="font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.06);border:1px solid var(--border);padding:1px 5px;border-radius:4px;color:#a78bfa">json_attrs</code>. Your API is always self-describing.</p>
+            </div>
+          </div>
+          <div class="atom-feature">
+            <div class="atom-feature-icon icon-ruby">🔐</div>
+            <div class="atom-feature-text">
+              <h4>Token-based authentication</h4>
+              <p>Integrated with Devise. Every endpoint is protected by default. Scoped access via CanCan ability rules.</p>
+            </div>
+          </div>
+        </div>
+        <div class="atom-code">
+          <div class="code-bar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="code-file">concerns/api/vehicle.rb</span>
+          </div>
+          <div class="code-body">
+<span class="kw">module</span> <span class="cl">Api</span>::<span class="cl">Vehicle</span>
+  <span class="fn">extend</span> <span class="cl">ActiveSupport</span>::<span class="cl">Concern</span>
+  <span class="fn">included</span> <span class="kw">do</span>
+    <span class="fn">cattr_accessor</span> <span class="st">:json_attrs</span>
+    <span class="kw">self</span>.json_attrs = <span class="cl">::ModelDrivenApi</span>.<span class="fn">smart_merge</span>(
+      (json_attrs || {}), {
+        <span class="st">only:</span> [<span class="st">:id</span>, <span class="st">:plate</span>, <span class="st">:make</span>, <span class="st">:year</span>, <span class="st">:status</span>],
+        <span class="st">include:</span> { <span class="st">assignments:</span> { <span class="st">only:</span> [<span class="st">:id</span>, <span class="st">:driver</span>] } }
+      }
+    )
+  <span class="kw">end</span>
+<span class="kw">end</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- thecore_ui_rails_admin -->
+      <div class="atom-card reveal">
+        <div class="atom-card-header">
+          <span class="tag tag-violet">Admin UI</span>
+          <h2>thecore_ui_rails_admin</h2>
+          <p>
+            Wires <code style="font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.06);border:1px solid var(--border);padding:1px 5px;border-radius:4px;color:#a78bfa">rails_admin</code>, Devise, and CanCan into a coherent,
+            permission-aware admin interface. Model configuration is done in
+            the <code style="font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.06);border:1px solid var(--border);padding:1px 5px;border-radius:4px;color:#a78bfa">RailsAdmin::ModelName</code> concern,
+            co-located with the model itself.
+          </p>
+        </div>
+        <div class="atom-features">
+          <div class="atom-feature">
+            <div class="atom-feature-icon icon-violet">🖥️</div>
+            <div class="atom-feature-text">
+              <h4>Auto-wired admin panel</h4>
+              <p>Every model with the concern appears in the sidebar with correct navigation label and icon, immediately after the server starts.</p>
+            </div>
+          </div>
+          <div class="atom-feature">
+            <div class="atom-feature-icon icon-violet">🔑</div>
+            <div class="atom-feature-text">
+              <h4>Authentication out of the box</h4>
+              <p>Devise is pre-configured. An admin user is created during <code style="font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.06);border:1px solid var(--border);padding:1px 5px;border-radius:4px;color:#a78bfa">db:seed</code>. Login, session, and token reset work without configuration.</p>
+            </div>
+          </div>
+          <div class="atom-feature">
+            <div class="atom-feature-icon icon-violet">🛡️</div>
+            <div class="atom-feature-text">
+              <h4>Role-based authorisation</h4>
+              <p>CanCan ability classes are auto-loaded from each ATOM's <code style="font-family:var(--mono);font-size:11px;background:rgba(255,255,255,.06);border:1px solid var(--border);padding:1px 5px;border-radius:4px;color:#a78bfa">Abilities::AtomName</code>. Rules compose across ATOMs.</p>
+            </div>
+          </div>
+          <div class="atom-feature">
+            <div class="atom-feature-icon icon-violet">📋</div>
+            <div class="atom-feature-text">
+              <h4>Configurable list, edit, show views</h4>
+              <p>Customise every aspect of the admin UI inside the concern, with no separate config file. The configuration lives next to the model.</p>
+            </div>
+          </div>
+          <div class="atom-feature">
+            <div class="atom-feature-icon icon-violet">⚡</div>
+            <div class="atom-feature-text">
+              <h4>Root &amp; member actions</h4>
+              <p>Generate custom admin pages (dashboards) and per-row buttons with ActionCable support for real-time updates — via a single VS Code command.</p>
+            </div>
+          </div>
+        </div>
+        <div class="atom-code">
+          <div class="code-bar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="code-file">concerns/rails_admin/vehicle.rb</span>
+          </div>
+          <div class="code-body">
+<span class="kw">module</span> <span class="cl">RailsAdmin</span>::<span class="cl">Vehicle</span>
+  <span class="fn">extend</span> <span class="cl">ActiveSupport</span>::<span class="cl">Concern</span>
+  <span class="fn">included</span> <span class="kw">do</span>
+    <span class="fn">rails_admin</span> <span class="kw">do</span>
+      <span class="fn">navigation_label</span> <span class="cl">I18n</span>.<span class="fn">t</span>(<span class="st">'admin.fleet.label'</span>)
+      <span class="fn">navigation_icon</span>  <span class="st">'fa fa-car'</span>
+      <span class="fn">list</span> <span class="kw">do</span>
+        <span class="fn">field</span> <span class="st">:plate</span>
+        <span class="fn">field</span> <span class="st">:make</span>
+        <span class="fn">field</span> <span class="st">:status</span>
+        <span class="fn">field</span> <span class="st">:created_at</span>
+      <span class="kw">end</span>
+    <span class="kw">end</span>
+  <span class="kw">end</span>
+<span class="kw">end</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── Architecture ─────────────────────────────────────────────── -->
+<section>
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">Architecture</div>
+      <h2 class="section-title">One thin app.<br />Many self-contained ATOMs.</h2>
+      <p class="section-sub">
+        The main Rails application is a shell. All domain logic lives in ATOMs —
+        Rails engines packaged as gems and mounted as Git submodules.
+        Each ATOM carries its own models, migrations, admin config, and API logic.
+      </p>
+    </div>
+    <div class="arch reveal">
+      <div class="arch-grid">
+        <div class="arch-label">Main app</div>
+        <div class="arch-items">
+          <div class="arch-box main">fleet_app (Rails)</div>
+          <div class="arch-arrow">+</div>
+          <div class="arch-box ext">model_driven_api</div>
+          <div class="arch-arrow">+</div>
+          <div class="arch-box ext">thecore_ui_rails_admin</div>
+        </div>
+
+        <div class="arch-label">ATOMs</div>
+        <div class="arch-items">
+          <div class="arch-box atom">vehicle_registry</div>
+          <div class="arch-box atom">driver_management</div>
+          <div class="arch-box atom">maintenance_log</div>
+          <div class="arch-box atom" style="color:var(--text-dim);border-color:var(--border)">+ your ATOM</div>
+        </div>
+
+        <div class="arch-label">Each ATOM</div>
+        <div class="arch-items">
+          <div class="arch-box ext">Models + Migrations</div>
+          <div class="arch-box ext">Api:: concerns</div>
+          <div class="arch-box ext">RailsAdmin:: concerns</div>
+          <div class="arch-box ext">Root / Member actions</div>
+          <div class="arch-box ext">Abilities</div>
+        </div>
+
+        <div class="arch-label">Persistence</div>
+        <div class="arch-items">
+          <div class="arch-box db">PostgreSQL</div>
+          <div class="arch-arrow">+</div>
+          <div class="arch-box db">KeyDB / Redis</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── How it works ─────────────────────────────────────────────── -->
+<section id="how-it-works">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-label">How it works</div>
+      <h2 class="section-title">From empty folder<br />to running API</h2>
+      <p class="section-sub">
+        Every step is a single VS Code right-click command.
+        No terminal commands to memorise. No documentation to consult.
+      </p>
+    </div>
+    <div class="steps reveal">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-body">
+          <h3>Open in devcontainer</h3>
+          <p>Clone the repository and reopen in the pre-built Docker devcontainer. Ruby, Rails, Node, PostgreSQL drivers, and all Thecore tooling are already installed. <code>Ctrl+Shift+P → Dev Containers: Reopen in Container</code></p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-body">
+          <h3>Create the application</h3>
+          <p>Right-click the project folder → <code>Thecore 3: Create an App</code>. Thecore runs <code>rails new</code>, adds all gems, runs every generator, seeds the database, and commits — automatically.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-body">
+          <h3>Create an ATOM for your domain</h3>
+          <p>Right-click the project folder → <code>Thecore 3: Create an ATOM</code>. Name it, fill in the metadata. The full Rails engine structure is scaffolded and wired into the main app's Gemfile.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-body">
+          <h3>Add a model</h3>
+          <p>Right-click the ATOM folder → <code>Thecore 3: Add a Model</code>. Enter the model name and fields. The migration, model file, and all three concerns (<code>Api::</code>, <code>RailsAdmin::</code>, <code>Endpoints::</code>) are created and wired together.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">05</div>
+        <div class="step-body">
+          <h3>Run the server — you're done</h3>
+          <p>Start <code>rails s</code>. The REST API is live at <code>/api/your_models</code>. The admin interface is live at <code>/app</code>. No additional configuration needed.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── Comparison ───────────────────────────────────────────────── -->
+<section id="compare">
+  <div class="container">
+    <div class="section-header centered reveal">
+      <div class="section-label">Comparison</div>
+      <h2 class="section-title">Thecore vs. vanilla Rails</h2>
+      <p class="section-sub">
+        Everything you would otherwise build by hand, Thecore generates and maintains for you.
+      </p>
+    </div>
+    <div class="reveal" style="overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);">
+      <table class="compare">
+        <thead>
+          <tr>
+            <th>Capability</th>
+            <th>Vanilla Rails</th>
+            <th>Thecore</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>REST API from a model</td>
+            <td class="cross">Controller + routes + serialiser</td>
+            <td class="check">✓ Include Api::Model — done</td>
+          </tr>
+          <tr>
+            <td>Admin interface</td>
+            <td class="cross">Manual rails_admin config file</td>
+            <td class="check">✓ Include RailsAdmin::Model — done</td>
+          </tr>
+          <tr>
+            <td>Authentication</td>
+            <td class="cross">Configure Devise manually</td>
+            <td class="check">✓ Pre-configured, seeded admin user</td>
+          </tr>
+          <tr>
+            <td>Authorisation</td>
+            <td class="cross">Write Ability class from scratch</td>
+            <td class="check">✓ Stub generated per ATOM, auto-loaded</td>
+          </tr>
+          <tr>
+            <td>Background jobs</td>
+            <td class="cross">Add Sidekiq, configure queues</td>
+            <td class="check">✓ Sidekiq config generated with sensible defaults</td>
+          </tr>
+          <tr>
+            <td>Custom API actions</td>
+            <td class="cross">New controller + route + docs</td>
+            <td class="check">✓ Endpoints::Model with OpenAPI inline</td>
+          </tr>
+          <tr>
+            <td>Admin dashboard pages</td>
+            <td class="cross">Custom controller, view, JS, CSS</td>
+            <td class="check">✓ One command → root action with ActionCable</td>
+          </tr>
+          <tr>
+            <td>Modular feature isolation</td>
+            <td class="cross">Namespace conventions by hand</td>
+            <td class="check">✓ Full Rails engine per domain, as a gem</td>
+          </tr>
+          <tr>
+            <td>CI/CD pipeline</td>
+            <td class="cross">Write from scratch</td>
+            <td class="check">✓ GitLab CI + GitHub Actions generated on create</td>
+          </tr>
+          <tr>
+            <td>Reuse across projects</td>
+            <td class="cross">Copy-paste or extract a gem manually</td>
+            <td class="check">✓ git submodule add — ATOM includes schema</td>
+          </tr>
+          <tr>
+            <td>i18n support</td>
+            <td class="cross">Add locale files manually</td>
+            <td class="check">✓ en.yml and it.yml stubs generated per action</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── CTA ──────────────────────────────────────────────────────── -->
+<section class="cta-section">
+  <div class="container">
+    <h2>Start building in minutes,<br />not days.</h2>
+    <p>
+      Open the devcontainer, create an app, add your first ATOM.
+      Your API and admin panel are ready before lunch.
+    </p>
+    <div class="hero-actions">
+      <a href="WALKTHROUGH.html" class="btn-primary">
+        ↳ Step-by-step walkthrough
+      </a>
+      <a href="https://github.com/gabrieletassoni/thecore_devcontainer" class="btn-secondary" target="_blank" rel="noopener">
+        View on GitHub
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ───────────────────────────────────────────────────── -->
+<footer>
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <div class="footer-mark">T</div>
+      Thecore
+    </div>
+    <div class="footer-links">
+      <a href="https://github.com/gabrieletassoni/thecore_devcontainer" target="_blank" rel="noopener">DevContainer</a>
+      <a href="https://github.com/gabrieletassoni/thecore_code_extension" target="_blank" rel="noopener">VS Code Extension</a>
+      <a href="https://github.com/gabrieletassoni/model_driven_api" target="_blank" rel="noopener">model_driven_api</a>
+      <a href="https://github.com/gabrieletassoni/thecore_ui_rails_admin" target="_blank" rel="noopener">thecore_ui_rails_admin</a>
+    </div>
+    <div class="footer-copy">MIT License · gabrieletassoni</div>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
