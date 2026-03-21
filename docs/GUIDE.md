@@ -13,8 +13,9 @@
    - 4.2 [Create an ATOM](#42-create-an-atom)
    - 4.3 [Add a database migration](#43-add-a-database-migration)
    - 4.4 [Add a model to an ATOM](#44-add-a-model-to-an-atom)
-   - 4.5 [Add a root action](#45-add-a-root-action)
-   - 4.6 [Add a member action](#46-add-a-member-action)
+   - 4.5 [Extend a model from another ATOM](#45-extend-a-model-from-another-atom)
+   - 4.6 [Add a root action](#46-add-a-root-action)
+   - 4.7 [Add a member action](#47-add-a-member-action)
 5. [Model anatomy](#5-model-anatomy)
 6. [Deploy](#6-deploy)
 7. [Command reference](#7-command-reference)
@@ -61,6 +62,11 @@ This makes models introspectable, composable, and straightforward to extend with
 | VS Code | IDE |
 | [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) | Opens the project inside the container |
 | [Thecore extension](https://marketplace.visualstudio.com/items?itemName=gabrieletassoni.thecore) | Provides all Thecore commands |
+
+For platform-specific installation instructions see:
+- [Linux (Ubuntu 24.04)](01.1_SETUP_VSCODE_LINUX.md)
+- [Windows 11 via WSL](01.2_SETUP_VSCODE_WINDOWS.md)
+- [macOS](01.3_SETUP_VSCODE_MACOS.md)
 
 ### What the devcontainer contains
 
@@ -343,6 +349,34 @@ vendor/submodules/tcp_debugger/
    ```
 5. Runs `bundle install`.
 
+**Gemspec dependencies:**
+
+An ATOM can depend on either or both base Thecore ATOMs:
+
+```ruby
+# For ATOMs that need the admin UI:
+s.add_dependency 'thecore_ui_rails_admin', '~> 3.0'
+# For ATOMs that need the REST API:
+s.add_dependency 'model_driven_api', '~> 3.0'
+```
+
+If your ATOM depends on another ATOM that already pulls in `thecore_ui_rails_admin` or `model_driven_api`, you only need to declare the other ATOM as a dependency.
+
+**Autoloading dependencies:**
+
+For every gem declared in the `.gemspec`, add the matching `require` to `lib/[atom_name].rb`:
+
+```ruby
+# lib/tcp_debugger.rb
+require 'thecore_ui_rails_admin'
+require 'model_driven_api'
+require 'tcp_debugger/engine'
+```
+
+**Versioning:**
+
+Keep the ATOM gem's major version aligned with the Thecore major version it targets (e.g. `3.x.x` for Thecore 3 applications). The main application's version file (`version`) follows the same scheme: `<major>.<year>.<month>.<day>`.
+
 **Example workflow:**
 
 ```
@@ -431,7 +465,39 @@ end
 
 ---
 
-### 4.5 Add a root action
+### 4.5 Extend a model from another ATOM
+
+When you need to add behaviour (validations, associations, callbacks, admin UI configuration) to a model that is defined in a **different** ATOM or gem, do not modify that gem directly. Instead:
+
+1. Create a concern file in `config/initializers/` of the consuming ATOM, named `concern_[model_name].rb`:
+
+```ruby
+# config/initializers/concern_tcp_connection.rb
+module ConcernTcpDebuggerTcpConnection
+  extend ActiveSupport::Concern
+
+  included do
+    validates :host, presence: true
+    # additional behaviour here
+  end
+end
+```
+
+2. In `config/initializers/after_initialize.rb`, include the concern into the target model after Rails initialises:
+
+```ruby
+Rails.application.configure do
+  config.after_initialize do
+    TcpConnection.send(:include, ConcernTcpDebuggerTcpConnection)
+  end
+end
+```
+
+This pattern keeps each ATOM self-contained while allowing cross-ATOM composition.
+
+---
+
+### 4.6 Add a root action
 
 **Command:** `Thecore 3: Add a Root Action`
 
@@ -513,7 +579,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 ---
 
-### 4.6 Add a member action
+### 4.7 Add a member action
 
 **Command:** `Thecore 3: Add a Member Action`
 
@@ -792,3 +858,13 @@ The devcontainer image itself is rebuilt weekly via the GitHub Actions workflow 
 | ATOM name | Free text, converted to snake_case automatically | `TCP Debugger` → `tcp_debugger` |
 | Email | Must be a valid email address | `user@example.com` ✓ |
 | URL | Must be a valid URL | `https://github.com/acme/atom` ✓ |
+
+---
+
+## 8. Further reading
+
+| Topic | Document |
+|---|---|
+| REST API reference (authentication, endpoints, search, schema, DSL) | [04_REST_API.md](04_REST_API.md) |
+| ActionCable topics, namespaces, and usage from Ruby/JavaScript clients | [97_USING_ACTIONCABLE.md](97_USING_ACTIONCABLE.md) |
+| Platform-specific environment setup | [01.1 Linux](01.1_SETUP_VSCODE_LINUX.md) · [01.2 Windows](01.2_SETUP_VSCODE_WINDOWS.md) · [01.3 macOS](01.3_SETUP_VSCODE_MACOS.md) |
