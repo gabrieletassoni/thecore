@@ -445,6 +445,128 @@
     /* ─── Scroll reveal ────────────────────────────────────────── */
     .reveal { opacity: 0; transform: translateY(22px); transition: opacity .55s ease, transform .55s ease; }
     .reveal.visible { opacity: 1; transform: none; }
+
+    /* ─── Integrations ──────────────────────────────────────────── */
+    .integrations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .integ-card {
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      padding: 28px;
+      display: flex; flex-direction: column; gap: 10px;
+      transition: border-color .25s, box-shadow .25s;
+    }
+    .integ-card:hover {
+      border-color: var(--border-hi);
+      box-shadow: 0 0 0 1px var(--border-hi), var(--shadow);
+    }
+    .integ-icon { font-size: 28px; line-height: 1; }
+    .integ-card .tag { align-self: flex-start; }
+    .integ-card h3 { font-size: 15px; font-weight: 700; letter-spacing: -.2px; }
+    .integ-card p {
+      font-size: 13px; color: var(--text-muted); line-height: 1.65; flex: 1;
+    }
+    .integ-card p code {
+      font-family: var(--mono); font-size: 11.5px;
+      background: rgba(255,255,255,.06); border: 1px solid var(--border);
+      padding: 1px 5px; border-radius: 4px; color: #a78bfa;
+    }
+    .integ-link {
+      font-size: 12.5px; font-weight: 600; color: var(--ruby);
+      cursor: pointer; margin-top: 4px;
+      transition: color .2s;
+      background: none; border: none; padding: 0; text-align: left;
+    }
+    .integ-link:hover { color: #c42828; }
+    .tag-green2 { color: #34d399; border-color: #065f46; background: rgba(52,211,153,.1); }
+    .tag-blue  { color: #60a5fa; border-color: #1d4ed8; background: rgba(96,165,250,.1); }
+    .tag-orange{ color: #fb923c; border-color: #9a3412; background: rgba(251,146,60,.1); }
+
+    /* ─── Docs Modal ─────────────────────────────────────────────── */
+    .docs-modal {
+      position: fixed; inset: 0; z-index: 200;
+      display: flex; align-items: flex-start; justify-content: center;
+      padding: 60px 16px 16px;
+    }
+    .docs-modal[hidden] { display: none; }
+    .docs-modal-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,.72);
+      backdrop-filter: blur(5px);
+    }
+    .docs-modal-box {
+      position: relative; z-index: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border-hi);
+      border-radius: var(--radius);
+      width: 100%; max-width: 840px;
+      max-height: calc(100vh - 80px);
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      box-shadow: 0 24px 80px rgba(0,0,0,.65);
+    }
+    .docs-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-card2);
+      flex-shrink: 0;
+    }
+    .docs-modal-title {
+      font-size: 12.5px; font-weight: 700; color: var(--text-muted);
+      font-family: var(--mono);
+    }
+    .docs-modal-close {
+      background: none; border: none; color: var(--text-muted);
+      font-size: 22px; cursor: pointer; line-height: 1;
+      padding: 2px 6px; border-radius: 4px;
+      transition: background .15s, color .15s;
+    }
+    .docs-modal-close:hover { background: rgba(255,255,255,.08); color: var(--text); }
+    .docs-modal-body {
+      padding: 32px 36px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .docs-loading { color: var(--text-dim); font-style: italic; }
+
+    /* ─── Markdown content (modal) ──────────────────────────────── */
+    .md-content h1, .md-content h2, .md-content h3, .md-content h4 {
+      font-weight: 700; letter-spacing: -.3px; margin: 1.6em 0 .5em; line-height: 1.3;
+    }
+    .md-content h1 { font-size: 24px; color: var(--text); margin-top: .4em; }
+    .md-content h2 { font-size: 19px; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    .md-content h3 { font-size: 15px; color: var(--text); }
+    .md-content h4 { font-size: 13.5px; color: var(--text-muted); }
+    .md-content p { font-size: 14px; color: var(--text-muted); margin: .7em 0; line-height: 1.75; }
+    .md-content ul, .md-content ol { padding-left: 22px; margin: .7em 0; }
+    .md-content li { font-size: 14px; color: var(--text-muted); line-height: 1.65; margin: .3em 0; }
+    .md-content code {
+      font-family: var(--mono); font-size: 12px;
+      background: rgba(255,255,255,.06); border: 1px solid var(--border);
+      padding: 1px 6px; border-radius: 4px; color: #a78bfa;
+    }
+    .md-content pre {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 18px 20px;
+      overflow-x: auto; margin: 1em 0;
+    }
+    .md-content pre code { background: none; border: none; padding: 0; font-size: 12.5px; color: var(--text); }
+    .md-content table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 13px; }
+    .md-content th, .md-content td { padding: 9px 14px; border: 1px solid var(--border); text-align: left; }
+    .md-content th { background: var(--bg-card2); color: var(--text-muted); font-weight: 600; }
+    .md-content blockquote {
+      border-left: 3px solid var(--ruby-dim); padding: 8px 16px; margin: 1em 0;
+      background: var(--ruby-glow); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+    .md-content a { color: var(--ruby); }
+    .md-content a:hover { text-decoration: underline; }
+    .md-content strong { color: var(--text); font-weight: 600; }
+    .md-content hr { border: none; border-top: 1px solid var(--border); margin: 1.5em 0; }
   </style>
 </head>
 <body>
@@ -459,6 +581,7 @@
     <div class="nav-links">
       <a href="#atoms">ATOMs</a>
       <a href="#philosophy">Philosophy</a>
+      <a href="#integrations">Integrations</a>
       <a href="#how-it-works">How it works</a>
       <a href="#compare">vs. vanilla Rails</a>
       <a href="GUIDE.html">Developer Guide</a>
@@ -912,6 +1035,116 @@
 
 <hr class="divider" />
 
+<!-- ── Integrations ──────────────────────────────────────────────── -->
+<section id="integrations">
+  <div class="container">
+    <div class="section-header centered reveal">
+      <div class="section-label">Out of the Box</div>
+      <h2 class="section-title">Built-in integrations.<br /><span style="color:var(--ruby)">Zero boilerplate.</span></h2>
+      <p class="section-sub">
+        Enterprise SSO, real-time WebSockets, background jobs, and advanced search —
+        all active with a handful of environment variables or a database record.
+        Click any card to read the full docs.
+      </p>
+    </div>
+    <div class="integrations-grid reveal">
+
+      <!-- LDAP / Active Directory -->
+      <div class="integ-card">
+        <div class="integ-icon">🏢</div>
+        <span class="tag tag-ruby">Auth</span>
+        <h3>LDAP / Active Directory</h3>
+        <p>Authenticate users against any LDAP server or Microsoft AD. Configure multiple servers with priority order — entirely through the <code>ldap_servers</code> table. No code changes required. Supports role mapping from AD groups and scheduled user sync via <code>ldap:sync_users</code>.</p>
+        <button class="integ-link" data-md="AUTHENTICATION.md">Read the docs →</button>
+      </div>
+
+      <!-- Google OAuth 2 -->
+      <div class="integ-card">
+        <div class="integ-icon">🔵</div>
+        <span class="tag tag-ruby">Auth</span>
+        <h3>Google OAuth 2</h3>
+        <p>Sign in with Google via OmniAuth. Set <code>GOOGLE_CLIENT_ID</code> and <code>GOOGLE_CLIENT_SECRET</code> — a Sign in with Google button appears on the login page automatically. Users are created on first login and linked to their existing account by email.</p>
+        <button class="integ-link" data-md="AUTHENTICATION.md">Read the docs →</button>
+      </div>
+
+      <!-- Microsoft Entra ID -->
+      <div class="integ-card">
+        <div class="integ-icon">🪟</div>
+        <span class="tag tag-ruby">Auth</span>
+        <h3>Microsoft Entra ID</h3>
+        <p>Azure AD / Entra ID enterprise SSO via OpenID Connect. Set <code>ENTRA_CLIENT_ID</code>, <code>ENTRA_CLIENT_SECRET</code>, and <code>ENTRA_TENANT_ID</code> to enable organisation-wide sign-in. Scopes include <code>openid</code>, <code>profile</code>, <code>email</code>, and <code>User.Read</code>.</p>
+        <button class="integ-link" data-md="AUTHENTICATION.md">Read the docs →</button>
+      </div>
+
+      <!-- WebSocket / ActionCable -->
+      <div class="integ-card">
+        <div class="integ-icon">⚡</div>
+        <span class="tag tag-violet">Real-time</span>
+        <h3>WebSocket / ActionCable</h3>
+        <p>Real-time push via ActionCable's <code>ActivityLogChannel</code>. Every model persist event (create, update, destroy) broadcasts automatically. Topic-based routing lets any ATOM send custom messages to connected clients — from both Ruby and JavaScript.</p>
+        <button class="integ-link" data-md="ACTIONCABLE.md">Read the docs →</button>
+      </div>
+
+      <!-- JWT Auth -->
+      <div class="integ-card">
+        <div class="integ-icon">🔐</div>
+        <span class="tag tag-ruby">Auth</span>
+        <h3>JWT Stateless Auth</h3>
+        <p>Every API request is authenticated by a JWT token with sliding expiration — a fresh token is issued with each successful response. Works with any HTTP client, mobile app, or IoT device. Protected by default on every endpoint via Devise + CanCan.</p>
+        <button class="integ-link" data-md="REST_API.md">Read the docs →</button>
+      </div>
+
+      <!-- Sidekiq -->
+      <div class="integ-card">
+        <div class="integ-icon">⚙️</div>
+        <span class="tag tag-green2">Background</span>
+        <h3>Sidekiq Background Jobs</h3>
+        <p>Sidekiq is pre-configured with sensible queue defaults. Scheduled LDAP user import (<code>BackgroundLdapImportJob</code>), custom workers, and retry logic work without any additional setup. Backed by KeyDB / Redis already in the devcontainer.</p>
+        <button class="integ-link" data-md="GUIDE.md">Read the docs →</button>
+      </div>
+
+      <!-- OpenAPI / Swagger -->
+      <div class="integ-card">
+        <div class="integ-icon">📄</div>
+        <span class="tag tag-violet">API</span>
+        <h3>OpenAPI / Swagger</h3>
+        <p>The full API schema is derived at runtime from your model definitions and <code>json_attrs</code>. Hit <code>GET /api/v2/info/swagger</code> for a live OpenAPI spec. No annotations to write, no spec to maintain — it stays in sync automatically.</p>
+        <button class="integ-link" data-md="REST_API.md">Read the docs →</button>
+      </div>
+
+      <!-- Ransack Search -->
+      <div class="integ-card">
+        <div class="integ-icon">🔎</div>
+        <span class="tag tag-violet">API</span>
+        <h3>Ransack Search &amp; Filter</h3>
+        <p>Every model endpoint supports Ransack-style query parameters (<code>q[field_predicate]=value</code>). Complex multi-field filters, flexible sorting, and pagination — with zero controller code. Client-driven field selection with <code>a[only]</code> / <code>a[except]</code> gives full API shape control.</p>
+        <button class="integ-link" data-md="REST_API.md">Read the docs →</button>
+      </div>
+
+      <!-- ActiveStorage -->
+      <div class="integ-card">
+        <div class="integ-icon">📎</div>
+        <span class="tag tag-green2">Storage</span>
+        <h3>ActiveStorage File Uploads</h3>
+        <p>File attachments work out of the box via multipart <code>FormData</code> uploads. Attach files to any model without extra gems or storage configuration changes. Both <code>has_one_attached</code> and <code>has_many_attached</code> are fully supported through the REST API.</p>
+        <button class="integ-link" data-md="REST_API.md">Read the docs →</button>
+      </div>
+
+      <!-- Raw SQL -->
+      <div class="integ-card">
+        <div class="integ-icon">🗄️</div>
+        <span class="tag tag-blue">API</span>
+        <h3>Safe Raw SQL Endpoint</h3>
+        <p>Need a complex report query? <code>POST /api/v2/raw/sql</code> accepts <code>SELECT</code>-only statements and returns results as JSON. Read-only guard is enforced server-side. Combine with <code>json_agg</code> for nested result sets without a custom endpoint.</p>
+        <button class="integ-link" data-md="REST_API.md">Read the docs →</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
 <!-- ── CTA ──────────────────────────────────────────────────────── -->
 <section class="cta-section">
   <div class="container">
@@ -931,6 +1164,20 @@
   </div>
 </section>
 
+<!-- ── Docs Modal ───────────────────────────────────────────────── -->
+<div id="docs-modal" class="docs-modal" role="dialog" aria-modal="true" aria-label="Documentation" hidden>
+  <div class="docs-modal-overlay"></div>
+  <div class="docs-modal-box">
+    <div class="docs-modal-header">
+      <span id="docs-modal-title" class="docs-modal-title"></span>
+      <button class="docs-modal-close" aria-label="Close">&times;</button>
+    </div>
+    <div id="docs-modal-body" class="docs-modal-body md-content">
+      <div class="docs-loading">Loading…</div>
+    </div>
+  </div>
+</div>
+
 <!-- ── Footer ───────────────────────────────────────────────────── -->
 <footer>
   <div class="container footer-inner">
@@ -948,12 +1195,54 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
 <script>
   // Scroll reveal
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
   }, { threshold: 0.08 });
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Docs modal — fetch & render markdown
+  const mdCache = {};
+  const modal      = document.getElementById('docs-modal');
+  const modalTitle = document.getElementById('docs-modal-title');
+  const modalBody  = document.getElementById('docs-modal-body');
+
+  function openModal(mdFile) {
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    modalTitle.textContent = mdFile;
+    if (mdCache[mdFile]) {
+      modalBody.innerHTML = marked.parse(mdCache[mdFile]);
+      modalBody.scrollTop = 0;
+      return;
+    }
+    modalBody.innerHTML = '<div class="docs-loading">Loading ' + mdFile + '…</div>';
+    fetch(mdFile)
+      .then(r => r.ok ? r.text() : Promise.reject(r.status))
+      .then(md => {
+        mdCache[mdFile] = md;
+        modalBody.innerHTML = marked.parse(md);
+        modalBody.scrollTop = 0;
+      })
+      .catch(() => {
+        modalBody.innerHTML = '<p style="color:var(--ruby)">Could not load <code>' + mdFile + '</code>.</p>';
+      });
+  }
+
+  function closeModal() {
+    modal.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('.integ-link').forEach(btn => {
+    btn.addEventListener('click', () => openModal(btn.dataset.md));
+  });
+
+  modal.querySelector('.docs-modal-overlay').addEventListener('click', closeModal);
+  modal.querySelector('.docs-modal-close').addEventListener('click', closeModal);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 </script>
 </body>
 </html>
