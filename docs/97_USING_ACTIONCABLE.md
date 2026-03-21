@@ -1,88 +1,116 @@
-# Topics and Namespaces
+# ActionCable Reference
 
-If the message has a `namespace: "subscriptions"` key in the message sent, it defaults to a conventional behaviour of PING - PONG from sender to server.
+Thecore uses ActionCable for real-time WebSocket communication. All messages flow through a single channel (`ActivityLogChannel`) and are distinguished by a mandatory `topic` key.
 
-Any message sent in a **Thecore** application must have a `topic` key, i.e. `{ topic: "record" }`, otherwise, only in cas of `namespace: "subscriptions"`, it can be automatically set to **general** if not provided.
+> **See also:** [GUIDE.md §4.6](GUIDE.md#46-add-a-root-action) for how root actions use ActionCable to push live updates to dashboard views.
 
-Any **topic** can be added to the message. The Channel is always **ActivityLogChannel**.
+---
 
-## Existing Topics
+## Message conventions
 
-- **{ topic: "general" }**: If no topic is defined in the message, it defaults to this one only if the message has a `namespace: "subscriptions"` key/value.
-- **{ topic: "record" }**: This topic sends a message whenever an ActiveRecord record is created succesfully in the DB, in the message these keys are also mandatory:
-  - **action**: This key holds information about the action executed on the record, be it: *create*, *update* or *destroy*.
-  - **class**: This is the class of the ActiveRecord Model on which the *action* was performed.
-  - **success**: Boolean indicating whether or not the *action* performed succesfully.
-  - **valid**: Boolean indicating if there where validation errors.
-  - **errors**: An array of validation errors.
-  - **record**: The ActiveRecord Model object.
-- **{ topic: "tcp_debug" }**: Exists only if the _ATOM_ [Thecore TCP Debug](https://github.com/gabrieletassoni/thecore_tcp_debug) is included in your project, it characterizes messages dealing with the PING or TCP Port Connection tests present in that Root Action. Other mandatory keys are:
-  - **status**: It indicates if the test performed correctly, can assume these values:
-    - *200*: The other end responded to ping or TCP connection.
-    - *400*: Invalid test, thus the requested test does not exist among the available ones.
-    - *503*: The other end didn't respond to ping or TCP connection.
-  - **message**: A descriptive message of the test performed.
+Every message sent through a Thecore ActionCable channel **must** include a `topic` key:
 
-# From a Ruby script
+```json
+{ "topic": "record" }
+```
 
-Works also for ActiveRecord Models.
+The optional `namespace` key enables a PING–PONG keep-alive convention when set to `"subscriptions"`. In that case, `topic` defaults to `"general"` if omitted.
 
-Add to the `Gemfile`, `Gemfile.base` or `*.gemspec` file the following dependency: `action_cable_client`
+---
 
-## Gemfile
+## Built-in topics
+
+### `general`
+
+Default topic when `namespace: "subscriptions"` is present and no explicit topic is set. Used for keep-alive / subscription confirmation messages.
+
+### `record`
+
+Broadcast whenever an ActiveRecord record is successfully persisted. Required keys:
+
+| Key | Type | Values |
+|---|---|---|
+| `action` | String | `create`, `update`, `destroy` |
+| `class` | String | ActiveRecord model class name |
+| `success` | Boolean | Whether the action succeeded |
+| `valid` | Boolean | Whether validations passed |
+| `errors` | Array | Validation error messages |
+| `record` | Object | The ActiveRecord model object |
+
+### `tcp_debug`
+
+Available when the [Thecore TCP Debug](https://github.com/gabrieletassoni/thecore_tcp_debug) ATOM is included. Additional required keys:
+
+| Key | Values | Meaning |
+|---|---|---|
+| `status` | `200` | Host responded to ping or TCP connection |
+| `status` | `400` | Invalid test type requested |
+| `status` | `503` | Host did not respond |
+| `message` | String | Human-readable description of the test result |
+
+---
+
+## Subscribing from a Ruby script
+
+Add the dependency:
 
 ```ruby
+# Gemfile or *.gemspec
 gem 'action_cable_client'
 ```
 
-## *.gemspec file
-
 ```ruby
-spec.add_dependency 'action_cable_client'
-```
-
-Then add to the `lib/[gemname].rb` the needed require:
-
-```ruby
+# lib/my_atom.rb
 require 'action_cable_client'
 ```
 
-## Example of usage
+### Example — receive messages in a Ruby script or model
 
-The following example uses the provided gem to receive messages using ActionCable, it can be in a Model or a standalone ruby script, it does not depend on Ruby on Rails.
-This example checks in the message received event for a specific topic for which to enable the business logic: **rfid_raw_tag_reading** this is a custom topic taken from an actual application, but the important thing here is that the topic key always exists in the messages which arrive through the ActionCable Channel.
-The **Authorization** token is assumed received using JWT in a previous step.
-The `timeout`, `websocket_url` and `channel_name` are variables assumed to be set in previous code.
+The JWT token is assumed to have been obtained in a previous step. `timeout`, `websocket_url`, and `channel_name` are variables set in surrounding code.
 
 ```ruby
 EventMachine.run do
-  # Stop EventMachine after timeout seconds
-  timer = EventMachine::Timer.new(timeout) { 
-    EventMachine.stop 
-  }
+  timer = EventMachine::Timer.new(timeout) { EventMachine.stop }
 
-  # Create a new ActionCableClient
-  # client = ActionCableClient.new(websocket_url, channel_name)
-  client = ActionCableClient.new(websocket_url, channel_name, true, { 
-    'Authorization' => "Bearer #{token}" 
+  client = ActionCableClient.new(websocket_url, channel_name, true, {
+    'Authorization' => "Bearer #{token}"
   })
-  # called whenever a welcome message is received from the server
-  client.connected { 
-    # Send a connection message to the server
-    client.perform('receive', { message: 'On Demand Inventory Client is connected', topic: "home", namespace: "subscriptions" }) 
-  }
 
-  # called whenever a message is received from the server
-  client.received do | message |
-    # Accumulate the message in the array only if the message is a rfid_raw_tag_reading and the tag matches the regex and the rssi is greater than the threshold and the tag is not already present in the array and the number of unique tags is less than the expected number of unique tags and the interface is still in on_demand_inventory mode
-    # Assume that the interesting topic is rfid_raw_tag_reading:
-    @messages << message["message"]["message"]["uuid"] if message["message"]["topic"] == "rfid_raw_tag_reading"
-    # Stop the EventMachine if the number of unique tags is equal to the expected number of unique tags
+  client.connected do
+    client.perform('receive', {
+      message: 'Client connected',
+      topic: 'home',
+      namespace: 'subscriptions'
+    })
+  end
+
+  client.received do |message|
+    # Filter by topic
+    if message.dig('message', 'topic') == 'rfid_raw_tag_reading'
+      @messages << message.dig('message', 'message', 'uuid')
+    end
     EventMachine.stop if @messages.count >= expected_unique_tags
   end
 end
 ```
 
-# From a javascript node page
+---
 
-...
+## Subscribing from JavaScript
+
+Use the ActionCable JavaScript client (included with Rails):
+
+```javascript
+import consumer from 'channels/consumer';
+
+consumer.subscriptions.create('ActivityLogChannel', {
+  received(data) {
+    if (data.topic === 'record' && data.class === 'Vehicle') {
+      // Handle vehicle record change
+      console.log(data.action, data.record);
+    }
+  }
+});
+```
+
+Root actions generated by Thecore include a pre-wired ActionCable subscription in their `.js` asset file — edit the `received` callback to add your business logic.
