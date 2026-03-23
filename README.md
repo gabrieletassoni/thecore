@@ -85,7 +85,7 @@ Every bit of input counts!
 
 ### Bancolini — SPOT Integration Platform
 
-[![Bancolini](https://www.bancolini.com/favicon.ico)](https://www.bancolini.com/soluzioni/tecnologie/spot/)
+[![Bancolini](https://www.bancolini.com/wp-content/uploads/2025/02/Logo_bancolini_2025_rgb.svg)](https://www.bancolini.com/soluzioni/tecnologie/spot/)
 
 [**Bancolini**](https://www.bancolini.com) has been using **Thecore** as the backbone of [**SPOT**](https://www.bancolini.com/soluzioni/tecnologie/spot/) — their flagship integration backend platform — for over 10 years.
 
