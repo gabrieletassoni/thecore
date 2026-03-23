@@ -120,12 +120,61 @@
     .nav-logo-mark img {
       width: 30px; height: 30px; border-radius: 7px; object-fit: contain;
     }
-    .nav-links { display: flex; gap: 28px; }
+    .nav-links { display: flex; align-items: center; gap: 24px; }
     .nav-links a {
       font-size: 13.5px; color: var(--text-muted);
       transition: color .2s;
     }
     .nav-links a:hover { color: var(--text); }
+
+    /* ─── Sections dropdown ─────────────────────────────────────── */
+    .nav-dropdown { position: relative; }
+    .nav-dropdown-toggle {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 13.5px; color: var(--text-muted);
+      cursor: pointer; background: none; border: none; padding: 0;
+      font-family: var(--sans);
+      transition: color .2s;
+      user-select: none;
+    }
+    .nav-dropdown-toggle:hover { color: var(--text); }
+    .nav-dropdown-toggle svg {
+      transition: transform .2s;
+      flex-shrink: 0;
+    }
+    .nav-dropdown:hover .nav-dropdown-toggle svg,
+    .nav-dropdown.open .nav-dropdown-toggle svg {
+      transform: rotate(180deg);
+    }
+    .nav-dropdown-menu {
+      position: absolute; top: calc(100% + 12px); left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-card);
+      border: 1px solid var(--border-hi);
+      border-radius: var(--radius);
+      padding: 6px;
+      min-width: 180px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.5);
+      opacity: 0; pointer-events: none;
+      transform: translateX(-50%) translateY(-6px);
+      transition: opacity .18s, transform .18s;
+      z-index: 200;
+    }
+    .nav-dropdown:hover .nav-dropdown-menu,
+    .nav-dropdown.open .nav-dropdown-menu {
+      opacity: 1; pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+    .nav-dropdown-menu a {
+      display: block; padding: 8px 14px;
+      font-size: 13px; color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      transition: background .15s, color .15s;
+      white-space: nowrap;
+    }
+    .nav-dropdown-menu a:hover {
+      background: rgba(255,255,255,.06); color: var(--text);
+    }
     .nav-cta {
       font-size: 13px; font-weight: 600;
       padding: 7px 16px; border-radius: var(--radius-sm);
@@ -738,14 +787,26 @@
       Thecore
     </a>
     <div class="nav-links">
-      <a href="#philosophy">Philosophy</a>
-      <a href="#atoms">ATOMs</a>
-      <a href="#architecture">Architecture</a>
-      <a href="#how-it-works">How it works</a>
-      <a href="#compare">vs. vanilla Rails</a>
-      <a href="#integrations">Integrations</a>
-      <a href="#sponsors">Sponsors</a>
-      <a href="#react-frontend">React Frontend</a>
+      <div class="nav-dropdown" id="nav-sections">
+        <button class="nav-dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+          Sections
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="nav-dropdown-menu" role="menu">
+          <a href="#philosophy" role="menuitem">Philosophy</a>
+          <a href="#atoms" role="menuitem">ATOMs</a>
+          <a href="#architecture" role="menuitem">Architecture</a>
+          <a href="#how-it-works" role="menuitem">How it works</a>
+          <a href="#compare" role="menuitem">vs. vanilla Rails</a>
+          <a href="#integrations" role="menuitem">Integrations</a>
+          <a href="#sponsors" role="menuitem">Sponsors</a>
+          <a href="#react-frontend" role="menuitem">React Frontend</a>
+        </div>
+      </div>
+      <a href="WALKTHROUGH.html">Walkthrough</a>
+      <a href="REACT_FRONTEND_WALKTHROUGH.html">⚛️ React</a>
       <a href="GUIDE.html">Developer Guide</a>
     </div>
     <a href="https://github.com/gabrieletassoni/thecore_devcontainer" class="nav-cta" target="_blank" rel="noopener">
@@ -1503,6 +1564,23 @@
 
   document.querySelectorAll('.integ-link').forEach(btn => {
     btn.addEventListener('click', () => openModal(btn.dataset.md));
+  });
+
+  // Sections dropdown — toggle on click, close on outside click
+  const navSections = document.getElementById('nav-sections');
+  const navToggle   = navSections.querySelector('.nav-dropdown-toggle');
+  navToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = navSections.classList.toggle('open');
+    navToggle.setAttribute('aria-expanded', isOpen);
+  });
+  document.addEventListener('click', () => {
+    navSections.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', 'false');
+  });
+  navSections.querySelector('.nav-dropdown-menu').addEventListener('click', () => {
+    navSections.classList.remove('open');
+    navToggle.setAttribute('aria-expanded', 'false');
   });
 
   modal.querySelector('.docs-modal-overlay').addEventListener('click', closeModal);
