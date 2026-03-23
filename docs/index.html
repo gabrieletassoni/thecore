@@ -608,6 +608,84 @@
     .md-content a:hover { text-decoration: underline; }
     .md-content strong { color: var(--text); font-weight: 600; }
     .md-content hr { border: none; border-top: 1px solid var(--border); margin: 1.5em 0; }
+
+    /* ─── Sponsors ──────────────────────────────────────────────── */
+    .sponsors-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 24px;
+    }
+    .sponsor-card {
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      padding: 36px 32px;
+      display: flex; flex-direction: column; gap: 16px;
+      transition: border-color .25s, box-shadow .25s;
+      position: relative; overflow: hidden;
+    }
+    .sponsor-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(124,92,191,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .sponsor-card:hover {
+      border-color: var(--border-hi);
+      box-shadow: 0 0 0 1px var(--border-hi), var(--shadow);
+    }
+    .sponsor-header {
+      display: flex; align-items: center; gap: 16px;
+    }
+    .sponsor-logo {
+      width: 52px; height: 52px; border-radius: 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; font-weight: 800; color: var(--text);
+      flex-shrink: 0;
+    }
+    .sponsor-name-block { display: flex; flex-direction: column; gap: 4px; }
+    .sponsor-name {
+      font-size: 18px; font-weight: 800; letter-spacing: -.3px;
+    }
+    .sponsor-product {
+      font-size: 12px; color: var(--text-muted); font-family: var(--mono);
+    }
+    .sponsor-desc {
+      font-size: 13.5px; color: var(--text-muted); line-height: 1.7;
+    }
+    .sponsor-quote {
+      background: var(--bg);
+      border-left: 3px solid var(--violet-dim);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 14px 18px;
+      font-size: 13px; color: var(--text-muted);
+      font-style: italic; line-height: 1.65;
+    }
+    .sponsor-quote cite {
+      display: block; margin-top: 8px;
+      font-style: normal; font-size: 11.5px;
+      color: var(--text-dim); font-weight: 600;
+    }
+    .sponsor-meta {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .sponsor-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12.5px; font-weight: 600; color: var(--ruby);
+      transition: color .2s;
+    }
+    .sponsor-link:hover { color: #c42828; }
+    .sponsor-years {
+      font-size: 11.5px; color: var(--text-dim);
+    }
+    .sponsor-cta {
+      margin-top: 40px; text-align: center;
+      font-size: 13.5px; color: var(--text-muted); line-height: 1.7;
+    }
+    .sponsor-cta a { color: var(--ruby); }
+    .sponsor-cta a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -625,6 +703,7 @@
       <a href="#integrations">Integrations</a>
       <a href="#how-it-works">How it works</a>
       <a href="#compare">vs. vanilla Rails</a>
+      <a href="#sponsors">Sponsors</a>
       <a href="GUIDE.html">Developer Guide</a>
     </div>
     <a href="https://github.com/gabrieletassoni/thecore_devcontainer" class="nav-cta" target="_blank" rel="noopener">
@@ -1181,6 +1260,58 @@
       </div>
 
     </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ── Sponsors ──────────────────────────────────────────────────── -->
+<section id="sponsors">
+  <div class="container">
+    <div class="section-header centered reveal">
+      <div class="section-label">Trusted in Production</div>
+      <h2 class="section-title">Sponsors &amp; real-world<br /><span style="color:var(--violet)">deployments</span></h2>
+      <p class="section-sub">
+        Companies that have built their core business on Thecore —
+        proving the framework in demanding, long-running enterprise environments.
+      </p>
+    </div>
+    <div class="sponsors-grid reveal">
+
+      <!-- Bancolini -->
+      <div class="sponsor-card">
+        <div class="sponsor-header">
+          <div class="sponsor-logo">B</div>
+          <div class="sponsor-name-block">
+            <span class="sponsor-name">Bancolini</span>
+            <span class="sponsor-product">SPOT Integration Platform</span>
+          </div>
+          <span class="tag tag-violet" style="margin-left:auto">10+ years</span>
+        </div>
+        <p class="sponsor-desc">
+          <a href="https://www.bancolini.com/soluzioni/tecnologie/spot/" target="_blank" rel="noopener" style="color:var(--text);font-weight:600;">SPOT</a>
+          is Bancolini's flagship modular integration backend, built entirely on Thecore and deployed at multiple enterprise clients across industries.
+          The platform has been in continuous production for over a decade, powering a growing suite of SPOT-based solutions that clients can adopt incrementally
+          — without disrupting what already works.
+        </p>
+        <div class="sponsor-quote">
+          The ATOM architecture lets us deliver domain-specific modules that plug seamlessly into clients' existing infrastructure,
+          scaling from a single integration to a full enterprise backbone without ever touching stable, proven code.
+          <cite>— Bancolini Engineering Team</cite>
+        </div>
+        <div class="sponsor-meta">
+          <a href="https://www.bancolini.com/soluzioni/tecnologie/spot/" target="_blank" rel="noopener" class="sponsor-link">
+            Visit SPOT →
+          </a>
+          <span class="sponsor-years">In production since ~2015 · Multiple enterprise deployments</span>
+        </div>
+      </div>
+
+    </div>
+    <p class="sponsor-cta reveal">
+      Is your company using Thecore in production?
+      <a href="mailto:gabriele.tassoni@gmail.com">Get in touch</a> to be featured here.
+    </p>
   </div>
 </section>
 

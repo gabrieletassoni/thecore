@@ -77,8 +77,27 @@ Every bit of input counts!
 
 ---
 
-## Support the Project  
+## Sponsors & Real-World Deployments
 
-Want to see **Thecore** in action? Hire [me](mailto:gabriele.tassoni@gmail.com) as your full-stack developer. I’ll bring **Thecore** technology to your Ruby on Rails projects and demonstrate how it can save time, effort, and resources.  
+**Thecore** is trusted in production by companies that have built their core business on it.
 
-Let’s build smarter, together.  
+---
+
+### Bancolini — SPOT Integration Platform
+
+[![Bancolini](https://www.bancolini.com/favicon.ico)](https://www.bancolini.com/soluzioni/tecnologie/spot/)
+
+[**Bancolini**](https://www.bancolini.com) has been using **Thecore** as the backbone of [**SPOT**](https://www.bancolini.com/soluzioni/tecnologie/spot/) — their flagship integration backend platform — for over 10 years.
+
+SPOT is a modular integration platform built entirely on Thecore, deployed at multiple enterprise clients across industries. It demonstrates how Thecore scales from a single-developer project to a long-running, multi-tenant enterprise backbone with dozens of integrations.
+
+> _"SPOT is our answer to enterprise integration complexity. Thecore’s ATOM architecture lets us deliver domain-specific modules that clients can adopt incrementally — without touching what already works."_
+> — Bancolini Engineering Team
+
+---
+
+## Support the Project
+
+Want to see **Thecore** in action? Hire [me](mailto:gabriele.tassoni@gmail.com) as your full-stack developer. I’ll bring **Thecore** technology to your Ruby on Rails projects and demonstrate how it can save time, effort, and resources.
+
+Let’s build smarter, together.
