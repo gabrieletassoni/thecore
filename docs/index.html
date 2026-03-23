@@ -147,18 +147,24 @@
       transform: rotate(180deg);
     }
     .nav-dropdown-menu {
-      position: absolute; top: calc(100% + 12px); left: 50%;
-      transform: translateX(-50%);
+      position: absolute; top: 100%; left: 50%;
+      transform: translateX(-50%) translateY(-2px);
       background: var(--bg-card);
       border: 1px solid var(--border-hi);
       border-radius: var(--radius);
-      padding: 6px;
+      padding: 14px 6px 6px;
       min-width: 180px;
       box-shadow: 0 8px 32px rgba(0,0,0,.5);
       opacity: 0; pointer-events: none;
-      transform: translateX(-50%) translateY(-6px);
       transition: opacity .18s, transform .18s;
       z-index: 200;
+    }
+    /* invisible bridge that fills the gap between button and menu */
+    .nav-dropdown-menu::before {
+      content: '';
+      position: absolute;
+      top: -10px; left: 0; right: 0;
+      height: 10px;
     }
     .nav-dropdown:hover .nav-dropdown-menu,
     .nav-dropdown.open .nav-dropdown-menu {
