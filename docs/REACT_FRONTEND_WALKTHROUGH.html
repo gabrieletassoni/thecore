@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>React Frontend Walkthrough — Thecore</title>
+  <meta name="description" content="A step-by-step walkthrough for building a complete React frontend on top of a Thecore backend using thecore-auth." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="images/logo.png" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:        #080b12;
+      --bg-card:   #0e1320;
+      --bg-card2:  #121826;
+      --border:    rgba(255,255,255,0.07);
+      --border-hi: rgba(255,255,255,0.14);
+      --ruby:      #e03030;
+      --ruby-dim:  #b02424;
+      --ruby-glow: rgba(224,48,48,0.18);
+      --blue:      #3b82f6;
+      --blue-dim:  #1d4ed8;
+      --blue-glow: rgba(59,130,246,0.18);
+      --violet:    #7c5cbf;
+      --violet-dim:#5a3f9a;
+      --green:     #22c55e;
+      --text:      #e8eaf0;
+      --text-muted:#7a8299;
+      --text-dim:  #4a5068;
+      --mono:      'JetBrains Mono', monospace;
+      --sans:      'Inter', system-ui, sans-serif;
+      --radius:    12px;
+      --radius-sm: 8px;
+      --shadow:    0 1px 3px rgba(0,0,0,0.4), 0 8px 32px rgba(0,0,0,0.3);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ─── Nav ──────────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      background: rgba(8,11,18,.85);
+    }
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 18px; font-weight: 700; letter-spacing: -.3px;
+      color: var(--text);
+    }
+    .nav-logo:hover { text-decoration: none; }
+    .nav-logo-mark {
+      width: 30px; height: 30px; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-logo-mark img {
+      width: 30px; height: 30px; border-radius: 7px; object-fit: contain;
+    }
+    .nav-links { display: flex; gap: 24px; }
+    .nav-back {
+      font-size: 13px; color: var(--text-muted);
+      transition: color .2s;
+    }
+    .nav-back:hover { color: var(--text); text-decoration: none; }
+    .nav-cta {
+      font-size: 13px; font-weight: 600;
+      padding: 7px 16px; border-radius: var(--radius-sm);
+      background: var(--blue); color: #fff;
+      transition: background .2s, box-shadow .2s;
+    }
+    .nav-cta:hover {
+      background: var(--blue-dim);
+      box-shadow: 0 0 18px var(--blue-glow);
+      text-decoration: none;
+    }
+
+    /* ─── Page header ──────────────────────────────────────────── */
+    .page-header {
+      padding: 120px 0 60px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .page-header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 80% at 50% 0%, rgba(59,130,246,.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .page-header .container { max-width: 820px; margin: 0 auto; padding: 0 24px; }
+    .page-header-eyebrow {
+      font-size: 11.5px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--blue);
+      margin-bottom: 16px;
+    }
+    .page-header h1 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800; letter-spacing: -1px;
+      line-height: 1.12; margin-bottom: 16px;
+    }
+    .page-header p {
+      font-size: 16px; color: var(--text-muted); line-height: 1.7;
+    }
+    .page-header-meta {
+      display: flex; gap: 24px; margin-top: 28px; flex-wrap: wrap;
+    }
+    .meta-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: var(--text-muted);
+    }
+    .meta-item span { color: var(--text); font-weight: 500; }
+
+    /* ─── Container ─────────────────────────────────────────────── */
+    .container { max-width: 820px; margin: 0 auto; padding: 0 24px; }
+
+    /* ─── Prose ─────────────────────────────────────────────────── */
+    .prose { padding: 64px 24px 96px; }
+    .prose h1 {
+      font-size: clamp(24px, 3vw, 36px);
+      font-weight: 800; letter-spacing: -.8px;
+      line-height: 1.15; margin: 48px 0 16px; color: var(--text);
+    }
+    .prose h1:first-child { margin-top: 0; }
+    .prose h2 {
+      font-size: clamp(19px, 2.5vw, 26px);
+      font-weight: 700; letter-spacing: -.5px;
+      line-height: 1.2; margin: 52px 0 14px;
+      padding-bottom: 10px; border-bottom: 1px solid var(--border); color: var(--text);
+    }
+    .prose h3 {
+      font-size: 17px; font-weight: 700;
+      letter-spacing: -.3px; margin: 32px 0 10px; color: var(--text);
+    }
+    .prose h4 {
+      font-size: 15px; font-weight: 600;
+      letter-spacing: -.2px; margin: 24px 0 8px; color: var(--text);
+    }
+    .prose p { font-size: 15px; color: var(--text-muted); line-height: 1.75; margin-bottom: 16px; }
+    .prose strong { color: var(--text); font-weight: 600; }
+    .prose hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+    .prose ul, .prose ol { padding-left: 24px; margin-bottom: 16px; }
+    .prose li { font-size: 15px; color: var(--text-muted); line-height: 1.75; margin-bottom: 6px; }
+    .prose li strong { color: var(--text); }
+    .prose a { color: var(--blue); }
+    .prose a:hover { text-decoration: underline; }
+    .prose p code, .prose li code, .prose td code, .prose th code,
+    .prose h2 code, .prose h3 code, .prose h4 code, .prose blockquote code {
+      font-family: var(--mono); font-size: 12.5px;
+      background: rgba(255,255,255,.06); border: 1px solid var(--border);
+      padding: 2px 6px; border-radius: 4px; color: #60a5fa;
+    }
+    .prose pre {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 20px 22px;
+      overflow-x: auto; margin: 20px 0 24px;
+    }
+    .prose pre code {
+      font-family: var(--mono); font-size: 13px; line-height: 1.75;
+      color: var(--text); background: none; border: none;
+      padding: 0; border-radius: 0; white-space: pre;
+    }
+    .prose blockquote {
+      border-left: 3px solid var(--blue-dim);
+      background: rgba(59,130,246,.04);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 14px 18px; margin: 20px 0;
+    }
+    .prose blockquote p { font-size: 14px; color: var(--text-muted); margin-bottom: 0; }
+    .prose blockquote p:not(:last-child) { margin-bottom: 8px; }
+    .prose blockquote strong { color: var(--text); }
+    .prose table {
+      width: 100%; border-collapse: collapse; font-size: 13.5px;
+      margin: 20px 0 28px; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); overflow: hidden;
+    }
+    .prose th, .prose td { padding: 10px 16px; border: 1px solid var(--border); text-align: left; }
+    .prose th {
+      background: var(--bg-card2); font-size: 12px; font-weight: 700;
+      letter-spacing: .05em; text-transform: uppercase; color: var(--text-muted);
+    }
+    .prose tr:nth-child(even) td { background: rgba(255,255,255,.015); }
+    .prose td { color: var(--text-muted); }
+    .prose td:first-child { color: var(--text); font-weight: 500; }
+
+    /* ─── Loading state ──────────────────────────────────────────── */
+    .loading {
+      text-align: center; padding: 80px 0;
+      font-size: 14px; color: var(--text-dim);
+    }
+
+    /* ─── Footer ───────────────────────────────────────────────── */
+    footer { border-top: 1px solid var(--border); padding: 36px 0; }
+    .footer-inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 16px;
+    }
+    .footer-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 14px; font-weight: 700; color: var(--text);
+    }
+    .footer-brand:hover { text-decoration: none; }
+    .footer-mark {
+      width: 24px; height: 24px; border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .footer-mark img {
+      width: 24px; height: 24px; border-radius: 5px; object-fit: contain;
+    }
+    .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+    .footer-links a { font-size: 13px; color: var(--text-dim); transition: color .2s; }
+    .footer-links a:hover { color: var(--text); text-decoration: none; }
+    .footer-copy { font-size: 12px; color: var(--text-dim); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-mark"><img src="images/logo.png" alt="Thecore logo" /></div>
+      Thecore
+    </a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-back">← Overview</a>
+      <a href="WALKTHROUGH.html" class="nav-back">Backend Walkthrough</a>
+      <a href="GUIDE.html" class="nav-back">Developer Guide</a>
+    </div>
+    <a href="https://github.com/SantiGalvan/thecore-auth" class="nav-cta" target="_blank" rel="noopener">
+      thecore-auth →
+    </a>
+  </div>
+</nav>
+
+<header class="page-header">
+  <div class="container">
+    <div class="page-header-eyebrow">⚛️ Step-by-step guide — React Frontend</div>
+    <h1>Building a React Frontend on Thecore</h1>
+    <p>
+      A complete walkthrough from an empty Vite project to a fully functional React application
+      — with JWT authentication, private routes, CRUD modals, Ransack search, pagination,
+      and live ActionCable updates.
+    </p>
+    <div class="page-header-meta">
+      <div class="meta-item">Stack: <span>React 19 · Vite · thecore-auth · Tailwind CSS</span></div>
+      <div class="meta-item">Backend: <span>Any Thecore app (see <a href="WALKTHROUGH.html">Backend Walkthrough</a>)</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <div class="prose" id="content">
+    <p class="loading">Loading…</p>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <a href="index.html" class="footer-brand">
+      <div class="footer-mark"><img src="images/logo.png" alt="Thecore logo" /></div>
+      Thecore
+    </a>
+    <div class="footer-links">
+      <a href="index.html">Overview</a>
+      <a href="WALKTHROUGH.html">Backend Walkthrough</a>
+      <a href="GUIDE.html">Developer Guide</a>
+      <a href="https://github.com/SantiGalvan/thecore-auth" target="_blank" rel="noopener">thecore-auth on GitHub</a>
+    </div>
+    <span class="footer-copy">MIT License</span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/marked@9.1.0/marked.min.js"></script>
+<script>
+  fetch('REACT_FRONTEND_WALKTHROUGH.md')
+    .then(r => r.text())
+    .then(md => {
+      document.getElementById('content').innerHTML = marked.parse(md);
+    })
+    .catch(() => {
+      document.getElementById('content').innerHTML =
+        '<p style="color:#3b82f6">Could not load REACT_FRONTEND_WALKTHROUGH.md.</p>';
+    });
+</script>
+
+</body>
+</html>

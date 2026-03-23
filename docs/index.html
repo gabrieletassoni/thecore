@@ -527,6 +527,46 @@
     .tag-blue  { color: #60a5fa; border-color: #1d4ed8; background: rgba(96,165,250,.1); }
     .tag-orange{ color: #fb923c; border-color: #9a3412; background: rgba(251,146,60,.1); }
 
+    /* ─── React Frontend cards ───────────────────────────────────── */
+    .react-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-top: 48px;
+    }
+    .react-card {
+      border-radius: var(--radius);
+      border: 1px solid rgba(96,165,250,.2);
+      background: linear-gradient(135deg, var(--bg-card) 70%, rgba(96,165,250,.04));
+      padding: 36px;
+      display: flex; flex-direction: column; gap: 14px;
+      transition: border-color .25s, box-shadow .25s;
+    }
+    .react-card:hover {
+      border-color: rgba(96,165,250,.45);
+      box-shadow: 0 0 0 1px rgba(96,165,250,.2), 0 0 32px rgba(96,165,250,.06), var(--shadow);
+    }
+    .react-card-icon { font-size: 36px; line-height: 1; }
+    .react-card .tag { align-self: flex-start; }
+    .react-card h3 { font-size: 18px; font-weight: 700; letter-spacing: -.3px; }
+    .react-card p {
+      font-size: 14px; color: var(--text-muted); line-height: 1.7; flex: 1;
+    }
+    .react-card p code {
+      font-family: var(--mono); font-size: 12px;
+      background: rgba(255,255,255,.06); border: 1px solid var(--border);
+      padding: 1px 5px; border-radius: 4px; color: #60a5fa;
+    }
+    .react-card-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13.5px; font-weight: 600; color: #60a5fa;
+      cursor: pointer; margin-top: 6px;
+      background: none; border: none; padding: 0; text-align: left;
+      transition: color .2s;
+      text-decoration: none;
+    }
+    .react-card-link:hover { color: #93c5fd; }
+
     /* ─── Docs Modal ─────────────────────────────────────────────── */
     .docs-modal {
       position: fixed; inset: 0; z-index: 200;
@@ -705,6 +745,7 @@
       <a href="#compare">vs. vanilla Rails</a>
       <a href="#integrations">Integrations</a>
       <a href="#sponsors">Sponsors</a>
+      <a href="#react-frontend">React Frontend</a>
       <a href="GUIDE.html">Developer Guide</a>
     </div>
     <a href="https://github.com/gabrieletassoni/thecore_devcontainer" class="nav-cta" target="_blank" rel="noopener">
@@ -1320,6 +1361,51 @@
 
 <hr class="divider" />
 
+<!-- ── React Frontend ──────────────────────────────────────────── -->
+<section id="react-frontend">
+  <div class="container">
+    <div class="section-header centered reveal">
+      <div class="section-label">Frontend Integration</div>
+      <h2 class="section-title">Build React frontends<br /><span style="color:#60a5fa">on top of Thecore.</span></h2>
+      <p class="section-sub">
+        The <strong>thecore-auth</strong> npm package gives React applications a complete
+        authentication layer, JWT client, routing guards, modal system, and ActionCable
+        integration — all pre-wired for Thecore backends.
+      </p>
+    </div>
+    <div class="react-cards reveal">
+
+      <div class="react-card">
+        <div class="react-card-icon">⚛️</div>
+        <span class="tag tag-blue">Walkthrough</span>
+        <h3>React Frontend Walkthrough</h3>
+        <p>
+          Build a complete Fleet Management React app from scratch. Covers project setup,
+          JWT authentication, private and admin-only routes, full CRUD with modals,
+          server-side Ransack search, pagination, and live updates via ActionCable.
+        </p>
+        <a href="REACT_FRONTEND_WALKTHROUGH.html" class="react-card-link">Start the walkthrough →</a>
+      </div>
+
+      <div class="react-card">
+        <div class="react-card-icon">📘</div>
+        <span class="tag tag-blue">Reference</span>
+        <h3>React Frontend Reference</h3>
+        <p>
+          Full API reference for <code>thecore-auth</code>: provider architecture,
+          <code>useAuth</code>, <code>useConfig</code>, <code>useAlert</code>,
+          <code>useModal</code>, Axios instance, route guards, CSS variables,
+          IndexedDB utilities, and ActionCable setup.
+        </p>
+        <button class="integ-link react-card-link" data-md="REACT_FRONTEND.md">Read the docs →</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
 <!-- ── CTA ──────────────────────────────────────────────────────── -->
 <section class="cta-section">
   <div class="container">
@@ -1331,6 +1417,9 @@
     <div class="hero-actions">
       <a href="WALKTHROUGH.html" class="btn-primary">
         ↳ Step-by-step walkthrough
+      </a>
+      <a href="REACT_FRONTEND_WALKTHROUGH.html" class="btn-secondary">
+        ⚛️ React Frontend Walkthrough
       </a>
       <a href="https://github.com/gabrieletassoni/thecore_devcontainer" class="btn-secondary" target="_blank" rel="noopener">
         View on GitHub
@@ -1365,6 +1454,7 @@
       <a href="https://github.com/gabrieletassoni/thecore_code_extension" target="_blank" rel="noopener">VS Code Extension</a>
       <a href="https://github.com/gabrieletassoni/model_driven_api" target="_blank" rel="noopener">model_driven_api</a>
       <a href="https://github.com/gabrieletassoni/thecore_ui_rails_admin" target="_blank" rel="noopener">thecore_ui_rails_admin</a>
+      <a href="https://github.com/SantiGalvan/thecore-auth" target="_blank" rel="noopener">thecore-auth (React)</a>
     </div>
     <div class="footer-copy">MIT License · gabrieletassoni</div>
   </div>

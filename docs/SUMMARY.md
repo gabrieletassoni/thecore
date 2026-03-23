@@ -25,6 +25,15 @@ Start with **WALKTHROUGH.md** if you are new to Thecore. Use **GUIDE.md** as you
 
 ---
 
+## React frontend
+
+| Document | Purpose |
+|---|---|
+| [REACT_FRONTEND.md](REACT_FRONTEND.md) | Complete reference: thecore-auth library, providers, auth, routing, API, modal, ActionCable |
+| [REACT_FRONTEND_WALKTHROUGH.md](REACT_FRONTEND_WALKTHROUGH.md) | Step-by-step tutorial: build a full React frontend on top of a Thecore backend |
+
+---
+
 ## Environment setup
 
 | Document | Purpose |
