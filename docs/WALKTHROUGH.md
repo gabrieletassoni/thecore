@@ -47,7 +47,7 @@ Make sure you have:
 
 - **Docker** running on your machine
 - **Visual Studio Code** with the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension installed
-- The **Thecore** VS Code extension installed (search `gabrieletassoni.thecore` in the Extensions panel)
+- The **Thecore** VS Code extension installed — see [Installing the Thecore VS Code extension](SETUP_VSCODE.md#installing-the-thecore-vs-code-extension) for all installation options (CLI via `ovsx`, manual `.vsix`, or configuring open-vsx in the Extensions panel). The Microsoft Marketplace is **not recommended** as it may not carry the latest version.
 
 ---
 

@@ -61,7 +61,7 @@ This makes models introspectable, composable, and straightforward to extend with
 | Docker | Runs the devcontainer |
 | VS Code | IDE |
 | [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) | Opens the project inside the container |
-| [Thecore extension](https://marketplace.visualstudio.com/items?itemName=gabrieletassoni.thecore) | Provides all Thecore commands |
+| Thecore extension — [open-vsx.org](https://open-vsx.org/extension/gabrieletassoni/thecore) (recommended) or [GitHub Releases](https://github.com/gabrieletassoni/vscode-thecore/releases) | Provides all Thecore commands |
 
 For platform-specific installation instructions see:
 - [Linux (Ubuntu 24.04)](SETUP_VSCODE_LINUX.md)
