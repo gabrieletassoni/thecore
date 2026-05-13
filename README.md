@@ -83,11 +83,11 @@ Every bit of input counts!
 
 ---
 
-### Bancolini — SPOT Integration Platform
+### Bancolini SRL Societá Benefit — SPOT Integration Platform
 
-[![Bancolini](https://www.bancolini.com/wp-content/uploads/2025/02/Logo_bancolini_2025_rgb.svg)](https://www.bancolini.com/soluzioni/tecnologie/spot/)
+[![Bancolini SRL Societá Benefit](https://www.bancolini.com/wp-content/uploads/2025/02/Logo_bancolini_2025_rgb.svg)](https://www.bancolini.com/soluzioni/tecnologie/spot/)
 
-[**Bancolini**](https://www.bancolini.com) has been using **Thecore** as the backbone of [**SPOT**](https://www.bancolini.com/soluzioni/tecnologie/spot/) — their flagship integration backend platform — for over 10 years.
+[**Bancolini SRL Societá Benefit**](https://www.bancolini.com) has been using **Thecore** as the backbone of [**SPOT**](https://www.bancolini.com/soluzioni/tecnologie/spot/) — their flagship integration backend platform — for over 10 years.
 
 SPOT is a modular integration platform built entirely on Thecore, deployed at multiple enterprise clients across industries. It demonstrates how Thecore scales from a single-developer project to a long-running, multi-tenant enterprise backbone with dozens of integrations.
 
