@@ -111,6 +111,16 @@ Watch the **Thecore: Create App** output channel. The command runs the following
 
 When the output channel shows `✅ Thecore 3 App created successfully.` the application is fully wired and the database is seeded with the default Thecore admin user.
 
+**One manual step for now:** `Thecore gems` above doesn't yet include `thecore_generators` — the app-creation command hasn't been taught to add it automatically. Before Step 4 below, add it yourself and `bundle install`:
+
+```ruby
+group :development do
+  gem "thecore_generators", "~> 3.2"
+end
+```
+
+Without it, `rails generate model`/`rails generate migration` behave like plain, un-hooked Rails — none of what Step 4 onward describes (ATOM-aware placement, default-first concerns, inverse-association wiring) takes effect.
+
 **What you now have:**
 
 ```

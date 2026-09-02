@@ -214,6 +214,16 @@ my_app/
 
 **When to use:** when the model logically belongs to the main application rather than to a reusable ATOM.
 
+**Prerequisite (one-time, per app):** add `thecore_generators` to the host app's own `Gemfile` — it's what registers the hook described below, and nothing else in the dependency chain pulls it in automatically:
+
+```ruby
+group :development do
+  gem "thecore_generators", "~> 3.2"
+end
+```
+
+Then `bundle install`. This applies once per application, not per model — every `rails generate model`/`rails generate migration` afterward (main app or any ATOM) picks up Thecore's conventions with no further setup.
+
 **Primary way — plain terminal:** from the host app root,
 
 ```bash
@@ -410,6 +420,8 @@ Keep the ATOM gem's major version aligned with the Thecore major version it targ
 
 **When to use:** when you need to alter the database schema from within an ATOM (add a table, add a column, etc.) without generating a full model.
 
+> Requires `thecore_generators` in the host app's `Gemfile` — see the prerequisite in [§3.3](#33-add-models-to-the-main-application). It's a host-app-level dependency even when you're targeting an ATOM: `rails generate` always runs against the booted host application.
+
 **Primary way — plain terminal**, from inside the ATOM's own directory:
 
 ```bash
@@ -450,6 +462,8 @@ If any field here is a `references` column, this also wires the inverse associat
 ---
 
 ### 4.4 Add a model to an ATOM
+
+> Requires `thecore_generators` in the host app's `Gemfile` — see the prerequisite in [§3.3](#33-add-models-to-the-main-application).
 
 **Primary way — plain terminal:** run the identical `rails generate model` command from *inside* the ATOM's own directory:
 
