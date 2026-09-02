@@ -14,15 +14,15 @@ Every filename, folder, module namespace, and class name follows a predictable p
 
 ### High automation
 
-No boilerplate is written by hand. A single VS Code context menu action triggers a chain of `rails g`, `bundle install`, file moves, YAML merges, and concern scaffolding. The goal is that a feature domain — model, admin UI, API serialisation, custom endpoints — is ready to be filled with business logic within seconds of clicking a menu entry.
+No boilerplate is written by hand. Model and migration scaffolding is a Rails-native generator (`rails generate model`/`rails generate migration`, hooked by the `thecore_generators` gem) that works identically from a plain terminal or from a single VS Code context menu action — the extension delegates to the same generator rather than reimplementing it. Root/member action and ATOM scaffolding, which have no Rails-native command to hook, remain VS Code-extension-only for now. Either way, the goal is that a feature domain — model, admin UI, API serialisation, custom endpoints — is ready to be filled with business logic within seconds.
 
 ### High standardisation
 
-Every ATOM (modular engine) has the same internal layout. Every model has the same three concern files. Every root action has the same file structure. This makes the codebase predictable at scale: adding a tenth ATOM feels identical to adding the first one.
+Every ATOM (modular engine) has the same internal layout. Every model gets the same default API serialisation and admin navigation behaviour with zero generated files, from gem-owned default modules included into `ApplicationRecord` automatically — a per-model `Api::`/`RailsAdmin::` concern exists only once a model needs to override that default (see "Default-first models, concerns only when customizing" in [GUIDE.md §1](GUIDE.md#1-philosophy)). Every root action has the same file structure. This makes the codebase predictable at scale: adding a tenth ATOM feels identical to adding the first one.
 
 ### Introspection-based development
 
-Thecore generates code that configures itself by reading the model structure at runtime. The `Api::ModelName` concern uses `ModelDrivenApi.smart_merge` to compose the JSON serialisation configuration; `RailsAdmin::ModelName` uses `rails_admin do` blocks that are loaded dynamically. You add a field to a migration and it appears in the API and admin UI without touching configuration files.
+Thecore generates code that configures itself by reading the model structure at runtime. Every `ApplicationRecord` subclass gets default JSON serialisation and default admin navigation automatically, from gem-owned default modules — no per-model file required for the common case. When a model needs to differ, an `Api::ModelName` or `RailsAdmin::ModelName` concern overrides just that piece: `Api::ModelName` uses `ModelDrivenApi.smart_merge` to compose the JSON serialisation configuration on top of the default; `RailsAdmin::ModelName` uses `rails_admin do` blocks, loaded dynamically after the default and so free to override it. You add a field to a migration and it appears in the API and admin UI without touching configuration files — whether or not a concern exists for that model.
 
 ### Sensible defaults
 
@@ -185,7 +185,7 @@ vendor/submodules/vehicle_registry/
 │       ├── en.yml                     ← English i18n stubs
 │       └── it.yml                     ← Italian i18n stubs
 ├── db/
-│   ├── migrate/                       ← ATOM migrations (moved here automatically)
+│   ├── migrate/                       ← ATOM migrations (written here directly by rails generate model/migration)
 │   └── seeds.rb                       ← ATOM seed data
 └── lib/
     ├── root_actions/                  ← rails_admin main menu sections
@@ -204,6 +204,15 @@ vendor/submodules/vehicle_registry/
 
 The vehicle registry needs a `Vehicle` model.
 
+**Primary way — plain terminal**, from inside the ATOM:
+
+```bash
+cd vendor/submodules/vehicle_registry
+bundle exec rails generate model Vehicle plate:string make:string model:string year:integer status:string
+```
+
+**Also available — VS Code extension:**
+
 > **Right-click `vendor/submodules/vehicle_registry` in the Explorer → Thecore 3: Add a Model**
 
 | Field | Format | Example value |
@@ -211,24 +220,24 @@ The vehicle registry needs a `Vehicle` model.
 | Model name | PascalCase | `Vehicle` |
 | Migration fields | `field:type` pairs, space-separated (leave empty to add fields later) | `plate:string make:string model:string year:integer status:string` |
 
-The command:
+Both paths run the exact same generator (`thecore_generators`' `Thecore::Generators::ModelGenerator`) and produce the same result — the extension delegates to it rather than reimplementing generation logic. `Thecore::Generators::WorkspaceContext` detects that the working directory (or an explicit `--atom=vehicle_registry`) is inside `vendor/submodules/vehicle_registry/`, so the model, migration, and test files land there directly — there is no separate "generate, then move" step any more:
 
-1. Runs `rails g model Vehicle plate:string make:string model:string year:integer status:string --skip-test-framework` from the app root
-2. Moves `db/migrate/..._create_vehicles.rb` → `vendor/submodules/vehicle_registry/db/migrate/`
-3. Moves `app/models/vehicle.rb` → `vendor/submodules/vehicle_registry/app/models/`
-4. Creates three concern files inside the ATOM
-5. Injects concern includes into the model class
+1. Writes `vendor/submodules/vehicle_registry/db/migrate/..._create_vehicles.rb`
+2. Writes `vendor/submodules/vehicle_registry/app/models/vehicle.rb`
+3. Writes `vendor/submodules/vehicle_registry/test/models/vehicle_test.rb` — test generation is never suppressed
 
 **Generated model file** (`vehicle_registry/app/models/vehicle.rb`):
 
 ```ruby
 class Vehicle < ApplicationRecord
-  include Api::Vehicle
-  include RailsAdmin::Vehicle
 end
 ```
 
-**Generated API concern** (`vehicle_registry/app/models/concerns/api/vehicle.rb`):
+No `include` lines, and no concern files — `Vehicle` is already serialisable through the API and visible in the `rails_admin` sidebar, driven entirely by the default modules every `ApplicationRecord` subclass picks up automatically (see "Default-first models..." in [GUIDE.md §1](GUIDE.md#1-philosophy)). By default `smart_merge` with an empty hash — the default module's own baseline — exposes all non-sensitive fields, and the default admin navigation uses a generic label/icon.
+
+**Customizing serialisation or admin UI.** The common case is realizing a model needs custom `json_attrs` or `rails_admin` configuration only *after* it already exists — add the concern by hand at that point rather than regenerating anything:
+
+`vehicle_registry/app/models/concerns/api/vehicle.rb`:
 
 ```ruby
 module Api::Vehicle
@@ -236,20 +245,14 @@ module Api::Vehicle
 
   included do
     cattr_accessor :json_attrs
-    self.json_attrs = ::ModelDrivenApi.smart_merge (json_attrs || {}), {}
+    self.json_attrs = ::ModelDrivenApi.smart_merge(json_attrs || {}, {
+      only: [:id, :plate, :make, :model, :year, :status]
+    })
   end
 end
 ```
 
-By default, `smart_merge` with an empty hash exposes all non-sensitive fields. To restrict the output, edit the concern:
-
-```ruby
-self.json_attrs = ::ModelDrivenApi.smart_merge (json_attrs || {}), {
-  only: [:id, :plate, :make, :model, :year, :status]
-}
-```
-
-**Generated admin concern** (`vehicle_registry/app/models/concerns/rails_admin/vehicle.rb`):
+`vehicle_registry/app/models/concerns/rails_admin/vehicle.rb`:
 
 ```ruby
 module RailsAdmin::Vehicle
@@ -264,9 +267,16 @@ module RailsAdmin::Vehicle
 end
 ```
 
-The `Vehicle` model is now immediately visible in the `rails_admin` admin panel under the label defined by the i18n key. Change the icon and label by editing this concern — no other file needs touching.
+...then `include Api::Vehicle` / `include RailsAdmin::Vehicle` in `vehicle.rb`. The `Vehicle` model is then visible in the `rails_admin` admin panel under the label defined by the i18n key — change the icon and label by editing this concern, no other file needs touching.
 
-**Generated endpoints concern** (`vehicle_registry/app/models/concerns/endpoints/vehicle.rb`):
+If the customization is already known at generation time instead, `--with-api-concern`/`--with-admin-concern` scaffold the same starter files and wire the `include` lines automatically:
+
+```bash
+bundle exec rails generate model Vehicle plate:string make:string model:string year:integer status:string \
+  --with-api-concern --with-admin-concern
+```
+
+**Custom API actions.** `Endpoints::Vehicle` is never generated — add it by hand, in `vehicle_registry/app/models/concerns/endpoints/vehicle.rb`, only when a real non-CRUD action is needed:
 
 ```ruby
 class Endpoints::Vehicle < NonCrudEndpoints
@@ -287,7 +297,9 @@ class Endpoints::Vehicle < NonCrudEndpoints
 end
 ```
 
-> **Introspection-based development in action:** the API response for `GET /api/vehicles` is built by `ModelDrivenApi` reading the model's `json_attrs` configuration at runtime. You never write a serialiser class. Adding a new field to the migration and re-running `db:migrate` makes it appear in the API response automatically, because the default configuration exposes all fields.
+> **Introspection-based development in action:** the API response for `GET /api/vehicles` is built by `ModelDrivenApi` reading the model's `json_attrs` configuration at runtime — the default one if no `Api::Vehicle` concern exists, the overridden one if it does. You never write a serialiser class either way. Adding a new field to the migration and re-running `db:migrate` makes it appear in the API response automatically.
+
+> **Wiring a `references` column.** None of `Vehicle`'s own fields are a reference, but if one had been — say a later model adds a `vehicle:references` column — the migration generator would also write the inverse `has_many :vehicles`/`has_one :vehicle` onto `Vehicle` automatically. See [GUIDE.md §4.4.1](GUIDE.md#441-inverse-association-wiring-any-context) for the full mechanism and generated file.
 
 ---
 
@@ -295,14 +307,23 @@ end
 
 Sometimes you need to alter the schema without creating a new model — for example, to add an index or a column to an existing table.
 
+**Primary way — plain terminal**, from inside the ATOM:
+
+```bash
+cd vendor/submodules/vehicle_registry
+bundle exec rails generate migration AddMileageToVehicles mileage:integer
+```
+
+Or from anywhere, with `--atom=vehicle_registry`. The migration is written directly into `vendor/submodules/vehicle_registry/db/migrate/` — the same context detection as Step 4, no separate move step — and is ready to be run with `rails db:migrate` from the main app.
+
+**Also available — VS Code extension:**
+
 > **Right-click `vendor/submodules/vehicle_registry` in the Explorer → Thecore 3: Add a DB Migration**
 
 | Field | Format | Example value |
 |---|---|---|
 | Migration name | PascalCase | `AddMileageToVehicles` |
 | Migration fields | `field:type` pairs (optional) | `mileage:integer` |
-
-The command runs `rails g migration AddMileageToVehicles mileage:integer` and moves the resulting file from `db/migrate/` in the app root to `vendor/submodules/vehicle_registry/db/migrate/`. The migration is ready to be run with `rails db:migrate` from the main app.
 
 The generated file follows the standard Rails migration format:
 
@@ -315,6 +336,8 @@ end
 ```
 
 No further editing is required for simple additions. For complex migrations (custom SQL, data transforms) open the file and edit the `change` method directly.
+
+If a field here had been a `references` column instead (e.g. `driver:references`), this same command would also wire the inverse association onto the referenced model — see [GUIDE.md §4.4.1](GUIDE.md#441-inverse-association-wiring-any-context) for the full mechanism.
 
 ---
 
@@ -449,6 +472,14 @@ require 'member_actions/archive_vehicle'
 
 Not all models belong to a reusable ATOM. Configuration tables, app-specific join tables, or models that glue multiple ATOMs together belong in the main application.
 
+**Primary way — plain terminal**, from the host app root:
+
+```bash
+bundle exec rails generate model FleetConfig key:string value:string
+```
+
+**Also available — VS Code extension:**
+
 > **Right-click the project root folder (or `app/models/`) in the Explorer → Thecore 3: Add a Model**
 
 | Field | Format | Example value |
@@ -456,18 +487,16 @@ Not all models belong to a reusable ATOM. Configuration tables, app-specific joi
 | Model name | PascalCase | `FleetConfig` |
 | Migration fields | `field:type` pairs | `key:string value:string` |
 
-The behaviour is identical to adding a model inside an ATOM, with one difference: **no file is moved**. Rails generates the migration in `db/migrate/` and the model in `app/models/`, and they stay there. The three concern files are created in `app/models/concerns/`.
+The behaviour is identical to adding a model inside an ATOM (Step 4), with one difference: no file needs redirecting anywhere — the model, migration, and test land directly in the host app's own `app/models`/`db/migrate`/`test`, since there is no ATOM context to detect. No `Api::`/`RailsAdmin::`/`Endpoints::` concern file is generated by default here either.
 
 ```
 fleet_app/
 ├── db/migrate/
 │   └── 20240315140000_create_fleet_configs.rb
-└── app/models/
-    ├── fleet_config.rb
-    └── concerns/
-        ├── api/fleet_config.rb
-        ├── rails_admin/fleet_config.rb
-        └── endpoints/fleet_config.rb
+├── app/models/
+│   └── fleet_config.rb
+└── test/models/
+    └── fleet_config_test.rb
 ```
 
 > **When to put a model in the main app vs. an ATOM?**
@@ -485,7 +514,7 @@ rails s -p 3000 -b 0.0.0.0
 
 Navigate to `http://localhost:3000/app` to access the `rails_admin` interface. Log in with the seeded admin credentials. You will see:
 
-- The **Vehicle** model in the sidebar (under the navigation label defined in `RailsAdmin::Vehicle`)
+- The **Vehicle** model in the sidebar (under the default admin navigation label/icon — no `RailsAdmin::Vehicle` concern was needed to get here; add one, as shown in Step 4, only to customize it)
 - The **Fleet Dashboard** root action in the main menu
 - The **Archive Vehicle** button on each row of the Vehicle list
 
@@ -504,10 +533,14 @@ From this point the development cycle for each new feature is:
    Right-click root → Thecore 3: Create an ATOM
 
 3. Add models:
-   Right-click ATOM (or root) → Thecore 3: Add a Model
+   bundle exec rails generate model (from inside the ATOM, or the root)
+   — or right-click ATOM (or root) → Thecore 3: Add a Model; both run the same generator
+   → no Api::/RailsAdmin:: concern by default (--with-api-concern/--with-admin-concern to opt in)
+   → a references field also wires the inverse association automatically (GUIDE.md §4.4.1)
 
 4. Add standalone schema changes:
-   Right-click ATOM → Thecore 3: Add a DB Migration → rails db:migrate
+   bundle exec rails generate migration (from inside the ATOM)
+   — or right-click ATOM → Thecore 3: Add a DB Migration → rails db:migrate
 
 5. Add admin UI pages (dashboard-style):
    Right-click ATOM → Thecore 3: Add a Root Action
@@ -521,19 +554,19 @@ From this point the development cycle for each new feature is:
    → add require to after_initialize.rb
 
 7. Expose custom API endpoints:
-   Open concerns/endpoints/<model>.rb
+   Create (or open) concerns/endpoints/<model>.rb
    → uncomment and complete the endpoint template
 
 8. Tune JSON output:
-   Open concerns/api/<model>.rb
+   Create (or open) concerns/api/<model>.rb
    → edit json_attrs with only:, except:, include:
 
 9. Tune admin UI:
-   Open concerns/rails_admin/<model>.rb
+   Create (or open) concerns/rails_admin/<model>.rb
    → add list do, edit do, show do blocks
 ```
 
-Each step is independent. You can add a root action without touching the model. You can extend the API without touching the admin config. The concerns keep each responsibility isolated.
+Each step is independent. You can add a root action without touching the model. You can extend the API without touching the admin config. Concerns exist only where a model actually customizes something, keeping each responsibility isolated without paying for boilerplate files nobody edits.
 
 ---
 
@@ -563,10 +596,12 @@ Standard Rails migration types accepted by the Add Model and Add Migration comma
 | `boolean` | BOOLEAN |
 | `date` | DATE |
 | `datetime` | DATETIME / TIMESTAMP |
-| `references` | Foreign key + index |
+| `references` | Foreign key + index; also wires the inverse `has_many`/`has_one` on the target model (see GUIDE.md §4.4.1) |
 | `json` / `jsonb` | JSON column (PostgreSQL) |
 
 ## Appendix C — What each concern file controls
+
+None of these three files exists by default any more — see [GUIDE.md §1](GUIDE.md#1-philosophy). Create the ones a given model needs (by hand, or via `--with-api-concern`/`--with-admin-concern` at generation time for the first two); the table below is what each controls once it exists.
 
 | File | Controls | How to customise |
 |---|---|---|
