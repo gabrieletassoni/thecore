@@ -21,5 +21,9 @@ The migration generator's detection of a `references` column and automatic autho
 _Avoid_: reverse association, back-reference, auto-association
 
 **thecore_generators**:
-The dedicated gem hosting all of thecore's Rails-native scaffolding: the generator hook for Model/Migration, the inverse-association wiring, the `thecore:check_practices` rake task, and (phase 2) the ATOM/Action generators. The application-creation template lives alongside it but is invoked via `rails new -m`, not a generator. See ADR 0002.
+The dedicated gem hosting all of thecore's Rails-native scaffolding: the generator hook for Model/Migration, the inverse-association wiring, the `thecore:check_practices` rake task (JSON output, `--fix` flag — see ADR 0004), and the Root/Member Action generators. The ATOM generator, the application-creation template (invoked via `rails new -m`, not a generator), and Collection Action support remain a later, unscoped phase. See ADR 0002 and ADR 0004.
 _Avoid_: thecore generator, scaffolding gem
+
+**Violation** (as checked by `thecore:check_practices`):
+A single non-conformance the rake task detects and reports as one structured entry (`file`, `line`, `message`, `severity`, `fixable`) — the Ruby-side counterpart to `thecore_code_extension`'s own `Violation` (its own CONTEXT.md), which now renders these as VS Code diagnostics instead of detecting them itself. A model with no `Api::`/`RailsAdmin::` concern file is never a Violation on its own (see ADR 0001's default module) — only an `include` pointing at a missing concern, or a concern file missing its required marker, is. See ADR 0004.
+_Avoid_: audit finding, practices error, lint issue
