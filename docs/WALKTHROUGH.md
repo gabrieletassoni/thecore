@@ -14,7 +14,7 @@ Every filename, folder, module namespace, and class name follows a predictable p
 
 ### High automation
 
-No boilerplate is written by hand. Model and migration scaffolding is a Rails-native generator (`rails generate model`/`rails generate migration`, hooked by the `thecore_generators` gem) that works identically from a plain terminal or from a single VS Code context menu action — the extension delegates to the same generator rather than reimplementing it. Root/member action and ATOM scaffolding, which have no Rails-native command to hook, remain VS Code-extension-only for now. Either way, the goal is that a feature domain — model, admin UI, API serialisation, custom endpoints — is ready to be filled with business logic within seconds.
+No boilerplate is written by hand. Model, migration, root action, and member action scaffolding are all Rails-native generators (`rails generate model`/`migration`/`thecore:root_action`/`thecore:member_action`, all hooked or shipped by the `thecore_generators` gem) that work identically from a plain terminal or from a single VS Code context menu action — the extension delegates to the same generator rather than reimplementing it. ATOM scaffolding is the one thing that remains VS Code-extension-only for now, with no Rails-native command to hook. Either way, the goal is that a feature domain — model, admin UI, API serialisation, custom endpoints — is ready to be filled with business logic within seconds.
 
 ### High standardisation
 
@@ -408,7 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 ```
 
-**Important:** after generating the action, open `config/initializers/after_initialize.rb` inside the ATOM and add the require line:
+The generator also takes care of registration for you — no manual step needed. It inserts a require line into `config/initializers/after_initialize.rb` inside the ATOM (creating the file from a skeleton first if it doesn't exist yet):
 
 ```ruby
 Rails.application.configure do
@@ -418,17 +418,14 @@ Rails.application.configure do
 end
 ```
 
-Also open `config/initializers/assets.rb` and uncomment the precompile lines for the new action's assets:
+...and a precompile line into `config/initializers/assets.rb` for the new action's assets:
 
 ```ruby
-Rails.application.config.assets.precompile += %w(
-  main_fleet_dashboard.js
-  main_fleet_dashboard.css
-)
+Rails.application.config.assets.precompile += %w( rails_admin/actions/fleet_dashboard.js rails_admin/actions/fleet_dashboard.css )
 ```
 
-> **Why is the require manual?**
-> Thecore generates the action file but leaves its registration explicit so you control load order. If you have ten root actions and only three are enabled in a given environment, you simply don't require the others in `after_initialize.rb`.
+> **Why is the require its own explicit line, rather than an implicit autoload?**
+> Thecore generates the action file but keeps its registration as one explicit line per action so you control load order. If you have ten root actions and only three are enabled in a given environment, you simply remove (or never generate) the require line for the others — Thecore never auto-discovers action files by scanning the directory. Re-running the generator for an action that already has its require line is safe: it's inserted idempotently, never duplicated.
 
 ---
 
@@ -470,7 +467,7 @@ end
 
 The `visible` block ensures the button only appears on `Vehicle` rows. `bindings[:object]` is the current record — this is `rails_admin`'s introspection mechanism at work. You never specify which model or which ID; the framework resolves it.
 
-Add the require to `after_initialize.rb`:
+The generator has already added the require line to `after_initialize.rb` for you — no manual step needed (see the callout at the end of Step 6 for why it's a separate explicit line per action):
 
 ```ruby
 require 'member_actions/archive_vehicle'

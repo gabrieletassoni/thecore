@@ -954,18 +954,22 @@ The devcontainer image itself is rebuilt weekly via the GitHub Actions workflow 
 | **Thecore 3: Add a Root Action** | Action name (snake_case) | Generates a `rails_admin` main-menu section with controller, view, assets, i18n |
 | **Thecore 3: Add a Member Action** | Action name (snake_case) | Generates a `rails_admin` per-row action with controller, view, assets, i18n |
 
-### Terminal equivalents (Model / Migration)
+### Terminal equivalents (Model / Migration / Root Action / Member Action)
 
-`rails generate model`/`rails generate migration` are the underlying mechanism for both "Add a Model" rows above and "Add a DB Migration" (see [§3.3](#33-add-models-to-the-main-application), [§4.3](#43-add-a-database-migration), [§4.4](#44-add-a-model-to-an-atom)) — the VS Code commands are a convenience wrapper around them, not a separate implementation. Root/Member Action and ATOM creation remain VS Code-extension-only for now (no Rails-native command to hook).
+`rails generate model`/`rails generate migration`/`rails generate thecore:root_action`/`rails generate thecore:member_action` are the underlying mechanism for all four "Add a ..." rows above (see [§3.3](#33-add-models-to-the-main-application), [§4.3](#43-add-a-database-migration), [§4.4](#44-add-a-model-to-an-atom)) — the VS Code commands are convenience wrappers around them, not separate implementations. This includes Root/Member Action as of `thecore_generators` 3.5.0/3.6.0: `addRootAction.js`/`addMemberAction.js` shell out to the same generators a terminal invocation would use. ATOM creation is the one command left that remains VS Code-extension-only for now (no Rails-native command to hook — no `thecore:atom` generator exists yet).
 
 | Flag | Applies to | Effect |
 |---|---|---|
-| `--atom=NAME` | model, migration | Targets `vendor/submodules/NAME/` explicitly, regardless of the invoking `cwd` |
+| `--atom=NAME` | model, migration, root_action, member_action | Targets `vendor/submodules/NAME/` explicitly, regardless of the invoking `cwd` |
 | `--with-api-concern` | model | Also scaffolds `Api::ModelName` and includes it in the model |
 | `--with-admin-concern` | model | Also scaffolds `RailsAdmin::ModelName` and includes it in the model |
 | `--non-interactive` | model, migration | Skips the inverse-association cardinality prompt ([§4.4.1](#441-inverse-association-wiring-any-context)), defaulting to `has_many` |
 
 `rails generate active_record:model`/`active_record:migration` remain available unmodified, as an escape hatch.
+
+`rails generate thecore:root_action NAME`/`rails generate thecore:member_action NAME` create the action file (RailsAdmin `:root`/`:member` action type), its view/JS/SCSS companions, the `after_initialize.rb` require line, the `assets.rb` precompile line, and locale entries in every `*.yml` already present under `config/locales` — all in one run, no follow-up manual step.
+
+`rails thecore:check_practices` (a rake task, not a generator — flags go after a literal `--`, e.g. `rails thecore:check_practices -- --json --atom=NAME`) audits an ATOM or the main app for Scaffold Files/Models/Actions conventions and can auto-apply fixable violations with `--fix`. The "Thecore 3: Check Practices" VS Code command (right-click on any ATOM or app folder) shells out to it with `--json` and renders the result as VS Code diagnostics, offering a QuickPick to re-run with `--fix` when any violation is fixable.
 
 ### Input validation rules
 
