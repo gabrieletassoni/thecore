@@ -475,7 +475,63 @@ require 'member_actions/archive_vehicle'
 
 ---
 
-## Step 8 — Add a model directly to the main app
+## Step 8 — Check the ATOM's practices
+
+`rails thecore:check_practices` audits an ATOM (or the main app) for the same Scaffold
+Files/Models/Actions conventions the generators above produce, and can be run any time —
+after hand-editing a generated file, after pulling someone else's branch, or just as a
+habit before committing. It's a rake task, not a generator, so flags go after a literal
+`--`.
+
+To see it catch something, suppose the JS companion for the fleet dashboard from Step 6
+got deleted by accident:
+
+```bash
+rm vendor/submodules/vehicle_registry/app/assets/javascripts/rails_admin/actions/fleet_dashboard.js
+```
+
+Run the audit scoped to that ATOM:
+
+```bash
+bundle exec rails thecore:check_practices -- --atom=vehicle_registry
+```
+
+```
+vendor/submodules/vehicle_registry/app/assets/javascripts/rails_admin/actions/fleet_dashboard.js:
+  [ERROR] fleet_dashboard: missing companion fleet_dashboard.js
+```
+
+> **Right-click `vendor/submodules/vehicle_registry` in the Explorer → Thecore 3: Check Practices** does the same thing from the VS Code extension, rendering the result as diagnostics instead of terminal output, with a QuickPick offering to re-run with `--fix` whenever a violation is fixable — like this one.
+
+A missing companion file created by a generator (view/JS/SCSS) is always fixable: the audit
+knows exactly which generator produced it and can re-run just that one template. Apply
+every fixable violation in one pass with `--fix`:
+
+```bash
+bundle exec rails thecore:check_practices -- --atom=vehicle_registry --fix
+```
+
+```
+✅ No violations found.
+```
+
+The fix delegated straight to `thecore:root_action`'s own template rendering — the
+regenerated `fleet_dashboard.js` is byte-for-byte what Step 6 would have produced,
+not a generic placeholder. `--fix` never asks its own confirmation: passing it means
+you've already decided, whether that's you on the command line or the VS Code
+extension after its own QuickPick.
+
+Not every violation is fixable this way — a missing marker inside an existing,
+possibly hand-customized file (rather than a missing file entirely) is reported but
+left untouched, since regenerating over it could clobber real customization. `--json`
+(`rails thecore:check_practices -- --json --atom=vehicle_registry`) emits the same
+violations as structured data instead of text — what the VS Code extension and CI
+actually consume — and the task exits non-zero whenever violations remain after any
+`--fix` pass, so it's usable as a CI gate either way.
+
+---
+
+## Step 9 — Add a model directly to the main app
 
 Not all models belong to a reusable ATOM. Configuration tables, app-specific join tables, or models that glue multiple ATOMs together belong in the main application.
 
@@ -511,7 +567,7 @@ fleet_app/
 
 ---
 
-## Step 9 — Run the application
+## Step 10 — Run the application
 
 With the database seeded by `thecore:db:seed`, a default admin user was created. Start the Rails server:
 
@@ -529,7 +585,7 @@ All of this is functional without writing any controller, route, serialiser, or 
 
 ---
 
-## Step 10 — The iteration cycle
+## Step 11 — The iteration cycle
 
 From this point the development cycle for each new feature is:
 

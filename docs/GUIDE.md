@@ -942,6 +942,7 @@ The devcontainer image itself is rebuilt weekly via the GitHub Actions workflow 
 | **Thecore 3: Create an App** | Scaffolds a complete Thecore Rails application |
 | **Thecore 3: Create an ATOM** | Creates a new Rails engine under `vendor/submodules/` |
 | **Thecore 3: Add a Model** | Generates a model + migration (no concerns by default — `--with-api-concern`/`--with-admin-concern` opt in) in the main app; same as `rails generate model` from a terminal |
+| **Thecore 3: Check Practices** | Audits the main app (plus every ATOM under `vendor/submodules/`) for Scaffold Files/Models/Actions conventions and reports violations as diagnostics; offers to re-run with `--fix` when any are fixable — same as `rails thecore:check_practices` from a terminal |
 
 ### ATOM context
 
@@ -953,6 +954,7 @@ The devcontainer image itself is rebuilt weekly via the GitHub Actions workflow 
 | **Thecore 3: Add a DB Migration** | Migration name (PascalCase), fields | Generates a migration directly inside the ATOM; same as `rails generate migration --atom=NAME` from a terminal |
 | **Thecore 3: Add a Root Action** | Action name (snake_case) | Generates a `rails_admin` main-menu section with controller, view, assets, i18n |
 | **Thecore 3: Add a Member Action** | Action name (snake_case) | Generates a `rails_admin` per-row action with controller, view, assets, i18n |
+| **Thecore 3: Check Practices** | — | Audits the ATOM for Scaffold Files/Models/Actions conventions and reports violations as diagnostics; offers to re-run with `--fix` when any are fixable — same as `rails thecore:check_practices -- --atom=NAME` from a terminal |
 
 ### Terminal equivalents (Model / Migration / Root Action / Member Action)
 
