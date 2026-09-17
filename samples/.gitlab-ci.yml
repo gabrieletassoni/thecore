@@ -1,0 +1,78 @@
+# Generic Thecore host-app GitLab CI pipeline. Uses the same devcontainer image
+# every Thecore app already runs in locally, so the pipeline environment matches
+# development exactly.
+image: gabrieletassoni/vscode-devcontainers-thecore:3
+
+variables:
+  DISABLE_SPRING: 1 # Disables the Spring preloader for a clean CI environment.
+
+stages:
+  - build
+  - test
+  - lint
+  - delivery
+  - deploy
+
+cache:
+  key: thecore-app-cache
+  paths:
+    - vendor/bundle
+    - app/assets
+    - lib/assets
+    - public/assets
+
+# Every job below only runs when the "version" file changes (and never for tag
+# pipelines) — a pipeline run is meant to be a deliberate version bump, not
+# every commit. Shared as a hidden job (leading `.`) + YAML anchor so it isn't
+# repeated five times.
+.only_on_version_bump: &only_on_version_bump
+  only:
+    changes:
+      - version
+    variables:
+      - $CI_COMMIT_TAG == null
+
+build:
+  stage: build
+  <<: *only_on_version_bump
+  script:
+    - sudo -E /usr/bin/app-compile.sh
+
+test:
+  stage: test
+  <<: *only_on_version_bump
+  script:
+    - bundle exec rails test
+
+lint:
+  stage: lint
+  <<: *only_on_version_bump
+  script:
+    - bundle exec rubocop
+
+# Deploys via the devcontainer image's own generic deploy script
+# (/usr/bin/docker-deploy.sh), which reads its target configuration from
+# vendor/deploytargets/ (developer-convenience directory, not committed
+# content — see ADR 0005 in docs/adr/) and no-ops safely when that isn't
+# configured for this environment yet. No customer-specific paths here.
+to-dev:
+  stage: delivery
+  dependencies:
+    - build
+  <<: *only_on_version_bump
+  cache: [] # Disables caching to ensure a fresh deployment.
+  variables:
+    TARGETENV: dev
+  script:
+    - "/usr/bin/docker-deploy.sh"
+
+to-prod:
+  stage: deploy
+  when: manual # Requires manual approval before execution.
+  dependencies:
+    - build
+  <<: *only_on_version_bump
+  allow_failure: true
+  cache: []
+  script:
+    - "/usr/bin/docker-deploy.sh"

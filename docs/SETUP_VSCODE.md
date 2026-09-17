@@ -21,6 +21,10 @@ Follow the guide for your operating system to install Docker and VS Code before 
 
 Once Docker and VS Code are running, install the Thecore extension (see below) and then continue with [WALKTHROUGH.md](WALKTHROUGH.md) Step 1 to set up the Thecore devcontainer for your project.
 
+## Reference samples
+
+[`samples/devcontainer/`](../samples/devcontainer/) is the canonical, generic Thecore devcontainer this repository maintains: base image, VS Code extensions/settings, `features`, a `postCreateCommand` chain (chown self-heal, host-home symlink, Claude Code plugin check), and `gh`/`glab` CLI config mounts — commented out by default, so uncomment whichever one you already have configured on your host to reuse that auth inside the container. [`samples/CLAUDE.md`](../samples/CLAUDE.md) and [`samples/.gitlab-ci.yml`](../samples/.gitlab-ci.yml) are the same kind of generic starting point for a new app's own `CLAUDE.md` and CI pipeline. Copy from these by hand today; the planned `rails new -m` App application template (see ADR 0005 in `docs/adr/`) will fetch them programmatically once it's built. "Thecore 3: Setup Devcontainer" renders its own, separate bundled templates (in the `thecore_code_extension` repo) and does not currently draw from these samples — ADR 0005 deliberately leaves that command unchanged.
+
 ---
 
 ## Installing the Thecore VS Code extension
