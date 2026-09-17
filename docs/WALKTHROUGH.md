@@ -147,6 +147,89 @@ fleet_app/
 
 ---
 
+## Alternative: the App application template (CLI, no VS Code needed)
+
+Everything Step 2 just did can also be done from a plain terminal, with `ruby`/`rails` available
+(inside the devcontainer from Step 1, or anywhere else) — no VS Code, no extension. This is the
+App application template, a genuine Rails application template (`thecore_generators`'s own
+`lib/templates/app_template.rb`), invoked via `rails new -m` instead of `rails generate`. Skip
+this box if you already did Step 2 the VS Code way; the rest of this walkthrough works either
+way, since Steps 3 onward only assume `fleet_app` already exists, not how it was created.
+
+```bash
+rails new fleet_app --database=postgresql --asset-pipeline=sprockets \
+  -m https://raw.githubusercontent.com/gabrieletassoni/thecore_generators/release/3/lib/templates/app_template.rb
+```
+
+Illustrative, not a verbatim capture — Thor logs more status lines per action than shown here
+(`route`, `chmod`, an extra line per `generate` call) and some are abbreviated with `...`:
+
+```
+      create  Gemfile
+      ...
+       apply  .../thecore_generators/lib/templates/app_template.rb
+     gemfile    devise
+     gemfile    cancancan
+     gemfile    rails_admin
+     gemfile    sassc-rails
+     gemfile    model_driven_api (~> 3.9)
+     gemfile    thecore_ui_rails_admin (~> 3.8)
+     gemfile    rails-erd
+     gemfile    thecore_generators (~> 3.6)
+      append    Gemfile
+      create    vendor/submodules
+      create    vendor/submodules/.keep
+      create    vendor/external
+      create    vendor/external/.keep
+       force    .devcontainer/devcontainer.json      (already existed — Setup Devcontainer made it)
+       force    .devcontainer/docker-compose.yml      (already existed — Setup Devcontainer made it)
+       force    .devcontainer/Dockerfile               (already existed — Setup Devcontainer made it)
+       force    .devcontainer/create-db-user.sql        (already existed — Setup Devcontainer made it)
+      create    .devcontainer/link-host-home.sh          (new — Setup Devcontainer doesn't make this one)
+      create    .devcontainer/check-plugins.sh            (new — Setup Devcontainer doesn't make this one)
+      create    .gitlab-ci.yml
+      create    CLAUDE.md
+  Run `bundle install` and the standard installer generators (devise, rails_admin,
+  active_storage, action_text, action_mailbox, cancan, erd) now? (y/n) y
+         run  bundle install
+    generate  devise:install
+    ...
+    generate  rails_admin:install
+    ...
+       rails  active_storage:install
+       ...
+```
+
+Answering `y` to the last prompt runs the same installer chain Step 2's table describes
+(`devise:install`, `rails_admin:install`, `active_storage:install`, `action_text:install`,
+`action_mailbox:install`, `cancan:ability`, `erd:install`) — answer `n` instead to bootstrap
+offline and run `bundle install` plus those generators by hand once you have connectivity; the
+Gemfile and every file listed above are written either way, regardless of the answer.
+
+**Compared to Step 2's "Thecore 3: Create an App"**, this produces the same core result with three
+differences worth knowing:
+
+- **`thecore_generators` is added automatically**, `:development` group — Step 2's "one manual
+  step" caveat above doesn't apply here.
+- **The devcontainer is (re)written** from this repo's own `samples/devcontainer/`, overwriting
+  the four `.devcontainer/*` files Step 1's "Setup Devcontainer" created, and adding two more
+  (`link-host-home.sh`/`check-plugins.sh`) it doesn't — Step 2's own command never touches
+  `.devcontainer/` at all.
+- **`.gitlab-ci.yml` is a different file, not the same one overwritten** — Step 2's command
+  already writes its own `.gitlab-ci.yml` (build/delivery/deploy stages, generated inline); this
+  template instead fetches this repo's own generic `samples/.gitlab-ci.yml`, replacing Step 2's
+  version if Step 2 already ran. `CLAUDE.md` genuinely is new either way — neither Step 1 nor
+  Step 2 creates one.
+
+**What it deliberately doesn't do yet**: this produces a generic, blank app — no
+customer-specific customization, no pre-wired `vendor/submodules/` content (Step 3 below adds a
+real ATOM by hand either way). The `thecore:atom` generator, a Collection Action generator, and
+delegating "Thecore 3: Create an App" to this same template are all still deferred — see
+[ADR 0005](https://github.com/gabrieletassoni/thecore/blob/release/3/docs/adr/0005-app-template-scoped-to-rails-new-m-assets-sourced-from-thecore-samples.md)
+in `docs/adr/`. Full reference: [GUIDE.md §3.2.1](GUIDE.md#321-the-app-application-template-rails-new--m).
+
+---
+
 ## Step 3 — Create the first ATOM
 
 The main application is intentionally thin. Feature domains live in ATOMs. Create one for vehicle management.
