@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   app:
     build:
@@ -7,44 +5,54 @@ services:
       dockerfile: .devcontainer/Dockerfile
 
     volumes:
-      - ..:/workspaces/project/backend:cached
-      - tmp:/workspaces/project/backend/tmp
-      - bundle:/workspaces/project/backend/vendor/bundle
-      - ${HOME}/.bundle/config:/home/vscode/.bundle/config
+      - ..:/workspaces/app:cached
+      - tmp:/workspaces/app/tmp
+      - bundle:/workspaces/app/vendor/bundle
       - /var/run/docker.sock:/var/run/docker.sock
 
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
 
-    # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
-    network_mode: service:db
-    environment:
-      REDIS_URL: redis://db:6379/1
-      DATABASE_URL: postgres://postgres:postgres@db:5432/mytrack_dev?pool=5
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
-    # Uncomment the next line to use a non-root user for all processes.
-    # user: vscode
+    environment:
+      REDIS_URL: redis://redis:6379/1
+      DATABASE_URL: postgres://postgres:postgres@db:5432/app_dev?pool=5
+      RAILS_ENV: development
+      SECRET_KEY_BASE: dummy
+
+    # Run all container processes as the non-root dev user. Without this the
+    # container's default user is root (the Dockerfile ends on `USER root`),
+    # so anything that isn't `postCreateCommand` (which devcontainer.json's
+    # remoteUser runs as vscode) — devcontainer feature installs, the
+    # `sleep infinity` command, a plain `docker compose exec` — creates
+    # root-owned files. That mixed ownership breaks `bundle update`/`bundle
+    # install`: /usr/local/bundle/bin has the sticky bit set, so vscode can't
+    # overwrite or delete binstubs it doesn't own.
+    user: vscode
 
     # Use "forwardPorts" in **devcontainer.json** to forward an app port locally.
-    # (Adding the "ports" property to this file will not forward from a Codespace.
-  redis:
-    image: redis:latest
-    restart: unless-stopped
-    command: redis-server
-    # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
-    network_mode: service:db
-    healthcheck: 
-      interval: 1s
-      retries: 30
-      test: "redis-cli ping"
-      timeout: 3s
+    # (Adding the "ports" property to this file will not forward from a Codespace.)
 
+  redis:
+    image: redis:7-bookworm
+    command: redis-server
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
 
   db:
-    # One might assume that using postgres:15 as their tag would accomplish soft-pinning to avoid breaking changes. However, what occurred in the past few days was that 15 moved from 15-bullseye to 15-bookworm. This creates a breaking change because postgres does not provide its own collations -- it uses collations from the base OS, which were upgraded with Debian's change from bullseye to bookworm.
-    # The takeaway is that if you actually want soft-pinning without breaking changes, you need to pin not only the postgres major version, but also the operating system, i.e. postgres:15-bookworm.
+    # Pin both the Postgres major version AND the base OS (bookworm) — Postgres
+    # doesn't provide its own collations, it uses the base OS's, so a bare
+    # `postgres:15` tag silently moving to a newer Debian release (as it did
+    # from bullseye to bookworm) is a breaking change, not just a patch bump.
     image: postgres:15-bookworm
-    restart: unless-stopped
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./create-db-user.sql:/docker-entrypoint-initdb.d/create-db-user.sql
@@ -52,12 +60,16 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
       POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 20
 
     # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
 volumes:
   postgres-data:
-  node-modules:
   tmp:
   bundle:
