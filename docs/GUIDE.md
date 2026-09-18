@@ -12,12 +12,14 @@
 4. [ATOM lifecycle](#4-atom-lifecycle)
    - 4.1 [What is an ATOM](#41-what-is-an-atom)
    - 4.2 [Create an ATOM](#42-create-an-atom)
+     - 4.2.1 [The `thecore:atom` generator (terminal alternative)](#421-the-thecoreatom-generator-terminal-alternative)
    - 4.3 [Add a database migration](#43-add-a-database-migration)
    - 4.4 [Add a model to an ATOM](#44-add-a-model-to-an-atom)
      - 4.4.1 [Inverse-association wiring (any context)](#441-inverse-association-wiring-any-context)
    - 4.5 [Extend a model from another ATOM](#45-extend-a-model-from-another-atom)
    - 4.6 [Add a root action](#46-add-a-root-action)
    - 4.7 [Add a member action](#47-add-a-member-action)
+   - 4.8 [Add a collection action](#48-add-a-collection-action)
 5. [Model anatomy](#5-model-anatomy)
 6. [Deploy](#6-deploy)
 7. [Command reference](#7-command-reference)
@@ -264,8 +266,9 @@ myapp/
 
 **What it deliberately does not do yet:** it produces a generic, blank app — no
 customer-specific customization (Bancolini's or anyone else's), no pre-wired `vendor/submodules/`
-content. The `thecore:atom` generator, a Collection Action generator, and delegating the VS Code
-"Thecore 3: Create an App" command to this same template are all still deferred — see
+content (see [§4.2.1](#421-the-thecoreatom-generator-terminal-alternative) for the equivalent
+terminal-only generator for ATOMs themselves). Delegating the VS Code "Thecore 3: Create an App"
+command to this same template remains deferred — see
 [ADR 0005](https://github.com/gabrieletassoni/thecore/blob/release/3/docs/adr/0005-app-template-scoped-to-rails-new-m-assets-sourced-from-thecore-samples.md).
 "Thecore 3: Create an App" (§3.2 above) keeps its own, separate, unmodified implementation for
 now — the two exist side by side, not one superseding the other yet.
@@ -475,6 +478,79 @@ Keep the ATOM gem's major version aligned with the Thecore major version it targ
 4. Watch the Output panel for completion.
 5. The new ATOM is immediately available to the main app.
 ```
+
+---
+
+### 4.2.1 The `thecore:atom` generator (terminal alternative)
+
+**Command:** `rails generate thecore:atom NAME` — not a VS Code command. A genuine Rails
+generator (`thecore_generators`'s `Thecore::Generators::AtomGenerator`), the same family as
+`thecore:root_action`/`thecore:member_action`/`thecore:collection_action` below.
+
+**When to use:** as an alternative to "Thecore 3: Create an ATOM" above, from any terminal —
+no VS Code, no extension required. Run it from the **main application's root** (unlike every
+other `thecore:*` generator, it takes no `--atom=NAME` option: creating a *new* ATOM only ever
+makes sense from the app that will contain it, never "from inside" an ATOM). Requires
+`vendor/submodules/` to already exist — every app scaffolded via either "Create the main
+application" path in [§3.2](#32-create-the-main-application) already has it.
+
+```bash
+bundle exec rails generate thecore:atom tcp_debugger
+```
+
+`NAME` must already be a valid gem name — lowercase letters, digits, underscores, or hyphens,
+starting with a letter (e.g. `tcp_debugger`, or `thecore-spot-overrides`-style hyphenation) —
+unlike "Create an ATOM"'s own free-text input, which converts spaces to underscores for you.
+
+**What it does (in order):**
+
+1. Prompts for summary, description, author, email, and homepage URL (same five fields
+   "Create an ATOM" collects) — or reads them from `--summary=`/`--description=`/`--author=`/
+   `--email=`/`--url=` with `--non-interactive` (aborts immediately, listing exactly which
+   flags are missing, if any required one is absent).
+2. Runs `bundle exec rails plugin new tcp_debugger -fG --skip-gemfile-entry --skip-hotwire
+   --full` (cwd'd to `vendor/submodules/`), producing the standard Rails engine skeleton.
+3. Asks (default yes; `--skip-api-admin-deps` in non-interactive mode) whether to add
+   `model_driven_api`/`thecore_ui_rails_admin` as dependencies, at this ecosystem's current
+   floor (`~> 3.9`/`~> 3.8`) — declining adds neither, but every Scaffold File/directory below
+   is created either way.
+4. Creates the same Scaffold Files/directories "Create an ATOM" does (see the file tree in
+   [§4.2](#42-create-an-atom) above) — `db/migrate`, the API/RailsAdmin concern directories,
+   `config/initializers`, `config/locales`, `lib/root_actions`/`member_actions`/
+   `collection_actions`, JS/CSS asset directories, the RailsAdmin main view directory,
+   `.github/workflows`.
+5. Generates **both** `.github/workflows/gempush.yml` (RubyGems publish-on-tag) and
+   `.gitlab-ci.yml` unconditionally — no prompt for which git host you'll actually push to;
+   whichever one you don't end up using simply never triggers.
+6. Fetches a `CLAUDE.md` skeleton from this repo's own `samples/ATOM_CLAUDE.md` — the same
+   `THECORE_SAMPLES_SOURCE` mechanism the App application template ([§3.2.1](#321-the-app-application-template-rails-new--m))
+   already uses for its own asset fetches.
+7. `git init`s the new ATOM directory with one local commit, then **logs** — but does not
+   run — the exact follow-up commands to finish wiring it in (illustrative below; the real
+   message uses the ATOM's actual absolute path, not the relative form shown here):
+   ```
+   tcp_debugger is git-initialized locally with one commit, but has no remote yet. To finish wiring it in:
+     1. Create a repository for it on the git host of your choice (GitHub, GitLab, ...)
+     2. cd <path-to-app>/vendor/submodules/tcp_debugger && git remote add origin <remote-url> && git push -u origin master
+     3. From this app's root: git submodule add <remote-url> vendor/submodules/tcp_debugger
+   ```
+   Creating the remote repository and registering the real git submodule are deliberately left
+   for you to do by hand — an irreversible, credential-dependent step this generator won't take
+   on your behalf.
+8. Adds `gem "tcp_debugger", path: "vendor/submodules/tcp_debugger"` to the main app's
+   `Gemfile` (skipped, with a warning, if a gem with that name is already declared there — the
+   same collision `rails plugin new`'s own force flag would otherwise silently overwrite one
+   layer down, at the `vendor/submodules/tcp_debugger` directory itself, which this
+   generator also refuses outright if it already exists). Does not run `bundle install`.
+
+**Compared to "Create an ATOM"**, the result is the same ATOM structure, with four differences
+worth knowing:
+
+- **Dependency versions are current** (`~> 3.9`/`~> 3.8`), not the stale `~> 3.1`/`~> 3.2`.
+- **The dependency choice is a real yes/no prompt**, not unconditional.
+- **A `CLAUDE.md` is generated**, fetched from this repo's own `samples/ATOM_CLAUDE.md`.
+- **The ATOM is `git init`'d with one local commit** — "Create an ATOM" leaves it without any
+  git history at all.
 
 ---
 
@@ -806,6 +882,86 @@ The JavaScript handles the interaction:
 
 ---
 
+### 4.8 Add a collection action
+
+**Command:** `rails generate thecore:collection_action NAME` — terminal-only, no VS Code
+command exists for this one. It's the third sibling to `thecore:root_action`/
+`thecore:member_action` above, built from the exact same shared generator infrastructure — only
+its own action-type template differs.
+
+**When to use:** when you need an action that operates on a model's whole index — all records
+at once — rather than a single row (member action) or a page with no model scope at all (root
+action). A bulk export, a "recalculate all" button above the list view, a batch status change.
+
+**How to invoke:** from the **ATOM root folder** inside `vendor/submodules/`, or from the main
+app root with `--atom=NAME`:
+
+```bash
+bundle exec rails generate thecore:collection_action bulk_export
+```
+
+**Inputs requested:**
+
+| Input | Format | Example |
+|---|---|---|
+| Action name | snake_case | `bulk_export` |
+
+**What it generates:**
+
+```
+vendor/submodules/tcp_debugger/
+  lib/
+    collection_actions/
+      bulk_export.rb              ← RailsAdmin collection action definition
+  app/
+    assets/
+      javascripts/rails_admin/actions/
+        bulk_export.js            ← ActionCable WebSocket client
+      stylesheets/rails_admin/actions/
+        bulk_export.scss          ← styles with loader animation
+    views/rails_admin/main/
+      bulk_export.html.erb        ← ERB template with loader
+  config/
+    locales/
+      en.yml                      ← updated with action label
+      it.yml                      ← updated with action label
+```
+
+The action file registers a `:collection`-scoped action — the third-positional `:collection`
+argument to `add_action` is what tells RailsAdmin its scope, unlike Root/Member's `:root`/
+`:member`:
+
+```ruby
+RailsAdmin::Config::Actions.add_action "bulk_export", :base, :collection do
+  visible? authorized?
+  link_icon 'fas fa-file'
+  http_methods [:get]
+  controller do
+    proc do
+      # This runs against the whole model index - @abstract_model is available
+      # here to scope the collection this action operates on.
+    end
+  end
+end
+```
+
+The starter template deliberately mirrors Root Action's simplicity (a minimal GET/JSON example
+with an `ActivityLogChannel` broadcast) rather than a fully-worked bulk-export implementation —
+it's a starting point to customize, not a finished feature. Companion JS/view/SCSS files, the
+`after_initialize.rb` require line, the `assets.rb` precompile line, and locale entries all work
+exactly like Root/Member Action's — see [§4.6](#46-add-a-root-action)'s own explanation of the
+require-line/idempotency mechanics, which applies identically here.
+
+**Example workflow:**
+
+```
+1. From vendor/submodules/tcp_debugger, run: rails generate thecore:collection_action bulk_export
+2. Edit lib/collection_actions/bulk_export.rb to implement the actual export logic.
+3. Edit the ERB template and JS to trigger it and display progress/results.
+```
+
+---
+
 ## 5. Model anatomy
 
 None of these three concern files is generated by default any more (see [§1](#1-philosophy)). `Api::ModelName`/`RailsAdmin::ModelName` are scaffolded only via `--with-api-concern`/`--with-admin-concern` at generation time, or added by hand later; `Endpoints::ModelName` is always hand-added. Here is the full content and purpose of each, for when one does exist.
@@ -1004,6 +1160,7 @@ The devcontainer image itself is rebuilt weekly via the GitHub Actions workflow 
 | **Thecore 3: Create an App** | Scaffolds a complete Thecore Rails application |
 | **App application template** (terminal-only, no VS Code command) | `rails new myapp -m <url>` — the same underlying job as "Create an App" above, runnable from any terminal; see [§3.2.1](#321-the-app-application-template-rails-new--m) |
 | **Thecore 3: Create an ATOM** | Creates a new Rails engine under `vendor/submodules/` |
+| **`thecore:atom` generator** (terminal-only, no VS Code command) | `rails generate thecore:atom NAME` — the same underlying job as "Create an ATOM" above, runnable from any terminal; see [§4.2.1](#421-the-thecoreatom-generator-terminal-alternative) |
 | **Thecore 3: Add a Model** | Generates a model + migration (no concerns by default — `--with-api-concern`/`--with-admin-concern` opt in) in the main app; same as `rails generate model` from a terminal |
 | **Thecore 3: Check Practices** | Audits the main app (plus every ATOM under `vendor/submodules/`) for Scaffold Files/Models/Actions conventions and reports violations as diagnostics; offers to re-run with `--fix` when any are fixable — same as `rails thecore:check_practices` from a terminal |
 
@@ -1017,24 +1174,25 @@ The devcontainer image itself is rebuilt weekly via the GitHub Actions workflow 
 | **Thecore 3: Add a DB Migration** | Migration name (PascalCase), fields | Generates a migration directly inside the ATOM; same as `rails generate migration --atom=NAME` from a terminal |
 | **Thecore 3: Add a Root Action** | Action name (snake_case) | Generates a `rails_admin` main-menu section with controller, view, assets, i18n |
 | **Thecore 3: Add a Member Action** | Action name (snake_case) | Generates a `rails_admin` per-row action with controller, view, assets, i18n |
+| **`thecore:collection_action` generator** (terminal-only, no VS Code command) | Action name (snake_case) | `rails generate thecore:collection_action NAME` — generates a `rails_admin` collection-scoped action with controller, view, assets, i18n; see [§4.8](#48-add-a-collection-action) |
 | **Thecore 3: Check Practices** | — | Audits the ATOM for Scaffold Files/Models/Actions conventions and reports violations as diagnostics; offers to re-run with `--fix` when any are fixable — same as `rails thecore:check_practices -- --atom=NAME` from a terminal |
 
-### Terminal equivalents (Model / Migration / Root Action / Member Action)
+### Terminal equivalents (Model / Migration / Root Action / Member Action / Collection Action / ATOM)
 
-`rails generate model`/`rails generate migration`/`rails generate thecore:root_action`/`rails generate thecore:member_action` are the underlying mechanism for all four "Add a ..." rows above (see [§3.3](#33-add-models-to-the-main-application), [§4.3](#43-add-a-database-migration), [§4.4](#44-add-a-model-to-an-atom)) — the VS Code commands are convenience wrappers around them, not separate implementations. This includes Root/Member Action as of `thecore_generators` 3.5.0/3.6.0: `addRootAction.js`/`addMemberAction.js` shell out to the same generators a terminal invocation would use. ATOM creation is the one command left that remains VS Code-extension-only for now (no Rails-native command to hook — no `thecore:atom` generator exists yet).
+`rails generate model`/`rails generate migration`/`rails generate thecore:root_action`/`rails generate thecore:member_action`/`rails generate thecore:collection_action` are the underlying mechanism for all "Add a ..." rows above (see [§3.3](#33-add-models-to-the-main-application), [§4.3](#43-add-a-database-migration), [§4.4](#44-add-a-model-to-an-atom)) — the VS Code commands are convenience wrappers around them, not separate implementations. This includes Root/Member Action as of `thecore_generators` 3.5.0/3.6.0: `addRootAction.js`/`addMemberAction.js` shell out to the same generators a terminal invocation would use. `thecore:collection_action` has no VS Code command at all — it's terminal-only from day one. `rails generate thecore:atom` is the terminal equivalent of "Create an ATOM" (see [§4.2.1](#421-the-thecoreatom-generator-terminal-alternative)), but stands apart from the flags table below: it takes no `--atom=NAME` (creating a *new* ATOM only ever happens from the main app root) and has its own separate set of flags (`--summary=`, `--description=`, `--author=`, `--email=`, `--url=`, `--skip-api-admin-deps`, `--non-interactive`), listed in [§4.2.1](#421-the-thecoreatom-generator-terminal-alternative) itself rather than repeated here.
 
 | Flag | Applies to | Effect |
 |---|---|---|
-| `--atom=NAME` | model, migration, root_action, member_action | Targets `vendor/submodules/NAME/` explicitly, regardless of the invoking `cwd` |
+| `--atom=NAME` | model, migration, root_action, member_action, collection_action | Targets `vendor/submodules/NAME/` explicitly, regardless of the invoking `cwd` |
 | `--with-api-concern` | model | Also scaffolds `Api::ModelName` and includes it in the model |
 | `--with-admin-concern` | model | Also scaffolds `RailsAdmin::ModelName` and includes it in the model |
 | `--non-interactive` | model, migration | Skips the inverse-association cardinality prompt ([§4.4.1](#441-inverse-association-wiring-any-context)), defaulting to `has_many` |
 
 `rails generate active_record:model`/`active_record:migration` remain available unmodified, as an escape hatch.
 
-`rails generate thecore:root_action NAME`/`rails generate thecore:member_action NAME` create the action file (RailsAdmin `:root`/`:member` action type), its view/JS/SCSS companions, the `after_initialize.rb` require line, the `assets.rb` precompile line, and locale entries in every `*.yml` already present under `config/locales` — all in one run, no follow-up manual step.
+`rails generate thecore:root_action NAME`/`rails generate thecore:member_action NAME`/`rails generate thecore:collection_action NAME` create the action file (RailsAdmin `:root`/`:member`/`:collection` action type), its view/JS/SCSS companions, the `after_initialize.rb` require line, the `assets.rb` precompile line, and locale entries in every `*.yml` already present under `config/locales` — all in one run, no follow-up manual step.
 
-`rails thecore:check_practices` (a rake task, not a generator — flags go after a literal `--`, e.g. `rails thecore:check_practices -- --json --atom=NAME`) audits an ATOM or the main app for Scaffold Files/Models/Actions conventions and can auto-apply fixable violations with `--fix`. The "Thecore 3: Check Practices" VS Code command (right-click on any ATOM or app folder) shells out to it with `--json` and renders the result as VS Code diagnostics, offering a QuickPick to re-run with `--fix` when any violation is fixable.
+`rails thecore:check_practices` (a rake task, not a generator — flags go after a literal `--`, e.g. `rails thecore:check_practices -- --json --atom=NAME`) audits an ATOM or the main app for Scaffold Files/Models/Actions conventions and can auto-apply fixable violations with `--fix`, including collection actions' own companion files — the last action kind stuck at "not fixable" (no generator to delegate to) until `thecore_generators` 3.9.0 shipped `thecore:collection_action`. The "Thecore 3: Check Practices" VS Code command (right-click on any ATOM or app folder) shells out to it with `--json` and renders the result as VS Code diagnostics, offering a QuickPick to re-run with `--fix` when any violation is fixable.
 
 ### Input validation rules
 
@@ -1043,7 +1201,8 @@ The devcontainer image itself is rebuilt weekly via the GitHub Actions workflow 
 | Model name | Must be PascalCase, letters only | `TcpConnection` ✓ — `tcp_connection` ✗ |
 | Action name | Must be snake_case, lowercase letters, digits, underscores | `test_connection` ✓ — `TestConnection` ✗ |
 | Migration fields | Space-separated `field:type` pairs | `host:string port:integer` ✓ |
-| ATOM name | Free text, converted to snake_case automatically | `TCP Debugger` → `tcp_debugger` |
+| ATOM name ("Create an ATOM", VS Code) | Free text, converted to snake_case automatically | `TCP Debugger` → `tcp_debugger` |
+| ATOM name (`thecore:atom`, terminal) | Must already be a valid gem name: lowercase letters, digits, underscores, or hyphens, starting with a letter — no automatic conversion | `tcp_debugger` ✓ — `TCP Debugger` ✗ |
 | Email | Must be a valid email address | `user@example.com` ✓ |
 | URL | Must be a valid URL | `https://github.com/acme/atom` ✓ |
 

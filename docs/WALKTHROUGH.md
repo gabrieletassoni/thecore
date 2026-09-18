@@ -14,7 +14,7 @@ Every filename, folder, module namespace, and class name follows a predictable p
 
 ### High automation
 
-No boilerplate is written by hand. Model, migration, root action, and member action scaffolding are all Rails-native generators (`rails generate model`/`migration`/`thecore:root_action`/`thecore:member_action`, all hooked or shipped by the `thecore_generators` gem) that work identically from a plain terminal or from a single VS Code context menu action — the extension delegates to the same generator rather than reimplementing it. ATOM scaffolding is the one thing that remains VS Code-extension-only for now, with no Rails-native command to hook. Either way, the goal is that a feature domain — model, admin UI, API serialisation, custom endpoints — is ready to be filled with business logic within seconds.
+No boilerplate is written by hand. Model, migration, root action, member action, collection action, and ATOM scaffolding are all Rails-native generators (`rails generate model`/`migration`/`thecore:root_action`/`thecore:member_action`/`thecore:collection_action`/`thecore:atom`, all hooked or shipped by the `thecore_generators` gem). The first four work identically from a plain terminal or from a single VS Code context menu action — the extension delegates to the same generator rather than reimplementing it. `thecore:atom` has a VS Code equivalent too ("Thecore 3: Create an ATOM"), which still uses its own separate implementation rather than delegating to the generator yet. `thecore:collection_action` has no VS Code command at all — terminal-only. Either way, the goal is that a feature domain — model, admin UI, API serialisation, custom endpoints — is ready to be filled with business logic within seconds.
 
 ### High standardisation
 
@@ -223,8 +223,9 @@ differences worth knowing:
 
 **What it deliberately doesn't do yet**: this produces a generic, blank app — no
 customer-specific customization, no pre-wired `vendor/submodules/` content (Step 3 below adds a
-real ATOM by hand either way). The `thecore:atom` generator, a Collection Action generator, and
-delegating "Thecore 3: Create an App" to this same template are all still deferred — see
+real ATOM by hand either way; the box just below it shows the terminal-only alternative for
+that too, now that it exists). Delegating "Thecore 3: Create an App" to this same template
+remains deferred — see
 [ADR 0005](https://github.com/gabrieletassoni/thecore/blob/release/3/docs/adr/0005-app-template-scoped-to-rails-new-m-assets-sourced-from-thecore-samples.md)
 in `docs/adr/`. Full reference: [GUIDE.md §3.2.1](GUIDE.md#321-the-app-application-template-rails-new--m).
 
@@ -290,6 +291,86 @@ vendor/submodules/vehicle_registry/
 > The `add_to_db_migration.rb` initialiser adds the ATOM's `db/migrate/` path to Rails' migration lookup. This means `rails db:migrate` in the main app finds and runs all ATOM migrations automatically. Keeping them inside the ATOM makes the domain self-contained: you can add this ATOM to another project and its schema comes with it.
 
 > **Convention in action:** note that you never chose any of these paths or filenames. The name `Vehicle Registry` became `vehicle_registry` everywhere — folder name, gemspec name, Gemfile entry, module namespace — without any additional input.
+
+---
+
+## Alternative: the `thecore:atom` generator (CLI, no VS Code needed)
+
+Everything Step 3 just did can also be done from a plain terminal — no VS Code, no extension.
+This is `thecore:atom`, a real Rails generator (`thecore_generators`'s
+`Thecore::Generators::AtomGenerator`), invoked via `rails generate` like any other. Skip this
+box if you already did Step 3 the VS Code way; Step 4 onward only assumes `vehicle_registry`
+already exists, not how it was created. Run it from `fleet_app`'s own root — unlike every other
+`thecore:*` generator, it takes no `--atom=NAME`, since creating a *new* ATOM only makes sense
+from the app that will contain it.
+
+```bash
+bundle exec rails generate thecore:atom vehicle_registry
+```
+
+Note the name itself: unlike "Create an ATOM"'s free-text input (`Vehicle Registry` → converted
+to `vehicle_registry` for you), the generator's `NAME` argument must already be a valid,
+already-snake_case gem name — you type `vehicle_registry` directly.
+
+Illustrative, not a verbatim capture — Thor logs one status line per file/directory created
+(a dozen-plus `.keep` files alone), and the nested `rails plugin new` subprocess prints its own
+full "create" log on top of that; both are elided here with `...`:
+
+```
+$ bundle exec rails generate thecore:atom vehicle_registry
+Enter the summary of the ATOM, i.e. TCP Debugger:
+Manages the vehicle fleet and assignments
+Enter the description of the ATOM, i.e. TCP Debugger:
+Provides models, admin UI, and API endpoints for vehicle lifecycle management
+Enter the author of the ATOM, i.e. Alchemic IT:
+Fleet Corp Engineering
+Enter the email of the ATOM author:
+dev@fleetcorp.example.com
+Enter the url of the ATOM:
+https://github.com/fleetcorp/vehicle_registry
+Include model_driven_api/thecore_ui_rails_admin as dependencies? [yes, no] yes
+       run  bundle exec rails plugin new vehicle_registry -fG --skip-gemfile-entry --skip-hotwire --full from "vendor/submodules"
+      ...
+      create  vendor/submodules/vehicle_registry/db/migrate/.keep
+      ...
+      create  vendor/submodules/vehicle_registry/config/initializers/after_initialize.rb
+      create  vendor/submodules/vehicle_registry/config/initializers/abilities.rb
+      create  vendor/submodules/vehicle_registry/db/seeds.rb
+      create  vendor/submodules/vehicle_registry/config/locales/en.yml
+      create  vendor/submodules/vehicle_registry/config/locales/it.yml
+      create  vendor/submodules/vehicle_registry/.github/workflows/gempush.yml
+      create  vendor/submodules/vehicle_registry/.gitlab-ci.yml
+      invoke  vendor/submodules/vehicle_registry/Gemfile
+      force  vendor/submodules/vehicle_registry/vehicle_registry.gemspec
+      create  vendor/submodules/vehicle_registry/CLAUDE.md
+       run  git init -q -b master from "vendor/submodules/vehicle_registry"
+       run  git add -A from "vendor/submodules/vehicle_registry"
+       run  git ... commit -q -m "Initial commit" from "vendor/submodules/vehicle_registry"
+  next_steps  vehicle_registry is git-initialized locally with one commit, but has no remote yet. To finish wiring it in:
+                1. Create a repository for it on the git host of your choice (GitHub, GitLab, ...)
+                2. cd <path-to-fleet_app>/vendor/submodules/vehicle_registry && git remote add origin <remote-url> && git push -u origin master
+                3. From this app's root: git submodule add <remote-url> vendor/submodules/vehicle_registry
+     gemfile  vehicle_registry
+```
+
+The last line (`gemfile vehicle_registry`) is `add_gem_to_host_gemfile` appending
+`gem "vehicle_registry", path: "vendor/submodules/vehicle_registry"` to `fleet_app`'s own
+`Gemfile` — same end result as Step 3's own final step.
+
+**Compared to Step 3's "Thecore 3: Create an ATOM"**, the resulting ATOM structure is the same
+(see the file tree above), with four differences worth knowing:
+
+- **Dependency versions are current** (`model_driven_api ~> 3.9`/`thecore_ui_rails_admin ~> 3.8`),
+  not Step 3's stale `~> 3.1`/`~> 3.2`.
+- **The dependency choice is a real prompt**, not unconditional — answering `no` skips both, but
+  every Scaffold File/directory is still created.
+- **A `CLAUDE.md` is generated**, fetched from this repo's own `samples/ATOM_CLAUDE.md` — Step 3
+  produces none.
+- **The ATOM is `git init`'d with one local commit** — Step 3 leaves it without any git history
+  at all. Creating a remote and running the real `git submodule add` are still manual steps
+  either way; this generator only logs the exact commands for you to run.
+
+Full reference: [GUIDE.md §4.2.1](GUIDE.md#421-the-thecoreatom-generator-terminal-alternative).
 
 ---
 
