@@ -1,0 +1,99 @@
+# Generic Thecore host-app GitHub Actions CI pipeline. Uses the same devcontainer
+# image every Thecore app already runs in locally, so the pipeline environment
+# matches development exactly. Sibling of samples/.gitlab-ci.yml — see ADR 0007
+# in docs/adr/ for why both exist unconditionally (git hosting is a generic,
+# per-developer choice, not something to prompt about).
+name: CI
+
+on:
+  # Only fires on branch pushes that touch the "version" file -- a pipeline run
+  # is meant to be a deliberate version bump, not every commit. Tag pushes never
+  # match "branches", so this naturally excludes tag pipelines too, mirroring
+  # the GitLab sample's `$CI_COMMIT_TAG == null` guard with no extra condition.
+  push:
+    branches: ["**"]
+    paths:
+      - version
+  # Lets a maintainer trigger the production deploy manually from the Actions UI.
+  # GitHub has no zero-config equivalent to GitLab's `when: manual` (the real
+  # equivalent, Environments + required reviewers, needs one-time per-repo setup
+  # only a human can do) -- workflow_dispatch keeps this sample fully self-
+  # contained instead, at the cost of losing the "gated by a fresh green build"
+  # guarantee GitLab's `when: manual` job gets for free.
+  workflow_dispatch:
+
+# Anchors, GitHub Actions' own equivalent of the GitLab sample's hidden-job-plus-
+# YAML-anchor trick (a top-level key prefixed "x-" is ignored by the workflow
+# schema, so it's a safe place to park shared nodes for `*alias` reuse below).
+x-devcontainer: &devcontainer
+  image: gabrieletassoni/vscode-devcontainers-thecore:3
+
+x-cache-step: &cache_step
+  uses: actions/cache@v4
+  with:
+    path: |
+      vendor/bundle
+      app/assets
+      lib/assets
+      public/assets
+    key: thecore-app-cache-${{ hashFiles('Gemfile.lock') }}
+
+env:
+  DISABLE_SPRING: 1 # Disables the Spring preloader for a clean CI environment.
+
+jobs:
+  build:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    container: *devcontainer
+    steps:
+      - uses: actions/checkout@v4
+      - *cache_step
+      - run: sudo -E /usr/bin/app-compile.sh
+
+  test:
+    if: github.event_name == 'push'
+    needs: build
+    runs-on: ubuntu-latest
+    container: *devcontainer
+    steps:
+      - uses: actions/checkout@v4
+      - *cache_step
+      - run: bundle exec rails test
+
+  lint:
+    if: github.event_name == 'push'
+    needs: build
+    runs-on: ubuntu-latest
+    container: *devcontainer
+    steps:
+      - uses: actions/checkout@v4
+      - *cache_step
+      - run: bundle exec rubocop
+
+  # Deploys via the devcontainer image's own generic deploy script
+  # (/usr/bin/docker-deploy.sh), which reads its target configuration from
+  # vendor/deploytargets/ (developer-convenience directory, not committed
+  # content -- see ADR 0005 in docs/adr/) and no-ops safely when that isn't
+  # configured for this environment yet. No customer-specific paths here.
+  to-dev:
+    if: github.event_name == 'push'
+    needs: [test, lint]
+    runs-on: ubuntu-latest
+    container: *devcontainer
+    env:
+      TARGETENV: dev
+    steps:
+      - uses: actions/checkout@v4
+      - run: /usr/bin/docker-deploy.sh
+
+  # Manual-only, decoupled from the push-triggered jobs above (workflow_dispatch
+  # is a distinct trigger event -- see the comment on that trigger for why).
+  to-prod:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    container: *devcontainer
+    continue-on-error: true # Mirrors the GitLab sample's `allow_failure: true`.
+    steps:
+      - uses: actions/checkout@v4
+      - run: /usr/bin/docker-deploy.sh
