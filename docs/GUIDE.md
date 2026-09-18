@@ -150,6 +150,32 @@ The menu entries shown depend on where you right-click:
 
 ---
 
+### 3.1.1 The headless CLI (`thecore setup-dev-container`)
+
+**Command:** `thecore setup-dev-container --name <name>` — a terminal binary
+(`thecore_code_extension#39`), not a VS Code command. The one extension command with no
+Rails-native generator/rake-task equivalent to delegate to (there's no Rails boot to hook into
+before a devcontainer even exists) — every other dual-context command already has a terminal
+path through `thecore_generators` itself; see [§7](#7-command-reference) for the full list.
+
+**When to use:** to generate `.devcontainer/` configuration from a script or CI pipeline, with no
+VS Code involved at all — the same job as "Setup Devcontainer" above, scriptable.
+
+**Install:** `npm install -g .` from a clone of `thecore_code_extension` (or directly from its git
+remote) — not published to the npm registry, since that repo's only publish target is the VS Code
+Marketplace/Open VSX.
+
+```bash
+thecore setup-dev-container --name "My Project"
+```
+
+**What it does:** identical output to "Setup Devcontainer" — `thecore setup-dev-container`
+shells into the exact same, unmodified command module via a minimal `vscode`-API shim, so the two
+are one implementation, not two. Missing `--name` exits `1` with a usage error on stderr;
+`--help` is available at both the top level and on the subcommand.
+
+---
+
 ### 3.2 Create the main application
 
 **Command:** `Thecore 3: Create an App`
@@ -160,34 +186,30 @@ The menu entries shown depend on where you right-click:
 - A workspace is open.
 - `ruby`, `rails`, and `bundle` are available in the shell.
 
-**What it does (in order):**
+**What it does (in order):** delegates most of the work to the [App application template](#321-the-app-application-template-rails-new--m) (thecore_code_extension#41), then adds the app-specific runtime config the template deliberately doesn't own (ADR 0005/0007).
 
-1. Runs `rails new . --database=postgresql`.
-2. Adds the core Thecore gems to the `Gemfile`:
-   - `rails_admin`, `devise`, `cancancan`
-   - `model_driven_api ~> 3.1`
-   - `thecore_ui_rails_admin ~> 3.2`
-   - `sassc-rails`
-   - `rails-erd` (development group)
-3. Runs `bundle install`.
-4. Runs the standard generators: `devise:install`, `rails_admin:install`, `cancan:ability`, `erd:install`, `active_storage:install`, `action_text:install`, `action_mailbox:install`.
-5. Creates configuration files: `.gitlab-ci.yml`, `config/sidekiq.yml`, `version`.
-6. Creates the vendor directory structure:
-   ```
-   vendor/
-     custombuilds/       ← custom Dockerfiles per deploy target
-     deploytargets/      ← per-customer .env files and host references
-     submodules/         ← Git submodules (ATOMs live here)
-   ```
-7. Runs `rails db:migrate` and `rails db:seed`.
+1. `sudo chown -R vscode:vscode .` (devcontainer file-ownership fix, unrelated to app generation itself).
+2. Shells out to `rails new . --database=postgresql --asset-pipeline=sprockets --skip-git -m <app_template.rb URL>`, with `THECORE_APP_TEMPLATE_NON_INTERACTIVE=1 THECORE_APP_TEMPLATE_RUN_INSTALLERS=true` — see [§3.2.1](#321-the-app-application-template-rails-new--m) for everything this one call brings in: the full Gemfile stack, both `.gitlab-ci.yml`/`.github/workflows/ci.yml`, devcontainer files, `CLAUDE.md`, `vendor/submodules/`/`vendor/external/`, and the complete installer chain (`devise:install`, `rails_admin:install`, `active_storage:install`, `action_text:install`, `action_mailbox:install`, `cancan:ability`, `erd:install`) — always run, no prompt, matching this command's own long-standing zero-prompt contract.
+3. Writes its own `.gitignore` — richer than Rails' own default (secrets, `.env`, `vendor/bundle`, OS/editor noise) — the template doesn't touch this file at all.
+4. Creates `config/sidekiq.yml` (queue names derived from `COMPOSE_PROJECT_NAME`).
+5. Creates `version` (seeded `3.0.1`).
+6. Patches `config/environments/development.rb` (`raise_on_missing_callback_actions` off).
+7. Runs `rails db:drop ; rails db:create && rails db:migrate && rails thecore:db:seed`.
+8. Creates `vendor/custombuilds/`/`vendor/deploytargets/` (`vendor/submodules/` is **not** duplicated here — the App template already created it in step 2).
+9. Removes `.dockerignore` if present.
+10. `git init` and a single "Initial commit" — the App template itself never touches git.
 
 **Resulting project structure (highlights):**
 
 ```
 my_app/
+├── .devcontainer/             ← from samples/devcontainer/ (via the App template)
+├── .github/workflows/ci.yml   ← from samples/.github/workflows/ci.yml (via the App template)
+├── .gitlab-ci.yml             ← from samples/.gitlab-ci.yml (via the App template)
+├── CLAUDE.md                  ← from samples/CLAUDE.md (via the App template)
 ├── app/
 │   ├── models/
-│   │   └── concerns/         ← app-level model concerns
+│   │   └── concerns/          ← app-level model concerns
 │   └── ...
 ├── config/
 │   ├── sidekiq.yml
@@ -196,8 +218,8 @@ my_app/
 ├── vendor/
 │   ├── custombuilds/
 │   ├── deploytargets/
-│   └── submodules/           ← ATOMs will be added here
-├── .gitlab-ci.yml
+│   ├── submodules/            ← ATOMs will be added here (created by the App template)
+│   └── external/              ← reference repos (created by the App template)
 └── version
 ```
 
@@ -211,12 +233,16 @@ my_app/
 5. Verify the database is reachable (the DATABASE_URL env var must be set).
 ```
 
+**Compared to the App application template directly:** identical Gemfile/CI/devcontainer/CLAUDE.md/installer-chain output — "Create an App" is a wrapper around the exact same `rails new -m` invocation, not a separate implementation. The differences are entirely in the app-specific config steps 3-10 above, which the terminal-only template ([§3.2.1](#321-the-app-application-template-rails-new--m)) doesn't perform.
+
 ---
 
 ### 3.2.1 The App application template (`rails new -m`)
 
-**Command:** a plain terminal `rails new` invocation — not a VS Code command. A genuine Rails
-application template (`thecore_generators`'s `lib/templates/app_template.rb`), invoked via `-m`.
+**Command:** a plain terminal `rails new` invocation — not itself a VS Code command, though
+"Thecore 3: Create an App" ([§3.2](#32-create-the-main-application)) shells out to this exact
+template underneath (thecore_code_extension#41). A genuine Rails application template
+(`thecore_generators`'s `lib/templates/app_template.rb`), invoked via `-m`.
 
 **When to use:** as an alternative to "Thecore 3: Create an App" above, from any terminal with
 Ruby/Rails available — no VS Code, no extension required. Run it inside the devcontainer already
@@ -240,38 +266,59 @@ rails new myapp --database=postgresql --asset-pipeline=sprockets \
    purpose comment — discoverable but off by default, uncomment only what the app needs.
 3. Creates empty `vendor/submodules/`/`vendor/external/` placeholder directories (a `.keep` file
    each) — developer-convenience clone locations, not pre-wired with any submodule or gem.
-4. Fetches `.devcontainer/*`, `.gitlab-ci.yml`, and `CLAUDE.md` from this repo's own `samples/` —
-   the six `.devcontainer/*` files overwrite whatever "Setup Devcontainer" created (that command
-   itself never touches `.gitlab-ci.yml`/`CLAUDE.md`, so those two are written fresh, not
-   overwrites of anything it produced).
-5. Asks, interactively, whether to run `bundle install` and the standard installer generators now
-   (`devise:install`, `rails_admin:install`, `active_storage:install`, `action_text:install`,
-   `action_mailbox:install`, `cancan:ability`, `erd:install`) — a developer bootstrapping without
-   network access can decline and run these by hand once they have connectivity; everything else
-   above happens either way.
+4. Fetches `.devcontainer/*`, **both** `.gitlab-ci.yml` and `.github/workflows/ci.yml`, and
+   `CLAUDE.md` from this repo's own `samples/` — the six `.devcontainer/*` files overwrite
+   whatever "Setup Devcontainer" created (that command itself never touches the CI files or
+   `CLAUDE.md`, so those are written fresh, not overwrites of anything it produced). Both CI
+   files are fetched unconditionally, no prompt: which git host a developer ends up pushing to
+   is a generic, per-developer choice, the same reasoning ADR 0006 already established for
+   `thecore:atom`'s own dual-CI generation ([§4.2.1](#421-the-thecoreatom-generator-terminal-alternative)).
+5. Runs the standard installer chain (`devise:install`, `rails_admin:install`,
+   `active_storage:install`, `action_text:install`, `action_mailbox:install`, `cancan:ability`,
+   `erd:install`) — interactively by default (asks whether to run `bundle install` and the
+   generators now; a developer bootstrapping without network access can decline and run these by
+   hand once they have connectivity), or non-interactively via two environment variables:
+
+   ```bash
+   THECORE_APP_TEMPLATE_NON_INTERACTIVE=1 THECORE_APP_TEMPLATE_RUN_INSTALLERS=true \
+     rails new myapp --database=postgresql --asset-pipeline=sprockets \
+     -m https://raw.githubusercontent.com/gabrieletassoni/thecore_generators/release/3/lib/templates/app_template.rb
+   ```
+
+   `THECORE_APP_TEMPLATE_NON_INTERACTIVE` (any non-blank value) skips the prompt entirely; when
+   set, `THECORE_APP_TEMPLATE_RUN_INSTALLERS` (`"true"`/`"false"`) is **required** — the template
+   aborts with a clear message naming the missing variable if it isn't set, rather than guessing
+   at a decision as consequential as whether to install the full gem set. Both are read from the
+   invoking shell's environment, not template arguments — application templates can't accept
+   custom `rails new` flags the way generators can. Everything else in this list happens
+   regardless of which path is taken.
 
 **Resulting project structure (highlights):**
 
 ```
 myapp/
-├── .devcontainer/            ← from samples/devcontainer/ (plugin mounts, gh/glab
-│                                commented mounts, postCreateCommand chain)
-├── .gitlab-ci.yml            ← from samples/.gitlab-ci.yml
-├── CLAUDE.md                 ← from samples/CLAUDE.md (universal sections + TODOs)
-├── Gemfile                   ← core stack active, rest of the ecosystem commented
+├── .devcontainer/                ← from samples/devcontainer/ (plugin mounts, gh/glab
+│                                    commented mounts, postCreateCommand chain)
+├── .github/workflows/ci.yml      ← from samples/.github/workflows/ci.yml
+├── .gitlab-ci.yml                ← from samples/.gitlab-ci.yml
+├── CLAUDE.md                     ← from samples/CLAUDE.md (universal sections + TODOs)
+├── Gemfile                       ← core stack active, rest of the ecosystem commented
 └── vendor/
-    ├── submodules/.keep      ← empty; clone real ATOMs here
-    └── external/.keep        ← empty; clone reference repos here
+    ├── submodules/.keep          ← empty; clone real ATOMs here
+    └── external/.keep            ← empty; clone reference repos here
 ```
 
-**What it deliberately does not do yet:** it produces a generic, blank app — no
-customer-specific customization (Bancolini's or anyone else's), no pre-wired `vendor/submodules/`
-content (see [§4.2.1](#421-the-thecoreatom-generator-terminal-alternative) for the equivalent
-terminal-only generator for ATOMs themselves). Delegating the VS Code "Thecore 3: Create an App"
-command to this same template remains deferred — see
-[ADR 0005](https://github.com/gabrieletassoni/thecore/blob/release/3/docs/adr/0005-app-template-scoped-to-rails-new-m-assets-sourced-from-thecore-samples.md).
-"Thecore 3: Create an App" (§3.2 above) keeps its own, separate, unmodified implementation for
-now — the two exist side by side, not one superseding the other yet.
+**What it deliberately does not do:** it produces a generic, blank app — no customer-specific
+customization (Bancolini's or anyone else's), no pre-wired `vendor/submodules/` content (see
+[§4.2.1](#421-the-thecoreatom-generator-terminal-alternative) for the equivalent terminal-only
+generator for ATOMs themselves). It's also deliberately narrower than "Thecore 3: Create an App"
+([§3.2](#32-create-the-main-application)): `config/sidekiq.yml`, the `version` file, a
+`development.rb` patch, the custom `.gitignore`, `vendor/custombuilds/`/`vendor/deploytargets/`,
+database bootstrap, and git init/commit are all app-specific runtime config outside this
+template's scope (ADR 0005/0007) — "Create an App" adds those itself after calling this same
+template. See [ADR 0005](https://github.com/gabrieletassoni/thecore/blob/release/3/docs/adr/0005-app-template-scoped-to-rails-new-m-assets-sourced-from-thecore-samples.md)
+and [ADR 0007](https://github.com/gabrieletassoni/thecore/blob/release/3/docs/adr/0007-github-actions-ci-sample-non-interactive-app-template-and-final-vscode-delegations.md)
+for the full design rationale behind this split.
 
 ---
 
@@ -398,48 +445,13 @@ This means ATOMs are developed in-place alongside the application and committed 
 | Email | Valid email | `gabriele@example.com` |
 | URL | Valid URL | `https://github.com/acme/tcp_debugger` |
 
-**What it does:**
-
-1. Runs `rails plugin new vendor/submodules/tcp_debugger -fG --full --skip-gemfile-entry`.
-2. Creates the full ATOM directory structure:
-
-```
-vendor/submodules/tcp_debugger/
-├── tcp_debugger.gemspec
-├── app/
-│   ├── models/
-│   │   └── concerns/
-│   │       ├── api/
-│   │       └── rails_admin/
-│   ├── assets/
-│   │   ├── javascripts/rails_admin/actions/
-│   │   └── stylesheets/rails_admin/actions/
-│   └── views/rails_admin/main/
-├── config/
-│   ├── initializers/
-│   │   ├── after_initialize.rb
-│   │   ├── add_to_db_migration.rb
-│   │   ├── assets.rb
-│   │   └── abilities.rb
-│   └── locales/
-│       ├── en.yml
-│       └── it.yml
-├── db/
-│   └── migrate/
-└── lib/
-    ├── root_actions/
-    ├── member_actions/
-    └── collection_actions/
-```
-
-3. Adds CI/CD pipelines:
-   - `.gitlab-ci.yml` for GitLab
-   - `.github/workflows/gempush.yml` for GitHub Actions (publishes the gem on tag push)
-4. Adds the ATOM to the main application's `Gemfile`:
-   ```ruby
-   gem 'tcp_debugger', path: 'vendor/submodules/tcp_debugger'
-   ```
-5. Runs `bundle install`.
+**What it does:** collects the six inputs above via the dialogs, then shells out to
+`rails generate thecore:atom` (thecore_code_extension#40) with those values as
+`--non-interactive --summary=... --description=... --author=... --email=... --url=...` flags —
+see [§4.2.1](#421-the-thecoreatom-generator-terminal-alternative) below for the full "what it
+does" list (Rails engine creation, Scaffold Files, both CI files, `CLAUDE.md`, git init, Gemfile
+wiring). The result is identical either way: this command and a terminal `thecore:atom`
+invocation are two ways of reaching the exact same generator, not two separate implementations.
 
 **Gemspec dependencies:**
 
@@ -543,14 +555,12 @@ unlike "Create an ATOM"'s own free-text input, which converts spaces to undersco
    layer down, at the `vendor/submodules/tcp_debugger` directory itself, which this
    generator also refuses outright if it already exists). Does not run `bundle install`.
 
-**Compared to "Create an ATOM"**, the result is the same ATOM structure, with four differences
-worth knowing:
-
-- **Dependency versions are current** (`~> 3.9`/`~> 3.8`), not the stale `~> 3.1`/`~> 3.2`.
-- **The dependency choice is a real yes/no prompt**, not unconditional.
-- **A `CLAUDE.md` is generated**, fetched from this repo's own `samples/ATOM_CLAUDE.md`.
-- **The ATOM is `git init`'d with one local commit** — "Create an ATOM" leaves it without any
-  git history at all.
+**Compared to "Create an ATOM"**: no difference in the result — "Create an ATOM" delegates to
+this exact generator (thecore_code_extension#40) since `thecore_generators` 3.10.0/3.11.0. The
+only real differences are in how the six inputs get to the generator: VS Code's dialogs accept
+free text and convert spaces to underscores for you, while a terminal invocation needs an
+already-valid gem name and reads the rest from `--summary=`/`--description=`/etc. flags — see
+the input validation rules table in [§7](#7-command-reference).
 
 ---
 
@@ -1157,10 +1167,11 @@ The devcontainer image itself is rebuilt weekly via the GitHub Actions workflow 
 | Command | What it does |
 |---|---|
 | **Thecore 3: Setup Devcontainer** | Generates `.devcontainer/` configuration for the workspace |
-| **Thecore 3: Create an App** | Scaffolds a complete Thecore Rails application |
-| **App application template** (terminal-only, no VS Code command) | `rails new myapp -m <url>` — the same underlying job as "Create an App" above, runnable from any terminal; see [§3.2.1](#321-the-app-application-template-rails-new--m) |
-| **Thecore 3: Create an ATOM** | Creates a new Rails engine under `vendor/submodules/` |
-| **`thecore:atom` generator** (terminal-only, no VS Code command) | `rails generate thecore:atom NAME` — the same underlying job as "Create an ATOM" above, runnable from any terminal; see [§4.2.1](#421-the-thecoreatom-generator-terminal-alternative) |
+| **`thecore setup-dev-container --name <name>`** (headless CLI, no VS Code) | Same job as "Setup Devcontainer" above, scriptable from any terminal/CI — see [§3.1.1](#311-the-headless-cli-thecore-setup-dev-container) |
+| **Thecore 3: Create an App** | Shells out to the App application template (below) for the Gemfile/CI/devcontainer/CLAUDE.md/installer-chain work, then adds app-specific runtime config of its own (`config/sidekiq.yml`, `version`, database bootstrap, git init) — see [§3.2](#32-create-the-main-application) |
+| **App application template** (terminal, no VS Code needed) | `rails new myapp -m <url>` — the same underlying template "Create an App" above shells out to, runnable standalone from any terminal; see [§3.2.1](#321-the-app-application-template-rails-new--m) |
+| **Thecore 3: Create an ATOM** | Shells out to `rails generate thecore:atom` — identical result to a terminal invocation, see [§4.2.1](#421-the-thecoreatom-generator-terminal-alternative) |
+| **`thecore:atom` generator** (terminal, no VS Code needed) | `rails generate thecore:atom NAME` — the same generator "Create an ATOM" above shells out to; see [§4.2.1](#421-the-thecoreatom-generator-terminal-alternative) |
 | **Thecore 3: Add a Model** | Generates a model + migration (no concerns by default — `--with-api-concern`/`--with-admin-concern` opt in) in the main app; same as `rails generate model` from a terminal |
 | **Thecore 3: Check Practices** | Audits the main app (plus every ATOM under `vendor/submodules/`) for Scaffold Files/Models/Actions conventions and reports violations as diagnostics; offers to re-run with `--fix` when any are fixable — same as `rails thecore:check_practices` from a terminal |
 

@@ -8,7 +8,7 @@ ADR 0005 shipped the App application template scoped to GitLab CI only, interact
 
 **`createATOM.js` and `createApp.js` delegate to their already-shipped generators — mechanical mirrors of `#36`/`#37`/`#38`.** Both commands keep their existing VS Code-side interactive flow (dialogs collecting the same inputs as today) and shell out instead of doing their own file placement. `createATOM.js` passes `--non-interactive --summary=... --description=... --author=... --email=... --url=... [--skip-api-admin-deps]` to `rails generate thecore:atom NAME` (flags already shipped in `thecore_generators` 3.10.0/3.11.0). `createApp.js` passes `THECORE_APP_TEMPLATE_NON_INTERACTIVE=1 THECORE_APP_TEMPLATE_RUN_INSTALLERS=true` to `rails new . -m <app_template.rb URL>` — which is why this ticket is blocked by the non-interactive mode landing first, not just conventionally sequenced after it.
 
-**Headless CLI narrows to exactly one surviving command.** Of the original PRD's 8 target subcommands, 7 (`create-app`, `create-atom`, `add-model`, `add-migration`, `add-root-action`, `add-member-action`, `check-practices`) are already headless-scriptable via the Rails-native generators/rake task this whole initiative shipped — no CLI shim needed, and building one now would recreate exactly the JS/Ruby drift ADR 0002 set out to eliminate. Only `setup-dev-container` has no Rails boot to hook into and remains genuinely VS-Code-only. Its CLI shim is scoped to the 4 VS Code API points `setupDevContainer.js` actually touches (`showInputBox` via `CommandRunner.input`, `showErrorMessage`, `showInformationMessage`, `showWarningMessage`) rather than the original design's general 8-command shim surface, and still ships as a `bin` entry + `commander` subcommand in the existing package (not a separate package) — one subcommand today, room for more without a redesign if that's ever needed again.
+**Headless CLI narrows to exactly one surviving command.** Of the original PRD's 8 target subcommands, 7 (`create-app`, `create-atom`, `add-model`, `add-migration`, `add-root-action`, `add-member-action`, `check-practices`) are already headless-scriptable via the Rails-native generators/rake task this whole initiative shipped — no CLI shim needed, and building one now would recreate exactly the JS/Ruby drift ADR 0002 set out to eliminate. Only `setup-dev-container` has no Rails boot to hook into and remains genuinely VS-Code-only. Its CLI shim is scoped to the 6 VS Code API points the real call path actually touches (`window.createOutputChannel` — called unconditionally by `ExecutionContext`'s own constructor, easy to miss without reading that source directly — `showInputBox` via `CommandRunner.input`, `showErrorMessage`, `showInformationMessage`, `showWarningMessage`, and `workspace.workspaceFolders`) rather than the original design's general 8-command shim surface, and still ships as a `bin` entry + `commander` subcommand in the existing package (not a separate package) — one subcommand today, room for more without a redesign if that's ever needed again.
 
 ## Status
 accepted
@@ -18,7 +18,22 @@ accepted
 - A freshly generated Main App (via the template) now always carries one CI file that will never run, exactly the same accepted wart ADR 0006 already introduced for ATOMs.
 - GitHub-hosted Thecore apps get a weaker production-deploy story than GitLab-hosted ones out of the box (manual `workflow_dispatch` vs GitLab's richer environment-gated `when: manual`) until/unless a developer configures GitHub Environments themselves — an accepted asymmetry, not silently hidden.
 - `thecore_code_extension`'s Headless CLI PRD (`#23`-`#31`) is closed as superseded rather than built as originally scoped; the `claude/grill-docs-cli-switches-pw8p7f` branch (an already-implemented multi-command shim for the old scope) and `claude/extract-createapp-templates-FB6x2` (an internal `createApp.js` refactor made moot by full delegation) are both deleted rather than merged.
-- Once `#40`/`#41` ship, `createATOM.js`/`createApp.js` join `addModel.js`/`addMigration.js`/`addRootAction.js`/`addMemberAction.js`/`checkPractices.js` as thin wrappers — every dual-context VS Code command will delegate to `thecore_generators`, none will do its own file placement.
+- `createATOM.js`/`createApp.js` (`#40`/`#41`) join `addModel.js`/`addMigration.js`/`addRootAction.js`/`addMemberAction.js`/`checkPractices.js` as thin wrappers over `thecore_generators` — every dual-context VS Code command delegates now. `createApp.js` remains the one exception that still writes real files of its own after delegating (`config/sidekiq.yml`, `version`, a `development.rb` patch, the custom `.gitignore`, `vendor/custombuilds`/`vendor/deploytargets`, git init) — the App template was never scoped to absorb everything it did, unlike `createATOM.js`'s much more complete handoff.
+
+## Delivery tracking
+
+Tickets filed under `/to-tickets` for this ADR's scope, all implemented and committed:
+- `thecore`: [#20](https://github.com/gabrieletassoni/thecore/issues/20) — `samples/.github/workflows/ci.yml`.
+- `thecore_generators`: [#23](https://github.com/gabrieletassoni/thecore_generators/issues/23) — non-interactive App template mode.
+- `thecore_generators`: [#25](https://github.com/gabrieletassoni/thecore_generators/issues/25) — App template fetches the GitHub Actions CI sample (blocked by thecore#20).
+- `thecore_code_extension`: [#39](https://github.com/gabrieletassoni/thecore_code_extension/issues/39) — `setup-dev-container` headless CLI.
+- `thecore_code_extension`: [#40](https://github.com/gabrieletassoni/thecore_code_extension/issues/40) — delegate `createATOM.js`.
+- `thecore_code_extension`: [#41](https://github.com/gabrieletassoni/thecore_code_extension/issues/41) — delegate `createApp.js` (blocked by thecore_generators#23).
+- `thecore`: [#21](https://github.com/gabrieletassoni/thecore/issues/21) — document the whole batch in GUIDE.md/WALKTHROUGH.md (this ticket).
+
+Nothing from this ADR's scope has been pushed/released to any remote yet as of `#21` landing —
+tracked separately from implementation, same convention as every earlier phase in this
+initiative.
 
 ## Considered Options
 - Require GitHub Environments + reviewers for the prod-deploy job, matching GitLab's `when: manual` as closely as possible — rejected: needs one-time manual repo configuration the generated sample can't perform itself, breaking the zero-config property every other generated asset in this initiative has had.
