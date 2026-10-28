@@ -25,5 +25,5 @@ The dedicated gem hosting all of thecore's Rails-native scaffolding: the generat
 _Avoid_: thecore generator, scaffolding gem
 
 **Violation** (as checked by `thecore:check_practices`):
-A single non-conformance the rake task detects and reports as one structured entry (`file`, `line`, `message`, `severity`, `fixable`) — the Ruby-side counterpart to `thecore_code_extension`'s own `Violation` (its own CONTEXT.md), which now renders these as VS Code diagnostics instead of detecting them itself. A model with no `Api::`/`RailsAdmin::` concern file is never a Violation on its own (see ADR 0001's default module) — only an `include` pointing at a missing concern, or a concern file missing its required marker, is. See ADR 0004.
+A single non-conformance the rake task detects and reports as one structured entry (`file`, `line`, `message`, `severity`, `fixable`) — the Ruby-side counterpart to `thecore_code_extension`'s own `Violation` (its own GLOSSARY.md), which now renders these as VS Code diagnostics instead of detecting them itself. A model with no `Api::`/`RailsAdmin::` concern file is never a Violation on its own (see ADR 0001's default module) — only an `include` pointing at a missing concern, or a concern file missing its required marker, is. See ADR 0004.
 _Avoid_: audit finding, practices error, lint issue

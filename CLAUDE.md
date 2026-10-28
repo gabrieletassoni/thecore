@@ -245,3 +245,49 @@ When asked to modify or extend documentation:
 - Framework GitHub org: `https://github.com/thecore-framework` (ATOMs are published here)
 - DevContainer image: `gabrieletassoni/vscode-devcontainers-thecore:3` (Docker Hub)
 - VS Code extension: Thecore extension (provides "Setup Devcontainer", "Create App", "Create ATOM", "Add Model", etc. commands)
+
+## Security scanning
+
+Configured in the GitHub repository settings, not in files:
+
+- **CodeQL** default setup on the Actions workflows (the only language CodeQL finds here): on every
+  push, on pull requests and weekly. Findings: Security → Code scanning.
+- **Secret scanning with push protection**: a push containing a recognised secret is rejected. It
+  is the only check that blocks anything. If it fires on a real secret, remove it from the commit and
+  rotate the secret; never bypass it.
+- **Dependabot alerts and security updates**, but no `dependabot.yml`, so no routine version-bump
+  pull requests.
+- Findings never block a release: GitHub notifies the owner. When one needs work, open a GitHub
+  issue (see Agent skills).
+
+## Agent skills
+
+### Issue tracker
+
+Tasks, issues, bugs, tickets and specs for this repository live **only** in its GitHub Issues
+(`gabrieletassoni/thecore`), handled with the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+**Mandatory rule.** Whenever a skill or development work creates, reads, updates, comments on,
+assigns, blocks or closes a task, issue, bug, ticket or spec (for example /to-tickets, /to-spec,
+/triage, /wayfinder, /implement, /diagnosing-bugs, /code-review, closing a piece of work, a bug found
+during a session), do it in this repository's GitHub Issues following `docs/agents/issue-tracker.md`.
+Never use Odoo, `.scratch/` or local Markdown files as a tracker: Odoo is only for the repositories
+on Bancolini's GitLab. `#123` means a GitHub issue number of this repository. If `gh` doesn't work,
+stop and say so instead of falling back to another tracker.
+
+### Triage labels
+
+The five canonical triage roles map to GitHub labels with the same name (`needs-triage`,
+`needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root, created lazily when the first
+term or decision is resolved. See `docs/agents/domain.md`.
+
+### Skills
+
+Matt Pocock's skills come from the `mattpocock-skills` Claude Code plugin installed on the
+developer's **host** (`claude plugins install mattpocock-skills`, official marketplace), never
+vendored here: no `.agents/skills/`, `.claude/commands/` or `skills-lock.json`. Its `ask-matt` skill
+maps how the skills connect.
