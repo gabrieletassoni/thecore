@@ -1128,7 +1128,7 @@ The `docker-compose.net.yml` overlay wires all services to a `webproxy` Docker n
 The `vendor/deploytargets/` directory holds one sub-folder per deployment provider. Each provider folder contains:
 
 - A `docker_host` file (for production) or `docker_<env>_host` file (for staging/UAT) with the SSH URL of the Docker host.
-- One `.env` file per customer/tenant with all required environment variables (`SECRET_KEY_BASE`, `ADMIN_PASSWORD`, `APP_NAME`, etc.).
+- One `.env` file per customer/tenant with all required environment variables (`SECRET_KEY_BASE`, `APP_NAME`, etc.).
 - Optionally, an `image` file to use a custom backend image name.
 
 The `scripts/docker-deploy.sh` script iterates over all providers and customers, SSHes into each Docker host, and runs `docker compose up -d` with the appropriate `.env` file. This makes multi-tenant, multi-host deployment fully automated.
@@ -1137,7 +1137,6 @@ The `scripts/docker-deploy.sh` script iterates over all providers and customers,
 
 ```env
 SECRET_KEY_BASE=<random 128-char hex>
-ADMIN_PASSWORD=<initial admin password>
 APP_NAME=My Application
 COMPOSE_PROJECT_NAME=my_app_prod
 BE_SUBDOMAIN=api
@@ -1145,6 +1144,8 @@ FE_SUBDOMAIN=app
 BASE_DOMAIN=example.com
 IMAGE_TAG_BACKEND=registry.example.com/myapp/backend:3.2024.3.15
 ```
+
+`ADMIN_PASSWORD` is optional. If `ADMIN_PASSWORD` is unset or empty, the seed (thecore_auth_commons >= 3.6.2) creates the first admin, `admin@BASE_DOMAIN`, with a random password written to `/root/persistence/${COMPOSE_PROJECT_NAME}/storage/admin_initial_password` on the Docker host (mode `0600`, never logged; or `docker compose exec backend cat storage/admin_initial_password`). Change it after the first login and delete the file. The admin is created only on a database without one, so setting or changing `ADMIN_PASSWORD` later has no effect. Older backends fall back to the fixed `Change#1`, so keep setting it for them.
 
 ### CI/CD
 
