@@ -275,6 +275,14 @@ rails new myapp --database=postgresql --asset-pipeline=sprockets \
    files are fetched unconditionally, no prompt: which git host a developer ends up pushing to
    is a generic, per-developer choice, the same reasoning ADR 0006 already established for
    `thecore:atom`'s own dual-CI generation ([§4.2.1](#421-the-thecoreatom-generator-terminal-alternative)).
+
+   It also patches the generated `test/test_helper.rb` with the **test-database rule**: when
+   `DATABASE_URL` is set (the devcontainer sets it to the development database, and a URL wins
+   over `config/database.yml`), the helper replaces the database it names with `<app>_test`
+   before the app boots, so running tests never touches development data. Both CI samples' test
+   jobs get a Postgres service, `RAILS_ENV=test`, a `DATABASE_URL` naming only the server, and
+   `db:test:prepare` before `rails test`. The generated `CLAUDE.md` says how to create the test
+   database locally the first time.
 5. Runs the standard installer chain (`devise:install`, `rails_admin:install`,
    `active_storage:install`, `action_text:install`, `action_mailbox:install`, `cancan:ability`,
    `erd:install`) — interactively by default (asks whether to run `bundle install` and the

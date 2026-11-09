@@ -185,6 +185,23 @@ rails thecore:check_practices -- --json
 <!-- TODO: any app-specific commands (background job worker, one-off data
      import/export or integration scripts, etc). -->
 
+**Tests use their own database.** The devcontainer sets one `DATABASE_URL`, pointing at the
+development database, and a URL wins over `config/database.yml`. So `test/test_helper.rb`
+replaces whatever database `DATABASE_URL` names with `<app>_test` before the app boots, and
+running tests never touches development data. Keep that block at the top of the helper. `rails
+test` doesn't create a missing database. The first time, or after the `db` volume is
+recreated, create the test database with the URL cut down to the server, so
+`config/database.yml`'s test name applies:
+
+```bash
+DATABASE_URL="${DATABASE_URL%/*}" RAILS_ENV=test bin/rails db:test:prepare
+```
+
+Never run `RAILS_ENV=test bin/rails db:...` with the devcontainer's `DATABASE_URL` unchanged:
+the URL's development database wins and gets purged. The CI samples' test jobs do the same
+thing: a Postgres service, `RAILS_ENV=test`, a `DATABASE_URL` naming only the server, and
+`db:test:prepare` before `rails test`.
+
 ## External integration
 
 <!-- TODO: describe this app's own external integrations, if any (a third-
