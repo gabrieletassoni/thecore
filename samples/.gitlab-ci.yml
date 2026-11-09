@@ -21,16 +21,99 @@ cache:
     - lib/assets
     - public/assets
 
+# --- Security scanning (see CLAUDE.md "Security scanning") ---
+# GitLab CE: the SAST (Semgrep) and Secret Detection templates only write a JSON
+# report, and their jobs stay green whatever they find; security-summary turns
+# findings into an orange job. Every security job reports only (allow_failure),
+# except bundler-audit in the nightly schedule, which fails so the schedule owner
+# gets the "pipeline failed" mail. The schedule itself is created by hand in
+# GitLab (Build > Pipeline schedules, daily, on the default branch).
+include:
+  - template: Jobs/SAST.gitlab-ci.yml
+  - template: Jobs/Secret-Detection.gitlab-ci.yml
+
+# The nightly schedule runs bundler-audit only: the template jobs would otherwise
+# run too, since their rules match any branch pipeline.
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      variables:
+        SAST_DISABLED: "true"
+        SECRET_DETECTION_DISABLED: "true"
+    - when: always
+
+# With needs: [] a security job starts with the pipeline and never waits for, or
+# blocks, build/test/deploy.
+.security-job:
+  stage: test
+  needs: []
+  cache: [] # The vendor/bundle cache is for the app's own jobs.
+
+# Template jobs: their own `extends` must stay, so the shared fields are repeated here.
+semgrep-sast:
+  stage: test
+  needs: []
+  cache: []
+  variables:
+    SAST_EXCLUDED_PATHS: "spec, test, tests, tmp, vendor, public/assets, node_modules"
+
+secret_detection:
+  stage: test
+  needs: []
+  cache: []
+  variables:
+    SECRET_DETECTION_EXCLUDED_PATHS: "vendor/bundle"
+
+# The reports reach this job as artifacts, so artifacts must be enabled on the
+# GitLab instance: without them both reports are missing and this job says so.
+security-summary:
+  extends: .security-job
+  needs:
+    - job: semgrep-sast
+      optional: true
+    - job: secret_detection
+      optional: true
+  allow_failure: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH
+  script:
+    - ruby script/security_summary.rb gl-sast-report.json gl-secret-detection-report.json
+
+brakeman:
+  extends: .security-job
+  allow_failure: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH
+  script:
+    - gem install brakeman --no-document --quiet
+    - brakeman --no-pager --quiet --format text
+
+bundler-audit:
+  extends: .security-job
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" # Nightly: the advisory database changes even when the code doesn't.
+      allow_failure: false
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH
+      allow_failure: true
+  script:
+    - gem install bundler-audit --no-document --quiet
+    - bundle-audit check --update
+
 # Every job below only runs when the "version" file changes (and never for tag
 # pipelines) — a pipeline run is meant to be a deliberate version bump, not
-# every commit. Shared as a hidden job (leading `.`) + YAML anchor so it isn't
-# repeated five times.
+# every commit — and never in the nightly security schedule: `only: changes` is
+# always true outside push pipelines, so without `except: schedules` the nightly
+# would build, test and deploy. Shared as a hidden job (leading `.`) + YAML anchor
+# so it isn't repeated five times.
 .only_on_version_bump: &only_on_version_bump
   only:
     changes:
       - version
     variables:
       - $CI_COMMIT_TAG == null
+  except:
+    refs:
+      - schedules
 
 build:
   stage: build

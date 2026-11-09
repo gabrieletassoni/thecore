@@ -2,7 +2,9 @@
 # image every Thecore app already runs in locally, so the pipeline environment
 # matches development exactly. Sibling of samples/.gitlab-ci.yml — see ADR 0007
 # in docs/adr/ for why both exist unconditionally (git hosting is a generic,
-# per-developer choice, not something to prompt about).
+# per-developer choice, not something to prompt about). Security scanning
+# (brakeman, bundler-audit, nightly too) lives in security.yml next to this
+# file, so the nightly schedule never builds, tests or deploys.
 name: CI
 
 on:

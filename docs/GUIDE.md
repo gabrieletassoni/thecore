@@ -204,8 +204,9 @@ are one implementation, not two. Missing `--name` exits `1` with a usage error o
 ```
 my_app/
 ├── .devcontainer/             ← from samples/devcontainer/ (via the App template)
-├── .github/workflows/ci.yml   ← from samples/.github/workflows/ci.yml (via the App template)
+├── .github/workflows/         ← ci.yml and security.yml from samples/ (via the App template)
 ├── .gitlab-ci.yml             ← from samples/.gitlab-ci.yml (via the App template)
+├── script/security_summary.rb ← from samples/ (via the App template), with its test in test/script/
 ├── AGENTS.md                  ← from samples/AGENTS.md (via the App template)
 ├── CLAUDE.md                  ← from samples/CLAUDE.md (via the App template)
 ├── docs/agents/               ← from samples/docs/agents/ (via the App template)
@@ -268,8 +269,10 @@ rails new myapp --database=postgresql --asset-pipeline=sprockets \
    purpose comment — discoverable but off by default, uncomment only what the app needs.
 3. Creates empty `vendor/submodules/`/`vendor/external/` placeholder directories (a `.keep` file
    each) — developer-convenience clone locations, not pre-wired with any submodule or gem.
-4. Fetches `.devcontainer/*`, **both** `.gitlab-ci.yml` and `.github/workflows/ci.yml`,
-   `CLAUDE.md`, `AGENTS.md` and `docs/agents/` from this repo's own `samples/` — the six `.devcontainer/*` files overwrite
+4. Fetches `.devcontainer/*`, **both** `.gitlab-ci.yml` and `.github/workflows/ci.yml` (plus
+   `.github/workflows/security.yml`, `script/security_summary.rb` and its test
+   `test/script/security_summary_test.rb`), `CLAUDE.md`, `AGENTS.md` and `docs/agents/` from
+   this repo's own `samples/` — the six `.devcontainer/*` files overwrite
    whatever "Setup Devcontainer" created (that command itself never touches the CI files or
    `CLAUDE.md`, so those are written fresh, not overwrites of anything it produced). Both CI
    files are fetched unconditionally, no prompt: which git host a developer ends up pushing to
@@ -283,6 +286,13 @@ rails new myapp --database=postgresql --asset-pipeline=sprockets \
    jobs get a Postgres service, `RAILS_ENV=test`, a `DATABASE_URL` naming only the server, and
    `db:test:prepare` before `rails test`. The generated `CLAUDE.md` says how to create the test
    database locally the first time.
+
+   Both CI samples carry the **security scanning** of the reference app: brakeman and
+   bundler-audit on every push and bundler-audit nightly (failing only then); on GitLab also
+   SAST, Secret Detection and a `security-summary` job that turns their CE reports into an
+   orange job (`script/security_summary.rb`). Security jobs start with the pipeline and never
+   block a deploy, and the nightly schedule never builds, tests or deploys. See the generated
+   `CLAUDE.md`, "Security scanning" (the GitLab schedule is created by hand).
 5. Runs the standard installer chain (`devise:install`, `rails_admin:install`,
    `active_storage:install`, `action_text:install`, `action_mailbox:install`, `cancan:ability`,
    `erd:install`) — interactively by default (asks whether to run `bundle install` and the
@@ -310,7 +320,10 @@ myapp/
 ├── .devcontainer/                ← from samples/devcontainer/ (plugin mounts, gh/glab
 │                                    commented mounts, postCreateCommand chain)
 ├── .github/workflows/ci.yml      ← from samples/.github/workflows/ci.yml
-├── .gitlab-ci.yml                ← from samples/.gitlab-ci.yml
+├── .github/workflows/security.yml ← from samples/ (brakeman, bundler-audit, nightly)
+├── .gitlab-ci.yml                ← from samples/.gitlab-ci.yml (build/test/deploy + security)
+├── script/security_summary.rb    ← from samples/ (GitLab CE security summary), tested by
+│                                    test/script/security_summary_test.rb
 ├── AGENTS.md                     ← from samples/AGENTS.md (points to CLAUDE.md)
 ├── CLAUDE.md                     ← from samples/CLAUDE.md (universal sections + TODOs)
 ├── docs/agents/                  ← from samples/docs/agents/ (issue tracker picked from the

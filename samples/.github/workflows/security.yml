@@ -1,0 +1,41 @@
+# Generic Thecore host-app security scanning on GitHub Actions (see CLAUDE.md
+# "Security scanning"). Kept apart from ci.yml on purpose: ci.yml only runs on a
+# version bump, while these scans run on every push and nightly, and the nightly
+# schedule must never build, test or deploy -- a separate workflow gets both for
+# free. GitHub's own code scanning (CodeQL default setup), Dependabot alerts and
+# secret scanning with push protection are repository settings, not jobs here.
+name: Security
+
+on:
+  push:
+    branches: ["**"]
+  # Nightly: the advisory database changes even when the code doesn't.
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+x-devcontainer: &devcontainer
+  image: gabrieletassoni/vscode-devcontainers-thecore:3
+
+jobs:
+  # Rails-specific static analysis. Reports only: a finding never blocks anything.
+  brakeman:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    container: *devcontainer
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - run: gem install brakeman --no-document --quiet
+      - run: brakeman --no-pager --quiet --format text
+
+  # Known CVEs in Gemfile.lock. Reports only on push; fails the nightly run, so
+  # the repository's watchers get GitHub's "workflow failed" notification.
+  bundler-audit:
+    runs-on: ubuntu-latest
+    container: *devcontainer
+    continue-on-error: ${{ github.event_name != 'schedule' }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: gem install bundler-audit --no-document --quiet
+      - run: bundle-audit check --update

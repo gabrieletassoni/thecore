@@ -38,6 +38,9 @@ thecore/
 │   ├── CLAUDE.md                 # Agent instructions for a new app (fetched by the App template)
 │   ├── AGENTS.md                 # Points agents other than Claude Code to CLAUDE.md
 │   ├── docs/agents/              # issue-tracker (GitHub/GitLab Issues from the git remote), triage-labels, domain
+│   ├── .gitlab-ci.yml            # App CI: build/test/lint/deploy + security scanning (SAST, Secret Detection, brakeman, bundler-audit, security-summary)
+│   ├── .github/workflows/        # ci.yml (build/test/lint/deploy), security.yml (brakeman, bundler-audit, nightly)
+│   ├── script/security_summary.rb # Lists GitLab CE SAST/Secret Detection findings; tested by test/script/security_summary_test.rb
 │   ├── sample_swagger.json       # Full OpenAPI/Swagger spec example
 │   ├── devcontainer/             # Sample DevContainer configuration
 │   │   ├── devcontainer.json
