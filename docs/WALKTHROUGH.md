@@ -187,6 +187,7 @@ Illustrative, not a verbatim capture — Thor logs more status lines per action 
        force    .devcontainer/create-db-user.sql        (already existed — Setup Devcontainer made it)
       create    .devcontainer/link-host-home.sh          (new — Setup Devcontainer doesn't make this one)
       create    .devcontainer/check-plugins.sh            (new — Setup Devcontainer doesn't make this one)
+      create    .devcontainer/heal-stale-containers.sh
       create    .gitlab-ci.yml
       create    .github/workflows/ci.yml
       create    CLAUDE.md
