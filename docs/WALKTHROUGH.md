@@ -122,8 +122,9 @@ When the output channel shows `✅ Thecore 3 App created successfully.` the appl
 ```
 fleet_app/
 ├── .devcontainer/                ← from the App template's samples/devcontainer/ fetch
-├── .github/workflows/ci.yml      ← from the App template's samples/ fetch
-├── .gitlab-ci.yml                ← from the App template's samples/ fetch
+├── .github/workflows/            ← ci.yml and security.yml, from the App template's samples/ fetch
+├── .gitlab-ci.yml                ← from the App template's samples/ fetch (with the security jobs)
+├── script/security_summary.rb    ← from the App template's samples/ fetch (test in test/script/)
 ├── AGENTS.md                     ← from the App template's samples/ fetch (points to CLAUDE.md)
 ├── CLAUDE.md                     ← from the App template's samples/ fetch
 ├── docs/agents/                  ← from the App template's samples/ fetch (tracker, labels, domain)
@@ -193,6 +194,9 @@ Illustrative, not a verbatim capture — Thor logs more status lines per action 
       create    .devcontainer/github-accounts.sh
       create    .gitlab-ci.yml
       create    .github/workflows/ci.yml
+      create    .github/workflows/security.yml
+      create    script/security_summary.rb
+      create    test/script/security_summary_test.rb
       create    CLAUDE.md
   Run `bundle install` and the standard installer generators (devise, rails_admin,
   active_storage, action_text, action_mailbox, cancan, erd) now? (y/n) y

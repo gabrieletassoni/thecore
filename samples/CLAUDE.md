@@ -202,6 +202,38 @@ the URL's development database wins and gets purged. The CI samples' test jobs d
 thing: a Postgres service, `RAILS_ENV=test`, a `DATABASE_URL` naming only the server, and
 `db:test:prepare` before `rails test`.
 
+## Security scanning
+
+Scans report; they never block a deploy. Only the nightly `bundler-audit` fails, because nobody
+pushes when a new advisory appears.
+
+- **GitLab** (`.gitlab-ci.yml`): on every push to any branch, `brakeman` (Rails-specific static
+  analysis), `bundler-audit` (CVEs in `Gemfile.lock`), and GitLab's **SAST** (Semgrep) and
+  **Secret Detection** templates, all `allow_failure` and in stage `test` with `needs: []`, so
+  they start with the pipeline and `build` never waits for them. On GitLab CE the two templates
+  only write `gl-sast-report.json`/`gl-secret-detection-report.json` and stay green whatever
+  they find (no Security Dashboard, no merge-request widget). So `security-summary` runs
+  `script/security_summary.rb` on both reports: it lists the findings in its log and turns
+  orange when there are any, or when a report is missing (`test/script/security_summary_test.rb`).
+  The reports reach it as job artifacts, so artifacts must be enabled on the GitLab instance;
+  without them the scanner jobs fail on upload and `security-summary` reports both missing.
+- **Nightly on GitLab**: create a pipeline schedule on the default branch by hand (Build >
+  Pipeline schedules). Its owner gets the "pipeline failed" mail. It runs only `bundler-audit`,
+  here **without** `allow_failure`, since the advisory database changes even when the code
+  doesn't: `workflow: rules` set `SAST_DISABLED`/`SECRET_DETECTION_DISABLED` for schedules, and
+  `build`, `test`, `lint`, `to-dev` and `to-prod` carry `except: refs: [schedules]`, because
+  `only: changes` is always true outside push pipelines and would otherwise build and deploy
+  every night.
+- **GitHub** (`.github/workflows/security.yml`, apart from the version-gated `ci.yml`): `brakeman`
+  and `bundler-audit` on every push, with `continue-on-error`, and `bundler-audit` nightly by
+  `schedule`, failing. Code scanning (CodeQL default setup), Dependabot alerts and secret
+  scanning with push protection are enabled in the repository's settings, not in a workflow.
+- The `brakeman` and `bundler-audit` gems are installed by the jobs, not in the `Gemfile`.
+  `bundler-audit` runs here because this app's `Gemfile.lock` resolves every ATOM it uses, so it
+  covers the CVEs of the whole stack.
+
+When a finding needs work, open an issue in this repository's tracker (see "Agent skills").
+
 ## External integration
 
 <!-- TODO: describe this app's own external integrations, if any (a third-
