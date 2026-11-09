@@ -24,33 +24,29 @@ on:
   # guarantee GitLab's `when: manual` job gets for free.
   workflow_dispatch:
 
-# Anchors, GitHub Actions' own equivalent of the GitLab sample's hidden-job-plus-
-# YAML-anchor trick (a top-level key prefixed "x-" is ignored by the workflow
-# schema, so it's a safe place to park shared nodes for `*alias` reuse below).
-x-devcontainer: &devcontainer
-  image: gabrieletassoni/vscode-devcontainers-thecore:3
-
-x-cache-step: &cache_step
-  uses: actions/cache@v4
-  with:
-    path: |
-      vendor/bundle
-      app/assets
-      lib/assets
-      public/assets
-    key: thecore-app-cache-${{ hashFiles('Gemfile.lock') }}
-
 env:
   DISABLE_SPRING: 1 # Disables the Spring preloader for a clean CI environment.
 
 jobs:
+  # The container and the cache step are YAML anchors defined here, at their first
+  # use, and reused below as aliases (GitHub Actions rejects unknown top-level keys,
+  # so they can't live in a separate `x-...` block as in docker-compose).
   build:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    container: *devcontainer
+    container: &devcontainer
+      image: gabrieletassoni/vscode-devcontainers-thecore:3
     steps:
       - uses: actions/checkout@v4
-      - *cache_step
+      - &cache_step
+        uses: actions/cache@v4
+        with:
+          path: |
+            vendor/bundle
+            app/assets
+            lib/assets
+            public/assets
+          key: thecore-app-cache-${{ hashFiles('Gemfile.lock') }}
       - run: sudo -E /usr/bin/app-compile.sh
 
   # Tests run against a throwaway Postgres service, the same image as the
