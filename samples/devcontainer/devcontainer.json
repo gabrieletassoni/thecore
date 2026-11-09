@@ -5,11 +5,18 @@
 	"service": "app",
 	"workspaceFolder": "/workspaces/app",
 
-	// Runs on the host before `docker compose up`: removes this project's
-	// containers when the network they point at no longer exists (a pruned
-	// network, a Docker upgrade), which otherwise fails every start with
-	// "network <id> not found". Volumes are kept. See the script's header.
-	"initializeCommand": "bash .devcontainer/heal-stale-containers.sh '${localWorkspaceFolder}'",
+	// Runs on the host before `docker compose up`, in two steps:
+	// 1. Creates the host paths of the bind mounts in "mounts" below when they
+	//    are missing (a fresh machine): a missing directory fails the mount and
+	//    stops the container from starting, and a missing file would be created
+	//    by Docker as a directory. ~/.claude.json gets `{}` so Claude Code reads
+	//    valid JSON; an existing one is never touched. Add any mount you
+	//    uncomment below to this list.
+	// 2. Removes this project's containers when the network they point at no
+	//    longer exists (a pruned network, a Docker upgrade), which otherwise
+	//    fails every start with "network <id> not found". Volumes are kept. See
+	//    the script's header.
+	"initializeCommand": "mkdir -p \"${localEnv:HOME}/.bundle\" \"${localEnv:HOME}/.gem\" \"${localEnv:HOME}/.claude\" && { [ -e \"${localEnv:HOME}/.claude.json\" ] || echo '{}' > \"${localEnv:HOME}/.claude.json\"; } && bash .devcontainer/heal-stale-containers.sh '${localWorkspaceFolder}'",
 
 	"customizations": {
 		"vscode": {
@@ -83,6 +90,11 @@
 	// ${localEnv:USER} is substituted from the HOST environment at
 	// container-create time, so this needs no per-developer configuration.
 	//
+	// github-accounts.sh lets a developer with several GitHub accounts push
+	// to each one's repositories: it asks GitHub which account each key in the
+	// forwarded SSH agent belongs to, and makes git use that key for remotes
+	// under that account. Does nothing with a single key; only warns on failure.
+	//
 	// Do NOT add `bundle update --bundler` (with no version) here. Bare
 	// `--bundler` makes Bundler's own SelfManager#find_latest_matching_spec
 	// query rubygems.org live, at container-create time, and pick the highest
@@ -93,7 +105,7 @@
 	// BUNDLED WITH to a prerelease. If bundler needs bumping, pin an explicit
 	// non-prerelease version at the call site (`bundle update --bundler
 	// X.Y.Z`) and update it deliberately — never leave `--bundler` bare.
-	"postCreateCommand": "sudo chown -R vscode:vscode /usr/local/bundle && bundle update && bash .devcontainer/link-host-home.sh '${localEnv:USER}' && bash .devcontainer/check-plugins.sh",
+	"postCreateCommand": "sudo chown -R vscode:vscode /usr/local/bundle && bundle update && bash .devcontainer/link-host-home.sh '${localEnv:USER}' && bash .devcontainer/github-accounts.sh && bash .devcontainer/check-plugins.sh",
 
 	// Persist host-side auth so bundler/gem and Claude Code don't need
 	// re-authentication after every container rebuild. The gh/glab CLI config

@@ -50,6 +50,23 @@ devcontainer's `vscode` user (i.e. for every developer) — every marketplace pl
 `postCreateCommand` (before `check-plugins.sh`), symlinks `/home/<host-username> -> /home/vscode`
 so those absolute paths resolve.
 
+The host paths behind the bind mounts (`~/.claude`, `~/.claude.json`, `~/.bundle`, `~/.gem`) are
+created on the host by `initializeCommand` when missing, before it heals stale containers, so a
+fresh machine never fails to start the container on a missing mount source. A mount you add or
+uncomment in `mounts` needs its host path added there too.
+
+**Several GitHub accounts.** The container has no SSH keys or `~/.ssh/config` of its own: it uses
+the keys the host's SSH agent forwards, and GitHub identifies the user by the first key offered,
+so a developer with two accounts (e.g. a work and a personal one) got `Permission ... denied to
+<first account>` pushing to the other account's repositories. `.devcontainer/github-accounts.sh`,
+also run from `postCreateCommand`, asks GitHub which account each agent key belongs to and makes
+git use that key for remotes under that account (`git@github.com:<account>/...`, via `includeIf
+"hasconfig:remote.*.url:..."` in `~/.config/git/`, since VS Code rewrites `~/.gitconfig` on every
+start). Nothing is hardcoded and other remotes are untouched. `gh` is separate: its config mount
+is commented out by default; once uncommented, a token the host keeps in its system keyring isn't
+reachable from the container, so `gh` reports it invalid here unless that account logged in on
+the host with `gh auth login --insecure-storage`.
+
 `ask-matt`'s own SKILL.md (inside the plugin) is the authoritative map of how the skills connect
 (main flow, on-ramps, standalone).
 
