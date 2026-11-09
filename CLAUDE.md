@@ -35,6 +35,9 @@ thecore/
 │   └── images/                   # Documentation images
 ├── samples/
 │   ├── Gitignore                 # Template .gitignore for Thecore apps
+│   ├── CLAUDE.md                 # Agent instructions for a new app (fetched by the App template)
+│   ├── AGENTS.md                 # Points agents other than Claude Code to CLAUDE.md
+│   ├── docs/agents/              # issue-tracker (GitHub/GitLab Issues from the git remote), triage-labels, domain
 │   ├── sample_swagger.json       # Full OpenAPI/Swagger spec example
 │   ├── devcontainer/             # Sample DevContainer configuration
 │   │   ├── devcontainer.json
