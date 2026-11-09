@@ -854,9 +854,9 @@
 <span class="cm">#    Enter: Vehicle  |  plate:string make:string year:integer status:string</span>
 
 <span class="kw">class</span> <span class="cl">Vehicle</span> &lt; <span class="cl">ApplicationRecord</span>
-  <span class="fn">include</span> <span class="cl">Api</span>::<span class="cl">Vehicle</span>           <span class="cm"># → auto REST API with json_attrs</span>
-  <span class="fn">include</span> <span class="cl">RailsAdmin</span>::<span class="cl">Vehicle</span>   <span class="cm"># → auto admin UI with rails_admin</span>
 <span class="kw">end</span>
+<span class="cm"># ApplicationRecord's defaults: REST API with json_attrs, admin UI with rails_admin.</span>
+<span class="cm"># Add Api::Vehicle / RailsAdmin::Vehicle concerns only to customize them.</span>
 
 <span class="cm"># That's it. The API endpoint and admin panel are live.</span>
 <span class="cm"># No serialiser. No controller. No route. No policy class.</span>
@@ -887,12 +887,12 @@
       <div class="pillar">
         <span class="pillar-icon">🤖</span>
         <h3>High automation</h3>
-        <p>A single context menu click triggers migrations, model moves, concern scaffolding, and i18n entries simultaneously.</p>
+        <p>A single context menu click (or the same Rails generator from a terminal) writes the model, its migration and its test straight into the right ATOM, or an action with its view, assets and i18n entries.</p>
       </div>
       <div class="pillar">
         <span class="pillar-icon">📐</span>
         <h3>High standardisation</h3>
-        <p>Every ATOM has the same internal layout. Every model has the same three concern files. Scale to ten ATOMs feels like adding the second.</p>
+        <p>Every ATOM has the same internal layout. Every model gets the same default API and admin behaviour, with a concern file only where it differs. Scale to ten ATOMs feels like adding the second.</p>
       </div>
       <div class="pillar">
         <span class="pillar-icon">🔍</span>

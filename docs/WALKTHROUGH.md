@@ -14,7 +14,7 @@ Every filename, folder, module namespace, and class name follows a predictable p
 
 ### High automation
 
-No boilerplate is written by hand. Model, migration, root action, member action, collection action, and ATOM scaffolding are all Rails-native generators (`rails generate model`/`migration`/`thecore:root_action`/`thecore:member_action`/`thecore:collection_action`/`thecore:atom`, all hooked or shipped by the `thecore_generators` gem). The first four work identically from a plain terminal or from a single VS Code context menu action — the extension delegates to the same generator rather than reimplementing it. `thecore:atom` has a VS Code equivalent too ("Thecore 3: Create an ATOM"), which still uses its own separate implementation rather than delegating to the generator yet. `thecore:collection_action` has no VS Code command at all — terminal-only. Either way, the goal is that a feature domain — model, admin UI, API serialisation, custom endpoints — is ready to be filled with business logic within seconds.
+No boilerplate is written by hand. Model, migration, root action, member action, collection action, and ATOM scaffolding are all Rails-native generators (`rails generate model`/`migration`/`thecore:root_action`/`thecore:member_action`/`thecore:collection_action`/`thecore:atom`, all hooked or shipped by the `thecore_generators` gem). Every one of them also has a VS Code context-menu command ("Thecore 3: Add a Model", "Add a DB Migration", "Add a Root Action", "Add a Member Action", "Add a Collection Action", "Create an ATOM"), and each command delegates to the same generator rather than reimplementing it, so the result is identical from either side. ("Add a Collection Action" ships in the first extension release after 3.10.0; with 3.10.0 use the terminal.) Either way, the goal is that a feature domain — model, admin UI, API serialisation, custom endpoints — is ready to be filled with business logic within seconds.
 
 ### High standardisation
 
@@ -26,7 +26,7 @@ Thecore generates code that configures itself by reading the model structure at 
 
 ### Sensible defaults
 
-Everything generated is immediately functional. A new model is visible in the admin UI, serialised in the API, and has a stub for custom endpoints — all before you write a single line of business logic. Defaults are designed to be correct for the common case and easy to override for the specific case.
+Everything generated is immediately functional. A new model is visible in the admin UI and serialised in the API before you write a single line of business logic; custom endpoints are added only when a model needs one. Defaults are designed to be correct for the common case and easy to override for the specific case.
 
 ---
 
@@ -63,15 +63,40 @@ VS Code will ask if you want to reopen in a container. If the folder does not al
 
 > **Right-click the `fleet_app` folder in the Explorer → Thecore 3: Setup Devcontainer**
 
-VS Code generates:
+It asks for the project name (`Fleet App`) and generates:
 
 ```
 fleet_app/
 └── .devcontainer/
-    ├── devcontainer.json
-    ├── docker-compose.yml
-    └── Dockerfile
+    ├── devcontainer.json            ← features, extensions, mounts, initializeCommand, postCreateCommand
+    ├── docker-compose.yml           ← app (as user vscode), db (PostgreSQL 15), redis, with healthchecks
+    ├── Dockerfile                   ← FROM gabrieletassoni/vscode-devcontainers-thecore:3
+    ├── create-db-user.sql           ← run by the db service on its first start
+    ├── backend.code-workspace       ← a VS Code workspace file for the app
+    ├── heal-stale-containers.sh     ← run on the host by initializeCommand
+    ├── link-host-home.sh            ← run by postCreateCommand (Claude Code plugin paths)
+    ├── github-accounts.sh           ← run by postCreateCommand (one SSH key per GitHub account)
+    ├── check-plugins.sh             ← run by postCreateCommand (warns if the skills plugin is missing)
+    └── .thecore-template-version    ← the extension version that wrote this scaffold (see below)
 ```
+
+The command refuses to run when `.devcontainer/` already exists, so it never overwrites a working
+configuration: move the old folder away first if you want a fresh one.
+
+What these files do when the container starts:
+
+- `initializeCommand` runs on the host, before `docker compose up`. It creates the host paths of
+  the active bind mounts when they are missing (`~/.claude`, `~/.bundle`, `~/.gem` as directories,
+  `~/.claude.json` as `{}`), so a fresh machine never fails on a missing mount source. Then it runs
+  `heal-stale-containers.sh`, which removes this project's containers when the Docker network they
+  point at was deleted (a `docker network prune`, a Docker upgrade); volumes are kept.
+- The `~/.claude`, `~/.claude.json`, `~/.bundle` and `~/.gem` mounts are active, so Claude Code's
+  login and plugins and your gem credentials work inside the container without editing JSON. The
+  `gh` and `glab` config mounts are commented out: uncomment one (and add its path to
+  `initializeCommand`) to reuse that CLI's host login.
+- `postCreateCommand` fixes the ownership of `/usr/local/bundle`, runs `bundle update`, then
+  `link-host-home.sh`, `github-accounts.sh` and `check-plugins.sh`. It never runs a bare
+  `bundle update --bundler` or `--all`, which could write a prerelease Bundler into `Gemfile.lock`.
 
 Then reopen in the container:
 
@@ -79,10 +104,19 @@ Then reopen in the container:
 Ctrl+Shift+P → Dev Containers: Reopen in Container
 ```
 
-The container starts with Ruby, Rails, Node.js, Docker-in-Docker, and all Thecore tooling already installed. Your terminal is now running inside the container.
+The container starts with Ruby, Rails, Node.js, the Docker CLI (talking to the host's Docker), and all Thecore tooling already installed. Your terminal is now running inside the container.
 
 > **Why a devcontainer?**
-> Every developer on the team runs the same binary versions of Ruby, Rails, bundler, Node, and the database driver. There is no "works on my machine" problem. The devcontainer image is rebuilt weekly and published to Docker Hub, so it always tracks the latest Thecore-compatible toolchain.
+> Every developer on the team runs the same binary versions of Ruby, Rails, bundler, Node, and the database driver. There is no "works on my machine" problem. The devcontainer image (`gabrieletassoni/vscode-devcontainers-thecore:3`) is rebuilt and published to Docker Hub on every push to `thecore_devcontainer`'s `release/3` branch and every Sunday, so it always tracks the latest Thecore-compatible toolchain.
+
+> **The "scaffold out of date" message.** `.thecore-template-version` holds the version of the
+> extension that ran Setup Devcontainer. The image carries the version of the extension it was
+> built with, and every new shell compares the two: when the scaffold is older, it prints a yellow
+> warning suggesting you regenerate `.devcontainer/`. Only Setup Devcontainer writes this marker.
+> Step 2 below rewrites the other devcontainer files but leaves the marker as it was, so after
+> Step 2 the marker no longer says where the files came from. An app created with the bare App
+> template (no Step 1) has no marker, and the message never appears. See
+> [GUIDE.md §3.1](GUIDE.md#31-setup-the-devcontainer) for how to act on it.
 
 ## Alternative: the headless CLI (`thecore setup-dev-container`)
 
@@ -104,24 +138,39 @@ this one) for the bulk of the work, then adds app-specific runtime config of its
 
 | Step | What happens |
 |---|---|
-| Pre-flight checks | Verifies `ruby`, `rails`, `bundle` are available and the workspace is empty |
-| App application template | `rails new . -m <app_template.rb URL>`, non-interactive, installers always run — see the box below for everything this one call does: Gemfile stack (`devise`/`cancancan`/`rails_admin`/`sassc-rails`/`model_driven_api`/`thecore_ui_rails_admin`/`rails-erd`/**`thecore_generators` itself**), both `.gitlab-ci.yml`/`.github/workflows/ci.yml`, `.devcontainer/*`, `CLAUDE.md`, `vendor/submodules/`/`vendor/external/`, and the full installer chain (`devise:install`, `rails_admin:install`, `active_storage:install`, `action_text:install`, `action_mailbox:install`, `cancan:ability`, `erd:install`) |
+| Pre-flight checks | Verifies that a folder is open and that at most one folder is open in the window (it does not check that the folder is empty: the `.devcontainer/` from Step 1 is expected), that `ruby`, `rails` and `bundle` are available, and that the folder isn't already a Rails app (if it is, the command stops without a message) |
+| App application template | `rails new . --database=postgresql --asset-pipeline=sprockets --skip-git -m <app_template.rb URL>`, non-interactive, installers always run — see the box below for everything this one call does: the Gemfile stack with its security floors (**`thecore_generators` itself** included), Rails' root `Dockerfile` and `bin/docker-entrypoint` removed, the eight `.devcontainer/*` files rewritten from the `thecore` samples, `.gitlab-ci.yml`, `.github/workflows/ci.yml` and `security.yml`, `script/security_summary.rb` and its test, `CLAUDE.md`, `AGENTS.md`, `docs/agents/`, the test-database rule in `test/test_helper.rb`, `vendor/submodules/`/`vendor/external/`, and the full installer chain (`devise:install`, `rails_admin:install`, `active_storage:install`, `action_text:install`, `action_mailbox:install`, `cancan:ability`, `erd:install`) |
 | `.gitignore` | Overwrites the default Rails gitignore with a comprehensive Thecore-specific one — the template doesn't touch this file |
 | Sidekiq | Creates `config/sidekiq.yml` with dynamic queue configuration |
 | Version file | Creates `version` containing `3.0.1` |
 | `development.rb` patch | Sets `raise_on_missing_callback_actions = false` |
-| Database | Runs `db:drop` (safety net), `db:create`, `db:migrate`, `thecore:db:seed` |
+| Database | Runs `db:drop` (safety net), `db:create`, `db:migrate`, `thecore:db:seed`, on the database the running container's `DATABASE_URL` names (Step 1's) |
 | Vendor directories | Creates `vendor/custombuilds/`, `vendor/deploytargets/` (`vendor/submodules/` already exists — the template created it) |
-| `.dockerignore` | Removed if present |
+| `.dockerignore` | Removes the one `rails new` writes. The Thecore Dockerfile builds the image with `ADD .`, so without it the image gets the whole CI checkout. The bare App template (box below) keeps it |
 | `git init` | Initialises the repository with a `main` branch and a single "Initial commit" — the template never touches git |
 
 When the output channel shows `✅ Thecore 3 App created successfully.` the application is fully wired and the database is seeded with the default Thecore admin user. `thecore_generators` is already in the Gemfile at this point — no manual step needed before Step 4 below.
+
+**Rebuild the container once.** The App template replaced `devcontainer.json` and
+`docker-compose.yml` with the `thecore` samples, which differ from Step 1's in three ways: the
+container is named `Thecore App`, the workspace is mounted at `/workspaces/app` instead of
+`/workspaces/project/backend`, and `DATABASE_URL` names the database `app_dev` instead of the one
+Step 1 derived from the project name. The running container still has Step 1's settings, so run
+**Dev Containers: Rebuild Container**, then create and seed the new database once:
+
+```bash
+bin/rails db:create db:migrate thecore:db:seed
+```
+
+`backend.code-workspace` and `.thecore-template-version` are left as Step 1 wrote them: the
+template only writes the eight files it fetches.
 
 **What you now have:**
 
 ```
 fleet_app/
-├── .devcontainer/                ← from the App template's samples/devcontainer/ fetch
+├── .devcontainer/                ← eight files from the App template's samples/devcontainer/ fetch,
+│                                    plus Step 1's backend.code-workspace and marker
 ├── .github/workflows/            ← ci.yml and security.yml, from the App template's samples/ fetch
 ├── .gitlab-ci.yml                ← from the App template's samples/ fetch (with the security jobs)
 ├── script/security_summary.rb    ← from the App template's samples/ fetch (test in test/script/)
@@ -136,9 +185,10 @@ fleet_app/
 │   ├── sidekiq.yml              ← Sidekiq queue configuration
 │   └── ...
 ├── db/
+├── test/test_helper.rb          ← forces the test database when DATABASE_URL is set
 ├── vendor/
-│   ├── custombuilds/            ← custom Dockerfiles per deploy target
-│   ├── deploytargets/           ← per-customer .env files
+│   ├── custombuilds/            ← custom Dockerfiles per deploy target (empty for now)
+│   ├── deploytargets/           ← per-installation deploy configuration, committed (empty for now)
 │   ├── submodules/              ← ATOMs will live here
 │   └── external/                ← reference repos
 └── version                      ← semantic version seed
@@ -160,12 +210,19 @@ this box if you already did Step 2 the VS Code way; the rest of this walkthrough
 way, since Steps 3 onward only assume `fleet_app` already exists, not how it was created.
 
 ```bash
+# Inside the Step 1 devcontainer, on the folder it opened:
+rails new . --database=postgresql --asset-pipeline=sprockets \
+  -m https://raw.githubusercontent.com/gabrieletassoni/thecore_generators/release/3/lib/templates/app_template.rb
+
+# Anywhere else, creating the folder (every .devcontainer/* file is then a `create`):
 rails new fleet_app --database=postgresql --asset-pipeline=sprockets \
   -m https://raw.githubusercontent.com/gabrieletassoni/thecore_generators/release/3/lib/templates/app_template.rb
 ```
 
 Illustrative, not a verbatim capture — Thor logs more status lines per action than shown here
-(`route`, `chmod`, an extra line per `generate` call) and some are abbreviated with `...`:
+(`route`, an extra line per `generate` call) and some are abbreviated with `...`. Run inside the
+Step 1 devcontainer, the eight `.devcontainer/*` files already exist: the two that differ from the
+samples are overwritten (`force`), the six that are byte-identical are left alone (`identical`):
 
 ```
       create  Gemfile
@@ -175,29 +232,44 @@ Illustrative, not a verbatim capture — Thor logs more status lines per action 
      gemfile    cancancan
      gemfile    rails_admin
      gemfile    sassc-rails
-     gemfile    model_driven_api (~> 3.9)
-     gemfile    thecore_ui_rails_admin (~> 3.8)
+     gemfile    model_driven_api (~> 3.13, >= 3.13.1)
+     gemfile    thecore_ui_rails_admin (~> 3.8, >= 3.8.7)
+     gemfile    thecore_backend_commons (~> 3.9, >= 3.9.1)
+     gemfile    thecore_auth_commons (~> 3.6, >= 3.6.3)
+        gsub    Gemfile                       (rails ~> 7.2, >= 7.2.4)
+        gsub    Gemfile                       (puma >= 7.2.1)
+     gemfile    redis (< 6)
+     gemfile    connection_pool (~> 2.4)
      gemfile    rails-erd
-     gemfile    thecore_generators (~> 3.6)
-      append    Gemfile
+     gemfile    thecore_generators (~> 3.13)
+      append    Gemfile                       (the optional ecosystem gems, commented out)
       create    vendor/submodules
       create    vendor/submodules/.keep
       create    vendor/external
       create    vendor/external/.keep
-       force    .devcontainer/devcontainer.json      (already existed — Setup Devcontainer made it)
-       force    .devcontainer/docker-compose.yml      (already existed — Setup Devcontainer made it)
-       force    .devcontainer/Dockerfile               (already existed — Setup Devcontainer made it)
-       force    .devcontainer/create-db-user.sql        (already existed — Setup Devcontainer made it)
-      create    .devcontainer/link-host-home.sh          (new — Setup Devcontainer doesn't make this one)
-      create    .devcontainer/check-plugins.sh            (new — Setup Devcontainer doesn't make this one)
-      create    .devcontainer/heal-stale-containers.sh
-      create    .devcontainer/github-accounts.sh
+      remove    Dockerfile
+      remove    bin/docker-entrypoint
+       force    .devcontainer/devcontainer.json
+       force    .devcontainer/docker-compose.yml
+   identical    .devcontainer/Dockerfile
+   identical    .devcontainer/create-db-user.sql
+   identical    .devcontainer/link-host-home.sh
+   identical    .devcontainer/check-plugins.sh
+   identical    .devcontainer/heal-stale-containers.sh
+   identical    .devcontainer/github-accounts.sh
+       chmod    .devcontainer/link-host-home.sh
+       ...
       create    .gitlab-ci.yml
       create    .github/workflows/ci.yml
       create    .github/workflows/security.yml
       create    script/security_summary.rb
       create    test/script/security_summary_test.rb
       create    CLAUDE.md
+      create    AGENTS.md
+      create    docs/agents/issue-tracker.md
+      create    docs/agents/triage-labels.md
+      create    docs/agents/domain.md
+      insert    test/test_helper.rb
   Run `bundle install` and the standard installer generators (devise, rails_admin,
   active_storage, action_text, action_mailbox, cancan, erd) now? (y/n) y
          run  bundle install
@@ -230,9 +302,12 @@ the missing variable rather than guessing whether to run the installer chain una
 **Compared to Step 2's "Thecore 3: Create an App"**: the same underlying template — "Create an
 App" shells out to this exact `rails new -m` invocation, non-interactively, with the installers
 always on. What Step 2 adds on top, that this bare template alone doesn't: `config/sidekiq.yml`,
-the `version` file, a `development.rb` patch, database bootstrap (`db:create`/`migrate`/
-`thecore:db:seed`), `vendor/custombuilds/`/`vendor/deploytargets/`, and git init/commit — see
-Step 2's own table above for the full list. Run this box directly when you only need the
+the `version` file, a `development.rb` patch, the Thecore `.gitignore`, database bootstrap
+(`db:create`/`migrate`/`thecore:db:seed`), `vendor/custombuilds/`/`vendor/deploytargets/`, the
+removal of `.dockerignore` (kept here, so the image build skips what it lists), and git init/commit
+— see Step 2's own table above for the full list. The template never writes
+`backend.code-workspace` or `.thecore-template-version`, so without Step 1 the app has neither
+(and no "scaffold out of date" message). Run this box directly when you only need the
 generic Rails/Gemfile/CI/devcontainer/CLAUDE.md core, without the app-specific runtime config
 Step 2 layers on top.
 
@@ -262,46 +337,68 @@ Fill in the fields as they appear:
 | URL | Valid URL | `https://github.com/fleetcorp/vehicle_registry` |
 
 The command collects these six fields via the dialogs above, then shells out to
-`rails generate thecore:atom` (thecore_code_extension#40) with them as
+`bundle install && rails generate thecore:atom` with them as
 `--non-interactive --summary=... --description=... --author=... --email=... --url=...` flags —
 the exact same generator the box just below this one invokes directly from a terminal. It:
 
-1. Creates the Rails engine at `vendor/submodules/vehicle_registry` (`rails plugin new`, run by the generator)
-2. Sets the gemspec dependencies to the current `model_driven_api ~> 3.9`/`thecore_ui_rails_admin ~> 3.8` floor
-3. Creates the full Thecore ATOM folder structure, both `.gitlab-ci.yml`/`.github/workflows/gempush.yml`, and a `CLAUDE.md`
-4. `git init`s the new ATOM with one local commit
-5. Adds `gem "vehicle_registry", path: "vendor/submodules/vehicle_registry"` to the main app `Gemfile`
+1. Creates the Rails engine at `vendor/submodules/vehicle_registry` (`rails plugin new ... --full
+   --database=postgresql --skip-ci`, run by the generator): the dummy app under `test/dummy/` runs
+   on PostgreSQL, and Rails' own SQLite CI and `dependabot.yml` are not generated
+2. Sets the gemspec: your author, email, homepage, summary and description, `rails ~> 7.2`, the
+   `model_driven_api ~> 3.9`/`thecore_ui_rails_admin ~> 3.8` dependencies, and
+   `allowed_push_host` `https://rubygems.org` (the dialogs don't ask for a gem server: for a
+   private one, use the terminal generator's `--gem-host`, see the box below)
+3. Creates the full Thecore ATOM folder structure, the CI (`.github/workflows/gempush.yml` and
+   `.gitlab-ci.yml`), `script/security_summary.rb` with its test, and a `CLAUDE.md`
+4. Makes the dummy app use `vehicle_registry_<RAILS_ENV>` databases, even when `DATABASE_URL`
+   (set by the devcontainer to the app's development database) is present
+5. `git init`s the new ATOM on branch `release/3`, with one local commit
+6. Adds `gem "vehicle_registry", path: "vendor/submodules/vehicle_registry"` to the main app `Gemfile`
 
 **What is generated inside the ATOM:**
 
 ```
 vendor/submodules/vehicle_registry/
-├── vehicle_registry.gemspec           ← gem metadata (author, deps, version)
+├── vehicle_registry.gemspec           ← gem metadata (author, deps, allowed_push_host)
+├── lib/vehicle_registry/version.rb    ← bump it to publish (see Step 12)
+├── CLAUDE.md                          ← from thecore's samples/ATOM_CLAUDE.md
+├── .github/workflows/gempush.yml      ← publishes to RubyGems.org from release/3
+├── .gitlab-ci.yml                     ← publishes when version.rb changes + SAST/Secret Detection
+├── script/security_summary.rb         ← GitLab CE security summary (test in test/script/)
+├── .rubocop.yml                       ← rubocop-rails-omakase, as rails plugin new writes it
 ├── app/
 │   ├── models/
 │   │   └── concerns/
 │   │       ├── api/                   ← Api:: concerns go here
 │   │       └── rails_admin/           ← RailsAdmin:: concerns go here
 │   ├── assets/
-│   │   ├── javascripts/rails_admin/actions/
-│   │   └── stylesheets/rails_admin/actions/
+│   │   ├── javascripts/
+│   │   └── stylesheets/
 │   └── views/rails_admin/main/        ← action templates go here
 ├── config/
 │   ├── initializers/
 │   │   ├── after_initialize.rb        ← hook to require root/member actions
 │   │   ├── add_to_db_migration.rb     ← registers db/migrate with Rails
 │   │   ├── assets.rb                  ← asset precompile declarations
-│   │   └── abilities.rb               ← CanCan ability class stub
+│   │   └── abilities.rb               ← CanCan ability class stub (only with the API/Admin dependencies)
 │   └── locales/
 │       ├── en.yml                     ← English i18n stubs
 │       └── it.yml                     ← Italian i18n stubs
 ├── db/
 │   ├── migrate/                       ← ATOM migrations (written here directly by rails generate model/migration)
 │   └── seeds.rb                       ← ATOM seed data
-└── lib/
-    ├── root_actions/                  ← rails_admin main menu sections
-    ├── member_actions/                ← rails_admin per-row buttons
-    └── collection_actions/            ← rails_admin collection-level actions
+├── lib/
+│   ├── root_actions/                  ← rails_admin main menu sections
+│   ├── member_actions/                ← rails_admin per-row buttons
+│   └── collection_actions/            ← rails_admin collection-level actions
+└── test/dummy/                        ← the app the ATOM's tests boot, on PostgreSQL
+```
+
+Its own tests run from its directory, on its own test database:
+
+```bash
+cd vendor/submodules/vehicle_registry
+bundle install && bin/rails db:create && bin/rails test
 ```
 
 > **Why are migrations inside the ATOM?**
@@ -346,8 +443,12 @@ dev@fleetcorp.example.com
 Enter the url of the ATOM:
 https://github.com/fleetcorp/vehicle_registry
 Include model_driven_api/thecore_ui_rails_admin as dependencies? [yes, no] yes
-       run  bundle exec rails plugin new vehicle_registry -fG --skip-gemfile-entry --skip-hotwire --full from "vendor/submodules"
+       run  bundle exec rails plugin new vehicle_registry -fG --skip-gemfile-entry --skip-hotwire --full --database=postgresql --skip-ci from "vendor/submodules"
       ...
+       force  vendor/submodules/vehicle_registry/test/dummy/config/database.yml
+      append  vendor/submodules/vehicle_registry/test/dummy/config/boot.rb
+      create  vendor/submodules/vehicle_registry/test/dummy/app/models/ability.rb
+      create  vendor/submodules/vehicle_registry/test/dummy/config/initializers/devise.rb
       create  vendor/submodules/vehicle_registry/db/migrate/.keep
       ...
       create  vendor/submodules/vehicle_registry/config/initializers/after_initialize.rb
@@ -357,16 +458,25 @@ Include model_driven_api/thecore_ui_rails_admin as dependencies? [yes, no] yes
       create  vendor/submodules/vehicle_registry/config/locales/it.yml
       create  vendor/submodules/vehicle_registry/.github/workflows/gempush.yml
       create  vendor/submodules/vehicle_registry/.gitlab-ci.yml
-      invoke  vendor/submodules/vehicle_registry/Gemfile
-      force  vendor/submodules/vehicle_registry/vehicle_registry.gemspec
+      create  vendor/submodules/vehicle_registry/script/security_summary.rb
+      create  vendor/submodules/vehicle_registry/test/script/security_summary_test.rb
+      append  vendor/submodules/vehicle_registry/Gemfile
+       force  vendor/submodules/vehicle_registry/vehicle_registry.gemspec
       create  vendor/submodules/vehicle_registry/CLAUDE.md
-       run  git init -q -b master from "vendor/submodules/vehicle_registry"
-       run  git add -A from "vendor/submodules/vehicle_registry"
-       run  git ... commit -q -m "Initial commit" from "vendor/submodules/vehicle_registry"
+         run  git init -q -b release/3 from "vendor/submodules/vehicle_registry"
+         run  git add -A from "vendor/submodules/vehicle_registry"
+         run  git ... commit -q -m "Initial commit" from "vendor/submodules/vehicle_registry"
   next_steps  vehicle_registry is git-initialized locally with one commit, but has no remote yet. To finish wiring it in:
                 1. Create a repository for it on the git host of your choice (GitHub, GitLab, ...)
-                2. cd <path-to-fleet_app>/vendor/submodules/vehicle_registry && git remote add origin <remote-url> && git push -u origin master
-                3. From this app's root: git submodule add <remote-url> vendor/submodules/vehicle_registry
+                2. cd <path-to-fleet_app>/vendor/submodules/vehicle_registry && git remote add origin <remote-url> && git push -u origin release/3
+                3. From this app's root: git submodule add -b release/3 <remote-url> vendor/submodules/vehicle_registry
+              Until the gem is published, this app's Gemfile uses it from the submodule:
+                gem "vehicle_registry", path: "vendor/submodules/vehicle_registry"
+              Once published (bump lib/vehicle_registry/version.rb and push to release/3; the CI publishes it), switch to the published gem:
+                4. Replace that line with gem "vehicle_registry", "~> <major.minor>"
+                5. bundle update vehicle_registry --conservative, then commit Gemfile.lock together with the submodule pointer
+              Its own tests run from its directory, on its own test database: cd <path-to-fleet_app>/vendor/submodules/vehicle_registry && bundle install && bin/rails db:create && bin/rails test
+              From then on every change follows the same loop: edit and test in vendor/submodules/vehicle_registry, bump the version, push to release/3, wait for the gem server, bundle update vehicle_registry --conservative, commit Gemfile.lock + the submodule pointer.
      gemfile  vehicle_registry
 ```
 
@@ -374,14 +484,22 @@ The last line (`gemfile vehicle_registry`) is `add_gem_to_host_gemfile` appendin
 `gem "vehicle_registry", path: "vendor/submodules/vehicle_registry"` to `fleet_app`'s own
 `Gemfile` — same end result as Step 3's own final step.
 
+**Publishing to a private gem server.** By default the ATOM publishes to RubyGems.org. Pass
+`--gem-host=gems.example.com` (just the host) to publish to a private gem server instead: the
+gemspec's `allowed_push_host` becomes `https://gems.example.com`, the GitLab CI pushes there
+(`GITLAB_GEM_REPO_TARGET`), and step 4 of the next steps says to declare the gem inside the app
+Gemfile's `source "https://gems.example.com/" do ... end` block. "Create an ATOM" has no field
+for this, so a VS Code-created ATOM always targets RubyGems.org until you change both values by
+hand (see `CLAUDE.md` in the ATOM, "Publishing").
+
 **Compared to Step 3's "Thecore 3: Create an ATOM"**: no difference — Step 3 delegates to this
 exact generator (thecore_code_extension#40), so the resulting ATOM structure (see the file tree
 above) is identical either way, including the `CLAUDE.md`, the `git init`'d commit, and the
-dependency versions. The only real difference is how the six inputs get collected: VS Code's
+dependency versions. The only real differences are how the inputs get collected — VS Code's
 dialogs accept free text and convert spaces to `snake_case` for you, while this terminal
-invocation needs an already-valid gem name typed directly. Creating a remote and running the real
-`git submodule add` are still manual steps either way; the generator only logs the exact commands
-for you to run.
+invocation needs an already-valid gem name typed directly — and `--gem-host`, which only the
+terminal offers. Creating a remote and running the real `git submodule add` are still manual
+steps either way; the generator only logs the exact commands for you to run.
 
 Full reference: [GUIDE.md §4.2.1](GUIDE.md#421-the-thecoreatom-generator-terminal-alternative).
 
@@ -463,26 +581,55 @@ bundle exec rails generate model Vehicle plate:string make:string model:string y
   --with-api-concern --with-admin-concern
 ```
 
-**Custom API actions.** `Endpoints::Vehicle` is never generated — add it by hand, in `vehicle_registry/app/models/concerns/endpoints/vehicle.rb`, only when a real non-CRUD action is needed:
+**Custom API actions.** Nothing is generated for these: add one by hand, only when a real
+non-CRUD action is needed. `model_driven_api` dispatches a custom action to a method of the
+model's `Endpoints::<Model>` class, a `NonCrudEndpoints` subclass. Declare that class once, empty,
+where the model lives:
+
+`vehicle_registry/app/models/endpoints/vehicle.rb`:
 
 ```ruby
 class Endpoints::Vehicle < NonCrudEndpoints
-  # Custom non-CRUD API actions go here.
-  # Uncomment the template below to add one.
-  #
-  # self.desc 'Vehicle', :archive, {
-  #   patch: {
-  #     summary:     "Archive a vehicle",
-  #     operationId: "archive",
-  #     tags:        ["Vehicle"],
-  #     ...
-  #   }
-  # }
-  # def archive(params)
-  #   { archived: true }, 200
-  # end
 end
 ```
+
+Then add each action with `class_eval` inside `after_initialize`, in a dedicated initializer:
+
+`vehicle_registry/config/initializers/vehicle_endpoints.rb`:
+
+```ruby
+Rails.application.config.after_initialize do
+  Endpoints::Vehicle.class_eval do
+    desc 'Vehicle', :archive, {
+      patch: {
+        summary: 'Archive a vehicle',
+        operationId: 'archive',
+        tags: ['Vehicle'],
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'integer' } }
+        ],
+        responses: { 200 => { description: 'The archived vehicle' }, 403 => { description: 'Not allowed' } }
+      }
+    }
+
+    def archive(params)
+      vehicle = Vehicle.find(params[:id])
+      # Custom actions skip model_driven_api's CanCan check: authorize the caller here.
+      return [{ error: 'You are not authorized to access this page.' }, 403] unless
+        Ability.new(User.find(params[:current_user_id])).can?(:update, vehicle)
+
+      vehicle.update!(status: 'archived')
+      [vehicle, 200]
+    end
+  end
+end
+```
+
+It answers `PATCH /api/v2/vehicles/custom_action/archive/:id` and appears in the OpenAPI
+document. Every action returns `[body, http_status]`. Use `class_eval`, never `include` of a
+module: `model_driven_api` finds the actions with `instance_methods(false)`, which doesn't see
+methods that come from an included module. The same `class_eval` adds an action to an
+`Endpoints::` class another ATOM or gem already defines, from the main app or from your ATOM.
 
 > **Introspection-based development in action:** the API response for `GET /api/vehicles` is built by `ModelDrivenApi` reading the model's `json_attrs` configuration at runtime — the default one if no `Api::Vehicle` concern exists, the overridden one if it does. You never write a serialiser class either way. Adding a new field to the migration and re-running `db:migrate` makes it appear in the API response automatically.
 
@@ -783,19 +930,21 @@ From this point the development cycle for each new feature is:
    — or right-click ATOM → Thecore 3: Add a DB Migration → rails db:migrate
 
 5. Add admin UI pages (dashboard-style):
-   Right-click ATOM → Thecore 3: Add a Root Action
+   Right-click ATOM → Thecore 3: Add a Root Action (or rails generate thecore:root_action)
    → edit the controller proc
    → edit the ERB template
-   → add require to after_initialize.rb
+   (the require line in after_initialize.rb is added for you)
 
 6. Add per-record admin UI buttons:
-   Right-click ATOM → Thecore 3: Add a Member Action
+   Right-click ATOM → Thecore 3: Add a Member Action (or rails generate thecore:member_action)
    → edit the controller proc
-   → add require to after_initialize.rb
+
+   Add actions on a model's whole list the same way:
+   Right-click ATOM → Thecore 3: Add a Collection Action (or rails generate thecore:collection_action)
 
 7. Expose custom API endpoints:
-   Create (or open) concerns/endpoints/<model>.rb
-   → uncomment and complete the endpoint template
+   Declare the empty Endpoints::<Model> < NonCrudEndpoints class once (app/models/endpoints/<model>.rb)
+   → add each action with class_eval in a config/initializers/ file's after_initialize block
 
 8. Tune JSON output:
    Create (or open) concerns/api/<model>.rb
@@ -807,6 +956,34 @@ From this point the development cycle for each new feature is:
 ```
 
 Each step is independent. You can add a root action without touching the model. You can extend the API without touching the admin config. Concerns exist only where a model actually customizes something, keeping each responsibility isolated without paying for boilerplate files nobody edits.
+
+---
+
+## Step 12 — Publish the ATOM and use the published gem
+
+Until it is published, `fleet_app` uses `vehicle_registry` from its folder (`path:` in the
+`Gemfile`). To share it, publish it as a gem and let the app use the published version, like every
+other ATOM.
+
+1. Create a repository for the ATOM, then follow the generator's next steps: `git remote add
+   origin <url>`, `git push -u origin release/3`, and from `fleet_app`'s root
+   `git submodule add -b release/3 <url> vendor/submodules/vehicle_registry`.
+2. Bump `lib/vehicle_registry/version.rb` and push to `release/3`. The ATOM's CI publishes that
+   version: on GitHub, `gempush.yml` (pushes to `release/3` only, the repository secret
+   `RUBYGEMS_AUTH_TOKEN`) tags it and pushes it to RubyGems.org; on GitLab, `build_gem` runs only
+   when `lib/*/version.rb` changes and pushes to `GITLAB_GEM_REPO_TARGET` (the `--gem-host`
+   server, with the CI/CD variable `GEMS_REPO_CREDENTIALS`) or, when that isn't set, to
+   RubyGems.org. A push that doesn't change the version publishes nothing.
+3. Once the version is on the gem server, replace the `path:` line in `fleet_app`'s `Gemfile` with
+   `gem "vehicle_registry", "~> 0.1"` (the version you published; `rails plugin new` starts at `0.1.0`), inside the `source "https://<server>/" do ... end` block
+   for a private server, run `bundle update vehicle_registry --conservative`, and commit
+   `Gemfile.lock` together with the submodule pointer.
+
+From then on, every change to an ATOM follows the same loop, written in the app's `CLAUDE.md`
+("Changing an ATOM"): edit and test in `vendor/submodules/<name>`, bump its version, push to
+`release/3`, wait for the gem server, `bundle update <name> --conservative`, commit
+`Gemfile.lock` with the submodule pointer. Never patch the installed gem, and never work around
+an ATOM's bug from the app.
 
 ---
 
@@ -841,10 +1018,10 @@ Standard Rails migration types accepted by the Add Model and Add Migration comma
 
 ## Appendix C — What each concern file controls
 
-None of these three files exists by default any more — see [GUIDE.md §1](GUIDE.md#1-philosophy). Create the ones a given model needs (by hand, or via `--with-api-concern`/`--with-admin-concern` at generation time for the first two); the table below is what each controls once it exists.
+None of these files exists by default any more — see [GUIDE.md §1](GUIDE.md#1-philosophy). Create the ones a given model needs (by hand, or via `--with-api-concern`/`--with-admin-concern` at generation time for the first two); the table below is what each controls once it exists.
 
 | File | Controls | How to customise |
 |---|---|---|
 | `concerns/api/<model>.rb` | JSON fields in API responses | Edit `json_attrs`: use `only:`, `except:`, `methods:`, `include:` |
 | `concerns/rails_admin/<model>.rb` | Admin sidebar label, icon, list/edit/show fields | Add `list do`, `edit do`, `show do` blocks inside `rails_admin do` |
-| `concerns/endpoints/<model>.rb` | Custom non-CRUD REST actions | Uncomment the template, fill in the OpenAPI descriptor and the method body |
+| `app/models/endpoints/<model>.rb` + an initializer | Custom non-CRUD REST actions | Declare the empty `Endpoints::<Model> < NonCrudEndpoints` class, then add each action (OpenAPI `desc` + method) with `class_eval` inside `after_initialize` (see Step 4) |

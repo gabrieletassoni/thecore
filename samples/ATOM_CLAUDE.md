@@ -44,10 +44,17 @@ devcontainer — the plugin mechanism is host-machine-level, not tied to any one
 `ask-matt`'s own SKILL.md (inside the plugin) is the authoritative map of how the skills connect
 (main flow, on-ramps, standalone).
 
-<!-- TODO: once this ATOM has its own issue tracker configured (run
-     /setup-matt-pocock-skills), list which skills are user-invoked-only
-     (`disable-model-invocation: true`) vs model-invocable here — it depends
-     on tracker choice, which is project-specific. -->
+**User-invoked only** (`disable-model-invocation: true`: Claude's Skill tool can't trigger them, so
+ask the developer to type the `/skill-name` command): `ask-matt`, `grill-with-docs`, `grill-me`,
+`to-spec`, `to-tickets`, `triage`, `handoff`, `improve-codebase-architecture`, `teach`,
+`to-questionnaire`, `wait-what`, `implement`, `wayfinder`, `setup-matt-pocock-skills`.
+
+**Model-invocable** (Claude invokes them directly when they fit the task): `grilling`,
+`domain-modeling`, `codebase-design`, `tdd`, `prototype`, `diagnosing-bugs`, `research`,
+`code-review`, `resolving-merge-conflicts`, `wizard`, `writing-for-agents`.
+
+<!-- TODO: the skills that publish tickets need this ATOM's issue tracker: run
+     /setup-matt-pocock-skills once to configure it (docs/agents/). -->
 
 ## Development workflow
 
@@ -70,7 +77,9 @@ sequence based on the situation.
 
 ## Code conventions
 
-- Follow RuboCop (`rubocop` + `rubocop-rails`). Run `bundle exec rubocop` before committing.
+- Follow RuboCop. `rails plugin new` set it up with `rubocop-rails-omakase` (`.rubocop.yml`
+  inherits Rails' omakase rules; add this ATOM's own cops there). Run `bundle exec rubocop`
+  before committing.
 - Model concerns follow the naming pattern `Api::ModelName` and `RailsAdmin::ModelName` — see
   `docs/GUIDE.md` §1/§5 in the thecore repo for when a concern is needed at all (the default,
   concern-less case is correct for most models).
@@ -122,8 +131,8 @@ host's `vendor/submodules/<name>` only to edit it. The repository's branch is `r
 the only branch that publishes, so work on another branch and merge into `release/3` to release.
 
 1. Edit and test here.
-2. Bump `lib/<name>/version.rb` and push to `release/3`. The CI publishes the new version and tags
-   it; a push that doesn't change the version publishes nothing.
+2. Bump `lib/<name>/version.rb` and push to `release/3`. The CI publishes the new version (on
+   GitHub it also tags it); a push that doesn't change the version publishes nothing.
 3. Wait until the new version is on the gem server.
 4. In the host app: `bundle update <name> --conservative`, then commit the new `Gemfile.lock`
    together with the moved submodule pointer.

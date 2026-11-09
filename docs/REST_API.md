@@ -366,18 +366,30 @@ Expected response:
 
 ## Custom actions
 
-Custom actions are defined in `concerns/endpoints/<model>.rb` (see [GUIDE.md §5](GUIDE.md#5-model-anatomy)) and triggered via the `do` query parameter:
+A custom (non-CRUD) action is a method of the model's `Endpoints::<Model>` class, a
+`NonCrudEndpoints` subclass, added with `class_eval` inside `after_initialize` (see
+[GUIDE.md §5](GUIDE.md#custom-rest-actions-endpointstcpconnection)). It is reached through a
+dedicated route, in v2 and v3 alike:
 
 ```
-GET  /api/v2/:model?do=custom_action          # collection-level action
-GET  /api/v2/:model/:id?do=custom_action      # member-level action
+GET    /api/v2/:model/custom_action/:action_name        # no record id
+GET    /api/v2/:model/custom_action/:action_name/:id    # with a record id
+POST   /api/v2/:model/custom_action/:action_name
+PUT    /api/v2/:model/custom_action/:action_name/:id
+PATCH  /api/v2/:model/custom_action/:action_name/:id
+DELETE /api/v2/:model/custom_action/:action_name/:id
 ```
 
-Custom actions can also be exposed as dedicated routes:
+or through the `do` query parameter on the CRUD routes:
 
 ```
-POST /api/v2/:model/custom_action/:action_name
+GET  /api/v2/:model?do=action_name          # collection-level action
+GET  /api/v2/:model/:id?do=action_name      # member-level action
 ```
+
+The response is the action's own JSON body and HTTP status. Custom actions skip the CanCan check
+the CRUD endpoints apply, so each action authorizes the caller itself; actions declared with
+`public_action` need no JWT.
 
 ---
 

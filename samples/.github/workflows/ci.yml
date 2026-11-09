@@ -93,10 +93,13 @@ jobs:
       - run: bundle exec rubocop
 
   # Deploys via the devcontainer image's own generic deploy script
-  # (/usr/bin/docker-deploy.sh), which reads its target configuration from
-  # vendor/deploytargets/ (developer-convenience directory, not committed
-  # content -- see ADR 0005 in docs/adr/) and no-ops safely when that isn't
-  # configured for this environment yet. No customer-specific paths here.
+  # (/usr/bin/docker-deploy.sh), which reads its targets from vendor/deploytargets/,
+  # committed in this repository: one folder per provider, with its docker_host
+  # (production) or docker_<TARGETENV>_host file and one <customer>.env per
+  # installation (no secrets: SECRET_KEY_BASE lives on the Docker host, see
+  # CLAUDE.md). A provider without the host file for this environment is skipped;
+  # with no vendor/deploytargets/ committed at all, the job fails.
+  # No customer-specific paths here.
   to-dev:
     if: github.event_name == 'push'
     needs: [test, lint]
