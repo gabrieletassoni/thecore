@@ -163,7 +163,7 @@ bin/rails db:create db:migrate thecore:db:seed
 ```
 
 `backend.code-workspace` and `.thecore-template-version` are left as Step 1 wrote them: the
-template only writes the eight files it fetches. Commit the result.
+template only writes the eight files it fetches.
 
 **What you now have:**
 
