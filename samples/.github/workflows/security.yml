@@ -14,15 +14,15 @@ on:
     - cron: "0 3 * * *"
   workflow_dispatch:
 
-x-devcontainer: &devcontainer
-  image: gabrieletassoni/vscode-devcontainers-thecore:3
-
 jobs:
   # Rails-specific static analysis. Reports only: a finding never blocks anything.
   brakeman:
     if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
-    container: *devcontainer
+    # A YAML anchor defined at its first use, reused below as an alias (GitHub
+    # Actions rejects unknown top-level keys such as docker-compose's `x-...`).
+    container: &devcontainer
+      image: gabrieletassoni/vscode-devcontainers-thecore:3
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
