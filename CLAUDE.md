@@ -30,8 +30,8 @@ thecore/
 │   ├── SETUP_VSCODE_WINDOWS.md   # Windows 11 + WSL setup instructions
 │   ├── SETUP_VSCODE_MACOS.md     # macOS setup instructions
 │   ├── index.html                # Documentation landing page (manually maintained)
-│   ├── GUIDE.html                # Generated HTML version of GUIDE.md
-│   ├── WALKTHROUGH.html          # Generated HTML version of WALKTHROUGH.md
+│   ├── GUIDE.html                # Renders GUIDE.md in the browser (hand-written sidebar TOC)
+│   ├── WALKTHROUGH.html          # Renders WALKTHROUGH.md in the browser
 │   └── images/                   # Documentation images
 ├── samples/
 │   ├── Gitignore                 # Template .gitignore for Thecore apps
@@ -73,19 +73,21 @@ Generated Thecore applications use:
 gem 'rails_admin'       # Admin UI
 gem 'devise'            # Authentication base
 gem 'cancancan'         # Authorization
-gem 'model_driven_api', '~> 3.1'  # Auto REST API from models
-gem 'thecore_ui_rails_admin', '~> 3.2'  # Admin UI theming/enhancements
+gem 'model_driven_api', '~> 3.13', '>= 3.13.1'  # Auto REST API from models
+gem 'thecore_ui_rails_admin', '~> 3.8', '>= 3.8.7'  # Admin UI theming/enhancements
+gem 'thecore_generators', '~> 3.13', group: :development  # Generators (see the App template)
 ```
 
-### Three-Concern Model Anatomy
+### Model Anatomy
 
-Every model in an ATOM has **three concern files** (fat model via concerns pattern):
+A model gets its default API serialization and admin navigation from `ApplicationRecord` (ADR
+0001): none of these files exists until the model needs to differ.
 
-| Concern | Module | Purpose |
+| File | Module | Purpose |
 |---|---|---|
-| `concerns/api/model_name.rb` | `Api::ModelName` | JSON serialization for REST API |
-| `concerns/rails_admin/model_name.rb` | `RailsAdmin::ModelName` | Admin UI configuration |
-| `concerns/endpoints/model_name.rb` | `Endpoints::ModelName` | Custom non-CRUD actions + OpenAPI docs |
+| `concerns/api/model_name.rb` | `Api::ModelName` | JSON serialization overrides for the REST API |
+| `concerns/rails_admin/model_name.rb` | `RailsAdmin::ModelName` | Admin UI configuration overrides |
+| `app/models/endpoints/model_name.rb` + an initializer | `Endpoints::ModelName` (`< NonCrudEndpoints`) | Custom non-CRUD actions + OpenAPI docs, added with `class_eval` inside `after_initialize` (never `include`) |
 
 ### Docker Services
 
@@ -133,7 +135,7 @@ The REST API is provided by the `model_driven_api` gem and is schema-driven (aut
 - **Authorization:** CanCanCan-based
 - **Filtering:** Ransack predicates; supports pagination and count params
 - **HTTP Status Codes:** 200, 401, 403, 404, 422, 500
-- **Custom Actions:** Non-CRUD endpoints documented with OpenAPI in `Endpoints::ModelName` concern
+- **Custom Actions:** Non-CRUD endpoints documented with OpenAPI on the `Endpoints::ModelName` class (`class_eval` in `after_initialize`, GUIDE §5)
 - **File Uploads:** ActiveStorage via FormData; deletion via `remove_<attribute>` param
 - **Raw SQL:** Simple queries and CTEs supported
 
@@ -164,8 +166,8 @@ See `docs/ACTIONCABLE.md` for Ruby and JavaScript client examples.
 
 ### Thecore Applications (described in docs)
 
-- **GitLab CI:** `docker-deploy.sh` for Docker image builds
-- **GitHub Actions:** Gem publishing for ATOM gems
+- **App CI** (`samples/.gitlab-ci.yml`, `samples/.github/workflows/ci.yml`): build (`app-compile.sh`), test, lint and deploy (`docker-deploy.sh`, reading the committed `vendor/deploytargets/`) on a `version` bump; security scanning on every push and nightly
+- **ATOM CI** (written by `thecore:atom`): `gempush.yml` publishes to RubyGems.org from `release/3`; GitLab's `build_gem` publishes when `lib/*/version.rb` changes
 
 ---
 
@@ -176,7 +178,7 @@ See `docs/ACTIONCABLE.md` for Ruby and JavaScript client examples.
 1. Edit files in `docs/` directory
 2. Update `docs/SUMMARY.md` if adding/removing files
 3. Update `docs/index.html` manually if the landing page needs changes (it is NOT auto-generated from markdown)
-4. HTML versions (`GUIDE.html`, `WALKTHROUGH.html`) are generated separately — update markdown source; HTML may need manual regeneration
+4. HTML versions (`GUIDE.html`, `WALKTHROUGH.html`) are not generated: they `fetch` the markdown file and render it in the browser (`marked`), so a markdown change shows there as is. Only `GUIDE.html`'s sidebar table of contents is hand-written: update it when you add, remove or renumber a `GUIDE.md` section
 
 ### Branch & PR Conventions
 

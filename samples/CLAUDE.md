@@ -27,8 +27,11 @@ Every change to an ATOM (a `thecore_*` base gem or one of this app's own engines
 around from this app:
 
 1. Edit and test in the submodule.
-2. Bump its version and push to its `release/3`, which publishes it: to RubyGems.org, or to the
-   private gem server its gemspec's `allowed_push_host` names.
+2. Bump its version (`lib/<name>/version.rb`) and push to its `release/3`, which publishes it.
+   On GitHub, `.github/workflows/gempush.yml` tags the version and pushes it to RubyGems.org; on
+   GitLab, the `build_gem` job runs only when `lib/*/version.rb` changes and pushes to the
+   private gem server in `GITLAB_GEM_REPO_TARGET` (RubyGems.org when it's unset). The gemspec's
+   `allowed_push_host` names that same server.
 3. Wait until the new version is on the gem server.
 4. Run `bundle update <gem> --conservative` here.
 5. Commit the new `Gemfile.lock` together with the moved submodule pointer.
@@ -37,7 +40,9 @@ An ATOM not cloned here yet is added first as a submodule on its release branch:
 `git submodule add -b release/3 <git url> vendor/submodules/<name>`, committed with the change that
 needed it. A new ATOM (`rails generate thecore:atom NAME`) starts as a `path:` entry in the
 `Gemfile`; once its first version is published, replace that entry with the published gem and its
-version constraint, so this app builds from the gem server like every other ATOM.
+version constraint (inside the `source "https://<server>/" do ... end` block for a private gem
+server), so this app builds from the gem server like every other ATOM. `thecore:atom` publishes to
+RubyGems.org unless you pass `--gem-host=<server host>`.
 
 ## Key domain models
 
@@ -122,7 +127,9 @@ sequence based on the situation.
 
 ## Code conventions
 
-- Follow RuboCop (`rubocop` + `rubocop-rails`). Run `bundle exec rubocop` before committing.
+- Follow RuboCop. `rails new` set it up with `rubocop-rails-omakase` (`.rubocop.yml` inherits
+  Rails' omakase rules; add this app's own cops there). Run `bundle exec rubocop` before
+  committing; the CI `lint` job runs the same.
 - Model concerns follow the naming pattern `Api::ModelName` and `RailsAdmin::ModelName` — see
   `docs/GUIDE.md` §1/§5 in the thecore repo for when a concern is needed at all (the default,
   concern-less case is correct for most models).
@@ -137,13 +144,28 @@ sequence based on the situation.
   `ThecoreSettings::Setting.find_by(ns: ..., key: ...)&.raw`, plus a fallback for a blank value. The
   `Settings.ns(...)` DSL memoizes a namespace for the life of the process, so a running Puma or
   Sidekiq worker keeps the old value after an admin edits it in RailsAdmin.
-- **No background job is ever retried.** `thecore_backend_commons` sets Sidekiq's default to
-  `retry: false` app-wide (mailer jobs included) and registers a death handler that records each
-  failed job (class, queue, jid, error, never its arguments) in the Rails log. A failure is fixed
-  and the job run again, or left to the next scheduled run. To record failures somewhere else too,
-  add your own handler to `config.death_handlers` next to the default. Retries of a job that keeps
-  failing (a mail with a large PDF refused by the SMTP server) fill Redis until the host runs out of
-  memory.
+- **Background jobs are not retried.** From `thecore_backend_commons` 3.10 (raise this app's
+  `Gemfile` floor to `>= 3.10` once it is on RubyGems; older versions keep Sidekiq's default of 25
+  retries), Sidekiq's default is `retry: false` app-wide, mailer jobs included: a failed job runs
+  once and is kept neither in the retry set nor in the Dead Set. Only the latest failed job stays
+  in Redis (the `failed` set of `sidekiq-failures`, capped at 1), visible in the Sidekiq web UI's
+  Failures tab. A death handler writes every failure to the Rails log: job class (or
+  `Mailer#action`), queue, jid and error, never the arguments. A failure is fixed and the job run
+  again, or left to the next scheduled run. Why: retries of jobs that keep failing (mails carrying
+  a whole PDF, refused by the SMTP server) once filled a production Redis to 23 GB.
+  - An installation changes the defaults with `THECORE_JOB_RETRIES` (retries, default `0`) and
+    `THECORE_FAILED_JOBS_KEPT` (failed jobs kept, default `1`) in the environment of both
+    `backend` and `worker` (its `vendor/deploytargets/<provider>/<customer>.env`). Any value that
+    isn't a whole number in range stops the app at boot.
+  - One job sets its own count with Sidekiq's `sidekiq_options retry: 3` (or `retry: false`),
+    which wins over the app-wide value. **Don't use ActiveJob's `retry_on`**: it retries
+    independently of Sidekiq, enqueuing a new copy with all its arguments whatever
+    `THECORE_JOB_RETRIES` says.
+  - To record failures somewhere else too, add your own handler to `config.death_handlers` in a
+    `Sidekiq.configure_server` block, next to the default one; both run. A handler class must be
+    `require`d explicitly in that initializer: autoloaded constants aren't available to
+    initializers, and `configure_server` runs only in the Sidekiq process, so a mistake there
+    crashes the worker at boot while the web app and the tests stay green.
 - `perform_later`/`deliver_later` arguments must be ActiveJob-serializable: records (passed by
   GlobalID) or JSON-safe primitives. In production they round-trip through JSON to reach Redis, so
   binary data (PDF bytes, images) is passed `Base64.strict_encode64`-encoded and decoded in the job
