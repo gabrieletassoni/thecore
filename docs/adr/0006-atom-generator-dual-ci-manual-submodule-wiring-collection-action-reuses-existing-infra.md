@@ -39,3 +39,14 @@ Tickets filed under `/to-tickets` for this ADR's scope:
 - Only generate the CI file matching whichever host the developer says they'll use — rejected: would need the same rejected hosting-profile prompt just to decide file selection, adding interactive friction to avoid a cost (one unused, inert CI file) that isn't actually harmful.
 - Have the generator create the remote repository and run `git submodule add` automatically — rejected: an irreversible, auth-dependent, cross-boundary action; matches this gem's existing convention (the Migration generator's cross-ATOM dependency wiring) of logging exactly what a human needs to run rather than performing it un-confirmed on their behalf.
 - Have the Collection Action generator's starter template match the real hand-written `save_filters.rb`/`load_filters.rb` pattern (GET+POST, redirect, persistence) — rejected: that's a specific, non-generic business feature, not a good minimal starting point. Root Action's simpler GET/JSON/`ActionCable`-broadcast shape is already this gem's established "minimal working example" convention.
+
+## Amendment (thecore_devcontainer#14)
+
+The hardcoded `allowed_push_host` is replaced by a `--gem-host=HOST` option (default
+`rubygems.org`), still with no prompt and no host named in the gem. It isn't a hosting profile: the
+two CI files are still both generated, and the option only names the gem server, setting the
+gemspec's `allowed_push_host` and the GitLab CI's push target to the same host. A fixed
+`allowed_push_host` made the GitLab path unusable for any private server (`gem push` refuses a host
+other than the one it names), so every such ATOM needed the same manual fix. Both CI files now
+publish like the real ATOMs: only from `release/3` (GitHub), only on a version change (GitLab), and
+the GitLab one runs SAST, Secret Detection and a summary of their findings.
