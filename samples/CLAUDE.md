@@ -144,9 +144,9 @@ sequence based on the situation.
   `ThecoreSettings::Setting.find_by(ns: ..., key: ...)&.raw`, plus a fallback for a blank value. The
   `Settings.ns(...)` DSL memoizes a namespace for the life of the process, so a running Puma or
   Sidekiq worker keeps the old value after an admin edits it in RailsAdmin.
-- **Background jobs are not retried.** From `thecore_backend_commons` 3.10 (raise this app's
-  `Gemfile` floor to `>= 3.10` once it is on RubyGems; older versions keep Sidekiq's default of 25
-  retries), Sidekiq's default is `retry: false` app-wide, mailer jobs included: a failed job runs
+- **Background jobs are not retried.** The App template requires `thecore_backend_commons >= 3.10`
+  (keep that `Gemfile` floor: older versions keep Sidekiq's default of 25 retries), whose
+  Sidekiq default is `retry: false` app-wide, mailer jobs included: a failed job runs
   once and is kept neither in the retry set nor in the Dead Set. Only the latest failed job stays
   in Redis (the `failed` set of `sidekiq-failures`, capped at 1), visible in the Sidekiq web UI's
   Failures tab. A death handler writes every failure to the Rails log: job class (or
