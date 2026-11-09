@@ -206,7 +206,9 @@ my_app/
 ├── .devcontainer/             ← from samples/devcontainer/ (via the App template)
 ├── .github/workflows/ci.yml   ← from samples/.github/workflows/ci.yml (via the App template)
 ├── .gitlab-ci.yml             ← from samples/.gitlab-ci.yml (via the App template)
+├── AGENTS.md                  ← from samples/AGENTS.md (via the App template)
 ├── CLAUDE.md                  ← from samples/CLAUDE.md (via the App template)
+├── docs/agents/               ← from samples/docs/agents/ (via the App template)
 ├── app/
 │   ├── models/
 │   │   └── concerns/          ← app-level model concerns
@@ -266,8 +268,8 @@ rails new myapp --database=postgresql --asset-pipeline=sprockets \
    purpose comment — discoverable but off by default, uncomment only what the app needs.
 3. Creates empty `vendor/submodules/`/`vendor/external/` placeholder directories (a `.keep` file
    each) — developer-convenience clone locations, not pre-wired with any submodule or gem.
-4. Fetches `.devcontainer/*`, **both** `.gitlab-ci.yml` and `.github/workflows/ci.yml`, and
-   `CLAUDE.md` from this repo's own `samples/` — the six `.devcontainer/*` files overwrite
+4. Fetches `.devcontainer/*`, **both** `.gitlab-ci.yml` and `.github/workflows/ci.yml`,
+   `CLAUDE.md`, `AGENTS.md` and `docs/agents/` from this repo's own `samples/` — the six `.devcontainer/*` files overwrite
    whatever "Setup Devcontainer" created (that command itself never touches the CI files or
    `CLAUDE.md`, so those are written fresh, not overwrites of anything it produced). Both CI
    files are fetched unconditionally, no prompt: which git host a developer ends up pushing to
@@ -301,7 +303,10 @@ myapp/
 │                                    commented mounts, postCreateCommand chain)
 ├── .github/workflows/ci.yml      ← from samples/.github/workflows/ci.yml
 ├── .gitlab-ci.yml                ← from samples/.gitlab-ci.yml
+├── AGENTS.md                     ← from samples/AGENTS.md (points to CLAUDE.md)
 ├── CLAUDE.md                     ← from samples/CLAUDE.md (universal sections + TODOs)
+├── docs/agents/                  ← from samples/docs/agents/ (issue tracker picked from the
+│                                    git remote: GitHub or GitLab Issues; triage labels; domain)
 ├── Gemfile                       ← core stack active, rest of the ecosystem commented
 └── vendor/
     ├── submodules/.keep          ← empty; clone real ATOMs here

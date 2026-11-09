@@ -124,7 +124,9 @@ fleet_app/
 ├── .devcontainer/                ← from the App template's samples/devcontainer/ fetch
 ├── .github/workflows/ci.yml      ← from the App template's samples/ fetch
 ├── .gitlab-ci.yml                ← from the App template's samples/ fetch
+├── AGENTS.md                     ← from the App template's samples/ fetch (points to CLAUDE.md)
 ├── CLAUDE.md                     ← from the App template's samples/ fetch
+├── docs/agents/                  ← from the App template's samples/ fetch (tracker, labels, domain)
 ├── app/
 │   ├── models/
 │   │   └── concerns/            ← app-level concerns (empty for now)
