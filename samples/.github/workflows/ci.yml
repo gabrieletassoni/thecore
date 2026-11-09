@@ -51,14 +51,33 @@ jobs:
       - *cache_step
       - run: sudo -E /usr/bin/app-compile.sh
 
+  # Tests run against a throwaway Postgres service, the same image as the
+  # devcontainer's `db`, reachable from the job container by its service name.
+  # DATABASE_URL names only the server, so the database is config/database.yml's
+  # test one, `<app>_test` -- the same name the app's test/test_helper.rb forces
+  # whenever DATABASE_URL is set. `rails test` doesn't create a missing database,
+  # so db:test:prepare creates it and loads the schema.
   test:
     if: github.event_name == 'push'
     needs: build
     runs-on: ubuntu-latest
     container: *devcontainer
+    services:
+      db:
+        image: postgres:15-bookworm
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: postgres://postgres:postgres@db:5432
     steps:
       - uses: actions/checkout@v4
       - *cache_step
+      - run: bundle exec rails db:test:prepare
       - run: bundle exec rails test
 
   lint:
