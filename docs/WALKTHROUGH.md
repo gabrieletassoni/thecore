@@ -190,6 +190,7 @@ Illustrative, not a verbatim capture — Thor logs more status lines per action 
       create    .devcontainer/link-host-home.sh          (new — Setup Devcontainer doesn't make this one)
       create    .devcontainer/check-plugins.sh            (new — Setup Devcontainer doesn't make this one)
       create    .devcontainer/heal-stale-containers.sh
+      create    .devcontainer/github-accounts.sh
       create    .gitlab-ci.yml
       create    .github/workflows/ci.yml
       create    CLAUDE.md
