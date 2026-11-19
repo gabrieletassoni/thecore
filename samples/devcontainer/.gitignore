@@ -1,0 +1,2 @@
+# Per host, written by docker-socket-gid.sh (initializeCommand): never commit it
+/.env

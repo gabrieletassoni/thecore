@@ -16,7 +16,10 @@
 	//    longer exists (a pruned network, a Docker upgrade), which otherwise
 	//    fails every start with "network <id> not found". Volumes are kept. See
 	//    the script's header.
-	"initializeCommand": "mkdir -p \"${localEnv:HOME}/.bundle\" \"${localEnv:HOME}/.gem\" \"${localEnv:HOME}/.claude\" && { [ -e \"${localEnv:HOME}/.claude.json\" ] || echo '{}' > \"${localEnv:HOME}/.claude.json\"; } && bash .devcontainer/heal-stale-containers.sh '${localWorkspaceFolder}'",
+	// 3. Writes the host's docker.sock group id to .devcontainer/.env, which
+	//    docker-compose.yml adds to the app container (group_add), so vscode
+	//    can use Docker without sudo. See docker-socket-gid.sh.
+	"initializeCommand": "mkdir -p \"${localEnv:HOME}/.bundle\" \"${localEnv:HOME}/.gem\" \"${localEnv:HOME}/.claude\" && { [ -e \"${localEnv:HOME}/.claude.json\" ] || echo '{}' > \"${localEnv:HOME}/.claude.json\"; } && bash .devcontainer/heal-stale-containers.sh '${localWorkspaceFolder}' && bash .devcontainer/docker-socket-gid.sh",
 
 	"customizations": {
 		"vscode": {

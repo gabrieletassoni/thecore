@@ -134,6 +134,8 @@ The "Add a ..." commands and Check Practices work on the ATOM when you right-cli
   create-db-user.sql           ← run by the db service on its first start
   backend.code-workspace       ← VS Code workspace file
   heal-stale-containers.sh     ← run on the host by initializeCommand
+  docker-socket-gid.sh         ← run on the host by initializeCommand (Docker without sudo)
+  .gitignore                   ← keeps .env (the host's docker.sock gid) out of git
   link-host-home.sh            ← run by postCreateCommand
   github-accounts.sh           ← run by postCreateCommand
   check-plugins.sh             ← run by postCreateCommand
@@ -142,13 +144,13 @@ The "Add a ..." commands and Check Practices work on the ATOM when you right-cli
 
 The files are the extension's bundled templates, which carry the same content as this repository's [`samples/devcontainer/`](SETUP_VSCODE.md#reference-samples). Only two things differ: the project name you typed (the container name, and the database name in `DATABASE_URL`) and the workspace folder, `/workspaces/project/backend` (the samples use `/workspaces/app`).
 
-- **`initializeCommand`** runs on the host before `docker compose up`. It creates the host paths of the active bind mounts when missing (`~/.claude`, `~/.bundle`, `~/.gem` as directories, `~/.claude.json` as `{}`; an existing file is never touched), so a fresh machine never fails on a missing mount source. Then `heal-stale-containers.sh` removes this project's containers when the network they point at was deleted (a `docker network prune`, a Docker upgrade), so compose recreates them; volumes are kept.
+- **`initializeCommand`** runs on the host before `docker compose up`. It creates the host paths of the active bind mounts when missing (`~/.claude`, `~/.bundle`, `~/.gem` as directories, `~/.claude.json` as `{}`; an existing file is never touched), so a fresh machine never fails on a missing mount source. Then `heal-stale-containers.sh` removes this project's containers when the network they point at was deleted (a `docker network prune`, a Docker upgrade), so compose recreates them; volumes are kept. Last, `docker-socket-gid.sh` writes the host's `docker.sock` group id to `.devcontainer/.env` (gitignored), and `docker-compose.yml` adds it to the app container with `group_add`, so `docker` works as `vscode` without `sudo` (the socket keeps the host's gid, which rarely matches the image's `docker` group; the fallback is 996). It takes effect when the container is created: rebuild it after reinstalling Docker on the host.
 - **Mounts**: `~/.claude`, `~/.claude.json` (Claude Code's login and plugins), `~/.bundle` and `~/.gem` (gem server credentials) are active. The `gh` and `glab` config mounts are commented out: uncomment the one whose CLI you already logged into on the host, and add its path to `initializeCommand`'s `mkdir -p`. A `gh` token kept in the host's system keyring isn't readable from the container: log in on the host with `gh auth login --insecure-storage` to use it there.
 - **`postCreateCommand`**: `sudo chown -R vscode:vscode /usr/local/bundle`, `bundle update`, then `link-host-home.sh` (aliases `/home/<host user>` to `/home/vscode`, so the absolute paths in Claude Code's plugin registry resolve), `github-accounts.sh` (with several GitHub accounts, git uses the forwarded SSH key of the account that owns each remote) and `check-plugins.sh` (warns, without failing, when the `mattpocock-skills` plugin isn't installed on the host). It never runs a bare `bundle update --bundler` or `bundle update --all`: bare `--bundler` can write a prerelease Bundler into `Gemfile.lock`.
 
 **The "scaffold out of date" message.** Every new shell in the dev image runs `thecore-motd.sh`. It reads `.devcontainer/.thecore-template-version` of the app mounted under `/workspaces/*/` or `/workspaces/*/*/` (so both `/workspaces/app` and `/workspaces/project/backend` are found) and compares it with the extension version the image was built with (`/etc/thecore/thecore-version.txt`). When the scaffold is older, it prints a yellow warning suggesting you regenerate `.devcontainer/`. Facts to keep in mind:
 
-- Only "Setup Devcontainer" writes the marker. The App template ([§3.2.1](#321-the-app-application-template-rails-new--m)) rewrites eight of the files with the `thecore` samples but leaves the marker alone: after "Create an App" the marker still holds the version of the extension that ran Step 1, not the origin of the files. An app made with the bare App template, without "Setup Devcontainer", has no marker and never gets the message.
+- Only "Setup Devcontainer" writes the marker. The App template ([§3.2.1](#321-the-app-application-template-rails-new--m)) rewrites ten of the files with the `thecore` samples but leaves the marker alone: after "Create an App" the marker still holds the version of the extension that ran Step 1, not the origin of the files. An app made with the bare App template, without "Setup Devcontainer", has no marker and never gets the message.
 - To act on the warning, compare your `.devcontainer/` with the current [`samples/devcontainer/`](../samples/devcontainer/) (your app uses the samples' layout after "Create an App") and copy what changed, or move `.devcontainer/` away and run "Setup Devcontainer" again (you get the extension's layout, `/workspaces/project/backend`). Then write the image's version into the marker to silence the message: `cp /etc/thecore/thecore-version.txt .devcontainer/.thecore-template-version`.
 
 **Example workflow:**
@@ -216,7 +218,7 @@ are one implementation, not two. Missing `--name` exits `1` with a usage error o
 
 ```
 my_app/
-├── .devcontainer/             ← eight files from samples/devcontainer/ (via the App template),
+├── .devcontainer/             ← ten files from samples/devcontainer/ (via the App template),
 │                                 plus "Setup Devcontainer"'s backend.code-workspace and marker
 ├── .github/workflows/         ← ci.yml and security.yml from samples/ (via the App template)
 ├── .gitlab-ci.yml             ← from samples/.gitlab-ci.yml (via the App template)
@@ -271,7 +273,7 @@ template underneath (thecore_code_extension#41). A genuine Rails application tem
 **When to use:** as an alternative to "Thecore 3: Create an App" above, from any terminal with
 Ruby/Rails available — no VS Code, no extension required. Run it inside the devcontainer already
 created by "Setup Devcontainer" ([§3.1](#31-setup-the-devcontainer)) — it doesn't invoke or
-modify that bootstrap step's own code, but it does overwrite eight of the devcontainer files that
+modify that bootstrap step's own code, but it does overwrite ten of the devcontainer files that
 step created with the versions this repo maintains in
 [`samples/`](SETUP_VSCODE.md#reference-samples): the same content, apart from the container
 name, the database name and the workspace folder (`/workspaces/app`).
@@ -303,14 +305,14 @@ rails new myapp --database=postgresql --asset-pipeline=sprockets \
    keeping Rails' one would build the production image with it instead of the Thecore Dockerfile.
    `.dockerignore` is kept (the Thecore Dockerfile's `ADD .` honours it); "Create an App" removes
    it afterwards.
-5. Fetches from this repo's own `samples/`: eight `.devcontainer/*` files (`devcontainer.json`,
+5. Fetches from this repo's own `samples/`: ten `.devcontainer/*` files (`devcontainer.json`,
    `docker-compose.yml`, `Dockerfile`, `create-db-user.sql`, `link-host-home.sh`,
-   `check-plugins.sh`, `heal-stale-containers.sh`, `github-accounts.sh`, the four scripts made
-   executable), **both** `.gitlab-ci.yml` and `.github/workflows/ci.yml` (plus
+   `check-plugins.sh`, `heal-stale-containers.sh`, `github-accounts.sh`, `docker-socket-gid.sh`,
+   the five scripts made executable, and `.gitignore`), **both** `.gitlab-ci.yml` and `.github/workflows/ci.yml` (plus
    `.github/workflows/security.yml`, `script/security_summary.rb` and its test
    `test/script/security_summary_test.rb`), `CLAUDE.md`, `AGENTS.md` and
    `docs/agents/{issue-tracker,triage-labels,domain}.md`. Every file is written unconditionally:
-   the eight `.devcontainer/*` files overwrite what "Setup Devcontainer" wrote, while
+   the ten `.devcontainer/*` files overwrite what "Setup Devcontainer" wrote, while
    `backend.code-workspace` and `.thecore-template-version`, which it also wrote, are left as they
    are (see [§3.1](#31-setup-the-devcontainer) for the motd marker). A failed fetch aborts the
    template; `THECORE_SAMPLES_SOURCE` (a URL or a local folder) overrides the default source,
@@ -363,7 +365,7 @@ Rails' omakase rules; add your own cops to `.rubocop.yml`. `rails plugin new`, w
 
 ```
 myapp/
-├── .devcontainer/                ← eight files from samples/devcontainer/ (active mounts,
+├── .devcontainer/                ← ten files from samples/devcontainer/ (active mounts,
 │                                    gh/glab mounts commented, initializeCommand,
 │                                    postCreateCommand chain)
 ├── .github/workflows/ci.yml      ← from samples/.github/workflows/ci.yml

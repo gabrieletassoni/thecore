@@ -74,6 +74,8 @@ fleet_app/
     ├── create-db-user.sql           ← run by the db service on its first start
     ├── backend.code-workspace       ← a VS Code workspace file for the app
     ├── heal-stale-containers.sh     ← run on the host by initializeCommand
+    ├── docker-socket-gid.sh         ← run on the host by initializeCommand (Docker without sudo)
+    ├── .gitignore                   ← keeps .env (the host's docker.sock gid) out of git
     ├── link-host-home.sh            ← run by postCreateCommand (Claude Code plugin paths)
     ├── github-accounts.sh           ← run by postCreateCommand (one SSH key per GitHub account)
     ├── check-plugins.sh             ← run by postCreateCommand (warns if the skills plugin is missing)
@@ -89,7 +91,10 @@ What these files do when the container starts:
   the active bind mounts when they are missing (`~/.claude`, `~/.bundle`, `~/.gem` as directories,
   `~/.claude.json` as `{}`), so a fresh machine never fails on a missing mount source. Then it runs
   `heal-stale-containers.sh`, which removes this project's containers when the Docker network they
-  point at was deleted (a `docker network prune`, a Docker upgrade); volumes are kept.
+  point at was deleted (a `docker network prune`, a Docker upgrade); volumes are kept. Last,
+  `docker-socket-gid.sh` writes the host's `docker.sock` group id to `.devcontainer/.env`
+  (gitignored), which `docker-compose.yml` adds to the app container (`group_add`): `docker` works
+  as `vscode` without `sudo`. Rebuild the container after reinstalling Docker on the host.
 - The `~/.claude`, `~/.claude.json`, `~/.bundle` and `~/.gem` mounts are active, so Claude Code's
   login and plugins and your gem credentials work inside the container without editing JSON. The
   `gh` and `glab` config mounts are commented out: uncomment one (and add its path to
@@ -163,13 +168,13 @@ bin/rails db:create db:migrate thecore:db:seed
 ```
 
 `backend.code-workspace` and `.thecore-template-version` are left as Step 1 wrote them: the
-template only writes the eight files it fetches.
+template only writes the ten files it fetches.
 
 **What you now have:**
 
 ```
 fleet_app/
-├── .devcontainer/                ← eight files from the App template's samples/devcontainer/ fetch,
+├── .devcontainer/                ← ten files from the App template's samples/devcontainer/ fetch,
 │                                    plus Step 1's backend.code-workspace and marker
 ├── .github/workflows/            ← ci.yml and security.yml, from the App template's samples/ fetch
 ├── .gitlab-ci.yml                ← from the App template's samples/ fetch (with the security jobs)
@@ -221,8 +226,8 @@ rails new fleet_app --database=postgresql --asset-pipeline=sprockets \
 
 Illustrative, not a verbatim capture — Thor logs more status lines per action than shown here
 (`route`, an extra line per `generate` call) and some are abbreviated with `...`. Run inside the
-Step 1 devcontainer, the eight `.devcontainer/*` files already exist: the two that differ from the
-samples are overwritten (`force`), the six that are byte-identical are left alone (`identical`):
+Step 1 devcontainer, the ten `.devcontainer/*` files already exist: the two that differ from the
+samples are overwritten (`force`), the eight that are byte-identical are left alone (`identical`):
 
 ```
       create  Gemfile
@@ -257,6 +262,8 @@ samples are overwritten (`force`), the six that are byte-identical are left alon
    identical    .devcontainer/check-plugins.sh
    identical    .devcontainer/heal-stale-containers.sh
    identical    .devcontainer/github-accounts.sh
+   identical    .devcontainer/docker-socket-gid.sh
+   identical    .devcontainer/.gitignore
        chmod    .devcontainer/link-host-home.sh
        ...
       create    .gitlab-ci.yml
