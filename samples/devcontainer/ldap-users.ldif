@@ -1,0 +1,15 @@
+# Test directory for the system tests (ADR 0010 in the thecore repo): loaded by the `ldap` service
+# at its first start, on top of the dc=example,dc=com base that LDAP_DOMAIN creates. Test-only
+# credentials; this server never holds real users.
+dn: ou=people,dc=example,dc=com
+objectClass: organizationalUnit
+ou: people
+
+dn: uid=ldap.user,ou=people,dc=example,dc=com
+objectClass: inetOrgPerson
+uid: ldap.user
+cn: Ldap User
+givenName: Ldap
+sn: User
+mail: ldap.user@example.com
+userPassword: LdapPassword123!

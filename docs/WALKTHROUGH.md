@@ -144,7 +144,7 @@ this one) for the bulk of the work, then adds app-specific runtime config of its
 | Step | What happens |
 |---|---|
 | Pre-flight checks | Verifies that a folder is open and that at most one folder is open in the window (it does not check that the folder is empty: the `.devcontainer/` from Step 1 is expected), that `ruby`, `rails` and `bundle` are available, and that the folder isn't already a Rails app (if it is, the command stops without a message) |
-| App application template | `rails new . --database=postgresql --asset-pipeline=sprockets --skip-git -m <app_template.rb URL>`, non-interactive, installers always run — see the box below for everything this one call does: the Gemfile stack with its security floors (**`thecore_generators` itself** included), Rails' root `Dockerfile` and `bin/docker-entrypoint` removed, the eight `.devcontainer/*` files rewritten from the `thecore` samples, `.gitlab-ci.yml`, `.github/workflows/ci.yml` and `security.yml`, `script/security_summary.rb` and its test, `CLAUDE.md`, `AGENTS.md`, `docs/agents/`, the test-database rule in `test/test_helper.rb`, `vendor/submodules/`/`vendor/external/`, and the full installer chain (`devise:install`, `rails_admin:install`, `active_storage:install`, `action_text:install`, `action_mailbox:install`, `cancan:ability`, `erd:install`) |
+| App application template | `rails new . --database=postgresql --asset-pipeline=sprockets --skip-git -m <app_template.rb URL>`, non-interactive, installers always run — see the box below for everything this one call does: the Gemfile stack with its security floors (**`thecore_generators` itself** included), Rails' root `Dockerfile` and `bin/docker-entrypoint` removed, the eleven `.devcontainer/*` files rewritten from the `thecore` samples, the system test case and its smoke test, `.gitlab-ci.yml`, `.github/workflows/ci.yml` and `security.yml`, `script/security_summary.rb` and its test, `CLAUDE.md`, `AGENTS.md`, `docs/agents/`, the test-database rule in `test/test_helper.rb`, `vendor/submodules/`/`vendor/external/`, and the full installer chain (`devise:install`, `rails_admin:install`, `active_storage:install`, `action_text:install`, `action_mailbox:install`, `cancan:ability`, `erd:install`) |
 | `.gitignore` | Overwrites the default Rails gitignore with a comprehensive Thecore-specific one — the template doesn't touch this file |
 | Sidekiq | Creates `config/sidekiq.yml` with dynamic queue configuration |
 | Version file | Creates `version` containing `3.0.1` |
@@ -168,13 +168,13 @@ bin/rails db:create db:migrate thecore:db:seed
 ```
 
 `backend.code-workspace` and `.thecore-template-version` are left as Step 1 wrote them: the
-template only writes the ten files it fetches.
+template only writes the eleven files it fetches.
 
 **What you now have:**
 
 ```
 fleet_app/
-├── .devcontainer/                ← ten files from the App template's samples/devcontainer/ fetch,
+├── .devcontainer/                ← eleven files from the App template's samples/devcontainer/ fetch,
 │                                    plus Step 1's backend.code-workspace and marker
 ├── .github/workflows/            ← ci.yml and security.yml, from the App template's samples/ fetch
 ├── .gitlab-ci.yml                ← from the App template's samples/ fetch (with the security jobs)
@@ -226,8 +226,8 @@ rails new fleet_app --database=postgresql --asset-pipeline=sprockets \
 
 Illustrative, not a verbatim capture — Thor logs more status lines per action than shown here
 (`route`, an extra line per `generate` call) and some are abbreviated with `...`. Run inside the
-Step 1 devcontainer, the ten `.devcontainer/*` files already exist: the two that differ from the
-samples are overwritten (`force`), the eight that are byte-identical are left alone (`identical`):
+Step 1 devcontainer, the eleven `.devcontainer/*` files already exist: the two that differ from the
+samples are overwritten (`force`), the nine that are byte-identical are left alone (`identical`):
 
 ```
       create  Gemfile
@@ -264,6 +264,7 @@ samples are overwritten (`force`), the eight that are byte-identical are left al
    identical    .devcontainer/github-accounts.sh
    identical    .devcontainer/docker-socket-gid.sh
    identical    .devcontainer/.gitignore
+   identical    .devcontainer/ldap-users.ldif
        chmod    .devcontainer/link-host-home.sh
        ...
       create    .gitlab-ci.yml
@@ -271,6 +272,8 @@ samples are overwritten (`force`), the eight that are byte-identical are left al
       create    .github/workflows/security.yml
       create    script/security_summary.rb
       create    test/script/security_summary_test.rb
+      create    test/application_system_test_case.rb
+      create    test/system/sign_in_test.rb
       create    CLAUDE.md
       create    AGENTS.md
       create    docs/agents/issue-tracker.md

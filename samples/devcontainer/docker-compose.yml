@@ -29,6 +29,8 @@ services:
       DATABASE_URL: postgres://postgres:postgres@db:5432/app_dev?pool=5
       RAILS_ENV: development
       SECRET_KEY_BASE: dummy
+      # System tests (bin/rails test:system) drive this remote browser (ADR 0010).
+      SELENIUM_URL: http://selenium:4444
 
     # Run all container processes as the non-root dev user. Without this the
     # container's default user is root (the Dockerfile ends on `USER root`),
@@ -73,6 +75,25 @@ services:
 
     # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
+
+  # Browser for the system tests, which run on demand only (ADR 0010). The app under test
+  # listens on 0.0.0.0 and the browser reaches it by the app container's hostname.
+  selenium:
+    # Keep it on the selenium-webdriver release in Gemfile.lock.
+    image: selenium/standalone-chromium:4.54.0
+    shm_size: 2gb
+
+  # Test LDAP server for the LdapServer system tests: dc=example,dc=com, admin
+  # cn=admin,dc=example,dc=com / admin, plus the users in ldap-users.ldif (loaded at the first start;
+  # --copy-service because the mounted file is read-only). Test-only credentials.
+  ldap:
+    image: osixia/openldap:1.5.0
+    command: --copy-service
+    environment:
+      LDAP_DOMAIN: example.com
+      LDAP_ADMIN_PASSWORD: admin
+    volumes:
+      - ./ldap-users.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/50-users.ldif:ro
 
 volumes:
   postgres-data:

@@ -188,8 +188,12 @@ bundle exec rails server
 # Run migrations
 bundle exec rails db:migrate
 
-# Run tests
+# Run tests (CI's set; skips test/system)
 bundle exec rails test
+
+# Browser system tests, on demand only: the devcontainer's `selenium` and `ldap` services
+# (ADR 0010 in the thecore repo)
+bin/rails test:system
 
 # RuboCop
 bundle exec rubocop

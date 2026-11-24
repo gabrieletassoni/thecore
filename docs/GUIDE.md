@@ -218,7 +218,7 @@ are one implementation, not two. Missing `--name` exits `1` with a usage error o
 
 ```
 my_app/
-├── .devcontainer/             ← ten files from samples/devcontainer/ (via the App template),
+├── .devcontainer/             ← eleven files from samples/devcontainer/ (via the App template),
 │                                 plus "Setup Devcontainer"'s backend.code-workspace and marker
 ├── .github/workflows/         ← ci.yml and security.yml from samples/ (via the App template)
 ├── .gitlab-ci.yml             ← from samples/.gitlab-ci.yml (via the App template)
@@ -305,14 +305,16 @@ rails new myapp --database=postgresql --asset-pipeline=sprockets \
    keeping Rails' one would build the production image with it instead of the Thecore Dockerfile.
    `.dockerignore` is kept (the Thecore Dockerfile's `ADD .` honours it); "Create an App" removes
    it afterwards.
-5. Fetches from this repo's own `samples/`: ten `.devcontainer/*` files (`devcontainer.json`,
+5. Fetches from this repo's own `samples/`: eleven `.devcontainer/*` files (`devcontainer.json`,
    `docker-compose.yml`, `Dockerfile`, `create-db-user.sql`, `link-host-home.sh`,
    `check-plugins.sh`, `heal-stale-containers.sh`, `github-accounts.sh`, `docker-socket-gid.sh`,
-   the five scripts made executable, and `.gitignore`), **both** `.gitlab-ci.yml` and `.github/workflows/ci.yml` (plus
+   the five scripts made executable, `.gitignore` and `ldap-users.ldif`, the test LDAP server's
+   user), `test/application_system_test_case.rb` and `test/system/sign_in_test.rb` (on-demand
+   system tests against the devcontainer's `selenium` and `ldap` services, ADR 0010), **both** `.gitlab-ci.yml` and `.github/workflows/ci.yml` (plus
    `.github/workflows/security.yml`, `script/security_summary.rb` and its test
    `test/script/security_summary_test.rb`), `CLAUDE.md`, `AGENTS.md` and
    `docs/agents/{issue-tracker,triage-labels,domain}.md`. Every file is written unconditionally:
-   the ten `.devcontainer/*` files overwrite what "Setup Devcontainer" wrote, while
+   the eleven `.devcontainer/*` files overwrite what "Setup Devcontainer" wrote, while
    `backend.code-workspace` and `.thecore-template-version`, which it also wrote, are left as they
    are (see [§3.1](#31-setup-the-devcontainer) for the motd marker). A failed fetch aborts the
    template; `THECORE_SAMPLES_SOURCE` (a URL or a local folder) overrides the default source,
@@ -365,7 +367,7 @@ Rails' omakase rules; add your own cops to `.rubocop.yml`. `rails plugin new`, w
 
 ```
 myapp/
-├── .devcontainer/                ← ten files from samples/devcontainer/ (active mounts,
+├── .devcontainer/                ← eleven files from samples/devcontainer/ (active mounts,
 │                                    gh/glab mounts commented, initializeCommand,
 │                                    postCreateCommand chain)
 ├── .github/workflows/ci.yml      ← from samples/.github/workflows/ci.yml

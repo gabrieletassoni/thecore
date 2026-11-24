@@ -35,12 +35,14 @@ thecore/
 │   ├── .gitlab-ci.yml            # App CI: build/test/lint/deploy + security scanning (SAST, Secret Detection, brakeman, bundler-audit, security-summary)
 │   ├── .github/workflows/        # ci.yml (build/test/lint/deploy), security.yml (brakeman, bundler-audit, nightly)
 │   ├── script/security_summary.rb # Lists GitLab CE SAST/Secret Detection findings; tested by test/script/security_summary_test.rb
+│   ├── test/application_system_test_case.rb, test/system/sign_in_test.rb # On-demand system tests (ADR 0010)
 │   ├── sample_swagger.json       # Full OpenAPI/Swagger spec example
 │   ├── devcontainer/             # Sample DevContainer configuration
 │   │   ├── devcontainer.json
-│   │   ├── docker-compose.yml    # db (PostgreSQL 15), cache (KeyDB), app services
+│   │   ├── docker-compose.yml    # app, db (PostgreSQL 15), redis, selenium and ldap services
 │   │   ├── Dockerfile            # References gabrieletassoni/vscode-devcontainers-thecore:3
 │   │   ├── create-db-user.sql
+│   │   ├── ldap-users.ldif       # The `ldap` service's test user (ADR 0010)
 │   │   └── backend.code-workspace
 │   └── insomnia/
 │       └── ApiV2Tests.json       # Insomnia API test collection
