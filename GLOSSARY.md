@@ -4,9 +4,17 @@ The scaffolding/convention framework for Rails apps built on thecore: a host app
 
 ## Language
 
+**ATOM test standard**:
+The single set of rules every ATOM's test suite and CI follow: tests run against its Dummy app on the same database and service versions as the host apps, and CI runs functional, lint and security checks at the agreed moments. Applies both to existing ATOMs and to every ATOM the generators scaffold.
+_Avoid_: testing guidelines, test policy, CI template
+
 **Default module**:
 A gem-owned module carrying an `ApplicationRecord.subclass`'s default behavior (e.g. default `Api::` serialization shape, default `RailsAdmin::` navigation config), generically `include`d into every subclass at boot rather than requiring a per-model generated concern file. Only models needing genuine customization get a hand-maintained concern on top. See ADR 0001.
 _Avoid_: base concern, shared concern, ApplicationRecord mixin
+
+**Dummy app**:
+The minimal host app inside an ATOM's repository (`test/dummy`) against which that ATOM's test suite runs; it declares only that ATOM as an explicit dependency, so every other gem reaches it through the ATOM's own gemspec.
+_Avoid_: test app, test host, sandbox app
 
 **Generator hook**:
 The `config.app_generators.orm :thecore` mechanism a gem's Railtie registers so that Rails' own `rails generate model`/`rails generate migration` commands transparently run thecore's scaffolding — no new command name for developers to learn. Distinct from a *new* `thecore:*`-namespaced generator (used only where Rails has no native command to override, e.g. ATOM or Action scaffolding). See ADR 0002.
