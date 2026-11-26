@@ -233,13 +233,13 @@ The `a` (or `json_attrs`) parameter lets the client specify exactly which fields
 |---|---|---|
 | `only` | Array | Include only these fields |
 | `except` | Array | Exclude these fields |
-| `methods` | Array | Include results of these model methods |
+| `methods` | Array | Include results of these model methods (see the rules below) |
 | `include` | Object | Include associated models (accepts the same keys recursively) |
 
 Example — select specific fields and a method:
 
-```
-GET /api/v2/users?a[only][]=locked&a[only][]=username&a[methods][]=jwe_data
+```bash
+GET /api/v2/projects?a[only][]=id&a[only][]=name&a[methods][]=customer_id
 ```
 
 Returns:
@@ -247,12 +247,20 @@ Returns:
 ```json
 [
   {
-    "username": "Administrator",
-    "locked": false,
-    "jwe_data": "eyJhbGci..."
+    "id": 12,
+    "name": "Plant maintenance",
+    "customer_id": 3
   }
 ]
 ```
+
+What a client may ask for follows conventions (model_driven_api >= 3.18.0, its ADR 0006), with no list to maintain:
+
+- `include` accepts real associations only.
+- Secrets a model hides by default (a hidden column named like a secret, such as Devise's `encrypted_password`) never come back.
+- `methods` serves the methods the model declares in `json_attrs[:methods]`, columns, associations, `<association>_ids`, and public methods written in the app or in a Thecore ATOM (not ending in `!` or `=`, without required arguments), which run read-only.
+
+Anything else is dropped from the response and logged; the response stays 200. A frontend that needs another method asks for it to be declared in the model's `json_attrs[:methods]`.
 
 ---
 
